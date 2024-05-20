@@ -1,0 +1,521 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<link href="coqdocjs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="coqdocjs.js"></script>
+</head>
+
+<body onload="document.getElementById('content').focus()">
+  <div id="header">
+    <span class="left">
+      <span class="modulename"> <script> document.write(document.title) </script> </span>
+    </span>
+
+    <span class="button" id="toggle-proofs"></span>
+
+    <span class="right">
+      <a href="https://github.com/ianshil/iS4">Project Page</a>
+      <a href="./indexpage.html"> Index </a>
+      <a href="./toc.html"> Table of Contents </a>
+    </span>
+</div>
+    <div id="content" tabindex="-1" onblur="document.getElementById('content').focus()">
+    <div id="main">
+<h1 class="libtitle">GG_translation</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Arith.Arith.html#"><span class="id" title="library">Arith</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.micromega.Lia.html#"><span class="id" title="library">Lia</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Sets.Ensembles.html#"><span class="id" title="library">Ensembles</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Wf.html#"><span class="id" title="library">Init.Wf</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Syntax.im_syntax.html#"><span class="id" title="library">im_syntax</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="GHC.CKH_export.html#"><span class="id" title="library">CKH_export</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Kripke.kripke_export.html#"><span class="id" title="library">kripke_export</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <a id="GG" class="idref" href="#GG"><span class="id" title="section">GG</span></a>.<br/>
+
+<br/>
+<span class="comment">(*&nbsp;GG&nbsp;should&nbsp;work&nbsp;here.&nbsp;*)</span><br/>
+
+<br/>
+<span class="comment">(*&nbsp;<br/>
+<span class="comment">(*&nbsp;We&nbsp;could&nbsp;hope&nbsp;that&nbsp;CK&nbsp;validates&nbsp;the&nbsp;GG&nbsp;translation&nbsp;thanks&nbsp;to<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;following.&nbsp;*)</span><br/>
+<br/>
+Lemma&nbsp;DNE_Box_Bot&nbsp;Γ&nbsp;:&nbsp;iS4H_prv&nbsp;(Γ,&nbsp;(¬&nbsp;(¬&nbsp;(Box&nbsp;Bot)))&nbsp;--&gt;&nbsp;Box&nbsp;Bot).<br/>
+Proof.<br/>
+apply&nbsp;Strong_Completeness.&nbsp;intros&nbsp;M&nbsp;x&nbsp;HΓ.<br/>
+intros&nbsp;y&nbsp;Rxy&nbsp;Hy.<br/>
+intros&nbsp;u&nbsp;Hu.<br/>
+exfalso.&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+apply&nbsp;Hy&nbsp;with&nbsp;y.<br/>
+-&nbsp;apply&nbsp;reach_refl.<br/>
+-&nbsp;intros.&nbsp;pose&nbsp;(H0&nbsp;u&nbsp;Hu).<br/>
+&nbsp;&nbsp;pose&nbsp;(Hu&nbsp;v).&nbsp;apply&nbsp;i.<br/>
+&nbsp;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;i_T&nbsp;;&nbsp;auto.<br/>
+Qed.<br/>
+<br/>
+<span class="comment">(*&nbsp;But&nbsp;it&nbsp;does&nbsp;not.&nbsp;To&nbsp;show&nbsp;this,&nbsp;we&nbsp;create&nbsp;an&nbsp;interior<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;preorder&nbsp;model&nbsp;with&nbsp;three&nbsp;points&nbsp;A,&nbsp;B&nbsp;and&nbsp;C&nbsp;such<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;that&nbsp;A&nbsp;forces&nbsp;¬&nbsp;¬&nbsp;Box&nbsp;0,&nbsp;but&nbsp;does&nbsp;not&nbsp;force&nbsp;Box&nbsp;¬&nbsp;¬&nbsp;0.&nbsp;*)</span><br/>
+<br/>
+<span class="comment">(*&nbsp;We&nbsp;first&nbsp;construct&nbsp;the&nbsp;model.&nbsp;*)</span><br/>
+<br/>
+Inductive&nbsp;ABC&nbsp;&nbsp;:&nbsp;Type&nbsp;:=<br/>
+&nbsp;|&nbsp;A&nbsp;:&nbsp;ABC<br/>
+&nbsp;|&nbsp;B&nbsp;:&nbsp;ABC<br/>
+&nbsp;|&nbsp;C&nbsp;:&nbsp;ABC.<br/>
+<br/>
+Definition&nbsp;ABCreach&nbsp;(n&nbsp;m&nbsp;:&nbsp;ABC)&nbsp;:&nbsp;Prop&nbsp;:=<br/>
+&nbsp;&nbsp;match&nbsp;n&nbsp;with<br/>
+&nbsp;&nbsp;&nbsp;|&nbsp;A&nbsp;=&gt;&nbsp;match&nbsp;m&nbsp;with<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;A&nbsp;=&gt;&nbsp;True<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;B&nbsp;=&gt;&nbsp;True<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;C&nbsp;=&gt;&nbsp;False<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end<br/>
+&nbsp;&nbsp;&nbsp;|&nbsp;B&nbsp;=&gt;&nbsp;match&nbsp;m&nbsp;with<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;A&nbsp;=&gt;&nbsp;False<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;B&nbsp;=&gt;&nbsp;True<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;C&nbsp;=&gt;&nbsp;False<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end<br/>
+&nbsp;&nbsp;&nbsp;|&nbsp;C&nbsp;=&gt;&nbsp;match&nbsp;m&nbsp;with<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;A&nbsp;=&gt;&nbsp;False<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;B&nbsp;=&gt;&nbsp;False<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;C&nbsp;=&gt;&nbsp;True<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end<br/>
+&nbsp;&nbsp;end.<br/>
+<br/>
+Lemma&nbsp;ABCreach_refl&nbsp;:&nbsp;forall&nbsp;n,&nbsp;ABCreach&nbsp;n&nbsp;n.<br/>
+Proof.<br/>
+intros.&nbsp;destruct&nbsp;n&nbsp;;&nbsp;unfold&nbsp;ABCreach&nbsp;;&nbsp;auto.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;ABCreach_trans&nbsp;:&nbsp;forall&nbsp;n&nbsp;m&nbsp;k,&nbsp;(ABCreach&nbsp;n&nbsp;m)&nbsp;-&gt;&nbsp;(ABCreach&nbsp;m&nbsp;k)&nbsp;-&gt;&nbsp;(ABCreach&nbsp;n&nbsp;k).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;ABCreach&nbsp;in&nbsp;*&nbsp;;&nbsp;destruct&nbsp;n&nbsp;;&nbsp;auto&nbsp;;&nbsp;destruct&nbsp;m&nbsp;;&nbsp;auto&nbsp;;&nbsp;destruct&nbsp;k&nbsp;;&nbsp;auto.<br/>
+Qed.<br/>
+<br/>
+<span class="comment">(*&nbsp;We&nbsp;can&nbsp;create&nbsp;a&nbsp;preord_set&nbsp;of&nbsp;the&nbsp;following&nbsp;form&nbsp;(omitting&nbsp;reflexive&nbsp;arrows):&nbsp;<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(A)&nbsp;==<span class="inlinecode"><span class="id" title="var">ABCreach</span></span>==&gt;&nbsp;(B)<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(C)<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;So,&nbsp;B&nbsp;can&nbsp;be&nbsp;reached&nbsp;by&nbsp;A,&nbsp;and&nbsp;C&nbsp;is&nbsp;an&nbsp;isolated&nbsp;point.&nbsp;*)</span><br/>
+<br/>
+Instance&nbsp;P&nbsp;:&nbsp;preord_set&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nodes&nbsp;:=&nbsp;ABC&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reachable&nbsp;:=&nbsp;ABCreach&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reach_refl&nbsp;u&nbsp;:=&nbsp;ABCreach_refl&nbsp;u&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reach_tran&nbsp;u&nbsp;v&nbsp;w&nbsp;:=&nbsp;@ABCreach_trans&nbsp;u&nbsp;v&nbsp;w<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+<span class="comment">(*&nbsp;We&nbsp;manually&nbsp;define&nbsp;some&nbsp;upsets&nbsp;in&nbsp;P&nbsp;(the&nbsp;canonical&nbsp;ones).&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;ABC_is_upset&nbsp;:&nbsp;forall&nbsp;w,&nbsp;((Triple&nbsp;_&nbsp;A&nbsp;B&nbsp;C)&nbsp;w)&nbsp;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;y,&nbsp;reachable&nbsp;w&nbsp;y&nbsp;-&gt;&nbsp;((Triple&nbsp;_&nbsp;A&nbsp;B&nbsp;C)&nbsp;y).<br/>
+&nbsp;&nbsp;Proof.<br/>
+&nbsp;&nbsp;intros.&nbsp;destruct&nbsp;y&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;Instance&nbsp;ABC_upset&nbsp;:&nbsp;upset&nbsp;P&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uset&nbsp;:=&nbsp;Triple&nbsp;_&nbsp;A&nbsp;B&nbsp;C;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_upset&nbsp;:=&nbsp;ABC_is_upset<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;AB_is_upset&nbsp;:&nbsp;forall&nbsp;w,&nbsp;((Couple&nbsp;_&nbsp;A&nbsp;B)&nbsp;w)&nbsp;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;y,&nbsp;reachable&nbsp;w&nbsp;y&nbsp;-&gt;&nbsp;((Couple&nbsp;_&nbsp;A&nbsp;B)&nbsp;y).<br/>
+&nbsp;&nbsp;Proof.<br/>
+&nbsp;&nbsp;intros.&nbsp;inversion&nbsp;H&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;reachable&nbsp;in&nbsp;H0&nbsp;;&nbsp;destruct&nbsp;y&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;Instance&nbsp;AB_upset&nbsp;:&nbsp;upset&nbsp;P&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uset&nbsp;:=&nbsp;Couple&nbsp;_&nbsp;A&nbsp;B;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_upset&nbsp;:=&nbsp;AB_is_upset<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;BC_is_upset&nbsp;:&nbsp;forall&nbsp;w,&nbsp;((Couple&nbsp;_&nbsp;B&nbsp;C)&nbsp;w)&nbsp;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;y,&nbsp;reachable&nbsp;w&nbsp;y&nbsp;-&gt;&nbsp;((Couple&nbsp;_&nbsp;B&nbsp;C)&nbsp;y).<br/>
+&nbsp;&nbsp;Proof.<br/>
+&nbsp;&nbsp;intros.&nbsp;inversion&nbsp;H&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;reachable&nbsp;in&nbsp;H0&nbsp;;&nbsp;destruct&nbsp;y&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;Instance&nbsp;BC_upset&nbsp;:&nbsp;upset&nbsp;P&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uset&nbsp;:=&nbsp;Couple&nbsp;_&nbsp;B&nbsp;C;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_upset&nbsp;:=&nbsp;BC_is_upset<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;B_is_upset&nbsp;:&nbsp;forall&nbsp;w,&nbsp;((Singleton&nbsp;_&nbsp;B)&nbsp;w)&nbsp;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;y,&nbsp;reachable&nbsp;w&nbsp;y&nbsp;-&gt;&nbsp;((Singleton&nbsp;_&nbsp;B)&nbsp;y).<br/>
+&nbsp;&nbsp;Proof.<br/>
+&nbsp;&nbsp;intros.&nbsp;inversion&nbsp;H&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;reachable&nbsp;in&nbsp;H0&nbsp;;&nbsp;destruct&nbsp;y&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;Instance&nbsp;B_upset&nbsp;:&nbsp;upset&nbsp;P&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uset&nbsp;:=&nbsp;Singleton&nbsp;_&nbsp;B;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_upset&nbsp;:=&nbsp;B_is_upset<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;C_is_upset&nbsp;:&nbsp;forall&nbsp;w,&nbsp;((Singleton&nbsp;_&nbsp;C)&nbsp;w)&nbsp;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;y,&nbsp;reachable&nbsp;w&nbsp;y&nbsp;-&gt;&nbsp;((Singleton&nbsp;_&nbsp;C)&nbsp;y).<br/>
+&nbsp;&nbsp;Proof.<br/>
+&nbsp;&nbsp;intros.&nbsp;inversion&nbsp;H&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;reachable&nbsp;in&nbsp;H0&nbsp;;&nbsp;destruct&nbsp;y&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;Instance&nbsp;C_upset&nbsp;:&nbsp;upset&nbsp;P&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uset&nbsp;:=&nbsp;Singleton&nbsp;_&nbsp;C;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_upset&nbsp;:=&nbsp;C_is_upset<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+&nbsp;&nbsp;Lemma&nbsp;Empty_is_upset&nbsp;:&nbsp;forall&nbsp;w,&nbsp;((Empty_set&nbsp;_)&nbsp;w)&nbsp;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forall&nbsp;y,&nbsp;reachable&nbsp;w&nbsp;y&nbsp;-&gt;&nbsp;((Empty_set&nbsp;_)&nbsp;y).<br/>
+&nbsp;&nbsp;Proof.<br/>
+&nbsp;&nbsp;intros.&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;Qed.<br/>
+<br/>
+&nbsp;&nbsp;Instance&nbsp;Empty_upset&nbsp;:&nbsp;upset&nbsp;P&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uset&nbsp;:=&nbsp;Empty_set&nbsp;_;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_upset&nbsp;:=&nbsp;Empty_is_upset<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+<span class="comment">(*&nbsp;Then&nbsp;we&nbsp;turn&nbsp;to&nbsp;the&nbsp;definition&nbsp;of&nbsp;our&nbsp;interior&nbsp;operator.&nbsp;*)</span><br/>
+<br/>
+Definition&nbsp;i_P&nbsp;:&nbsp;(upset&nbsp;P)&nbsp;-&gt;&nbsp;(upset&nbsp;P).<br/>
+Proof.<br/>
+intro.&nbsp;destruct&nbsp;X.<br/>
+exists&nbsp;(fun&nbsp;x&nbsp;=&gt;<br/>
+&nbsp;&nbsp;((uset&nbsp;A&nbsp;/\&nbsp;uset&nbsp;B&nbsp;/\&nbsp;uset&nbsp;C))&nbsp;\/&nbsp;<span class="comment">(*&nbsp;For&nbsp;{A,B,C}&nbsp;*)</span><br/>
+&nbsp;&nbsp;(uset&nbsp;A&nbsp;/\&nbsp;uset&nbsp;B&nbsp;/\&nbsp;(~&nbsp;(uset&nbsp;C))&nbsp;/\&nbsp;x&nbsp;=&nbsp;B)&nbsp;\/&nbsp;<span class="comment">(*&nbsp;For&nbsp;{A,B}&nbsp;*)</span><br/>
+&nbsp;&nbsp;(~&nbsp;(uset&nbsp;A)&nbsp;/\&nbsp;uset&nbsp;B&nbsp;/\&nbsp;~&nbsp;(uset&nbsp;C)&nbsp;/\&nbsp;x&nbsp;=&nbsp;B)&nbsp;\/&nbsp;<span class="comment">(*&nbsp;For&nbsp;{B}&nbsp;*)</span><br/>
+&nbsp;&nbsp;((~&nbsp;(uset&nbsp;A))&nbsp;/\&nbsp;(~&nbsp;(uset&nbsp;B))&nbsp;/\&nbsp;uset&nbsp;C&nbsp;/\&nbsp;x&nbsp;=&nbsp;C)&nbsp;\/&nbsp;<span class="comment">(*&nbsp;For&nbsp;{C}&nbsp;*)</span><br/>
+&nbsp;&nbsp;((~&nbsp;(uset&nbsp;A))&nbsp;/\&nbsp;uset&nbsp;B&nbsp;/\&nbsp;uset&nbsp;C&nbsp;/\&nbsp;(x&nbsp;=&nbsp;B&nbsp;\/&nbsp;x&nbsp;=&nbsp;C))&nbsp;<span class="comment">(*&nbsp;For&nbsp;{B,C}&nbsp;*)</span><br/>
+).<br/>
+intros&nbsp;D&nbsp;H0.&nbsp;destruct&nbsp;H0&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">H0</span>]]]</span>&nbsp;;<br/>
+intros&nbsp;E&nbsp;reachDE.<br/>
+destruct&nbsp;H0&nbsp;as&nbsp;(H1&nbsp;&amp;&nbsp;H2&nbsp;&amp;&nbsp;H3)&nbsp;;&nbsp;auto.<br/>
+all:&nbsp;destruct&nbsp;H0&nbsp;as&nbsp;(H1&nbsp;&amp;&nbsp;H2&nbsp;&amp;&nbsp;H3&nbsp;&amp;&nbsp;H4)&nbsp;;&nbsp;unfold&nbsp;reachable&nbsp;in&nbsp;reachDE&nbsp;;&nbsp;subst.<br/>
+-&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;repeat&nbsp;split&nbsp;;&nbsp;auto.&nbsp;destruct&nbsp;E&nbsp;;&nbsp;auto&nbsp;;&nbsp;subst&nbsp;;&nbsp;try&nbsp;contradiction.<br/>
+-&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;repeat&nbsp;split&nbsp;;&nbsp;auto.&nbsp;destruct&nbsp;E&nbsp;;&nbsp;auto&nbsp;;&nbsp;subst&nbsp;;&nbsp;try&nbsp;contradiction.<br/>
+-&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;repeat&nbsp;split&nbsp;;&nbsp;auto.&nbsp;destruct&nbsp;E&nbsp;;&nbsp;auto&nbsp;;&nbsp;subst&nbsp;;&nbsp;try&nbsp;contradiction.<br/>
+-&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;repeat&nbsp;split&nbsp;;&nbsp;auto.&nbsp;destruct&nbsp;H4&nbsp;;&nbsp;subst&nbsp;;&nbsp;auto&nbsp;;&nbsp;destruct&nbsp;E&nbsp;;&nbsp;auto&nbsp;;&nbsp;subst&nbsp;;&nbsp;try&nbsp;contradiction.<br/>
+Defined.<br/>
+<br/>
+<span class="comment">(*&nbsp;The&nbsp;next&nbsp;lemma&nbsp;shows&nbsp;that&nbsp;upset&nbsp;in&nbsp;our&nbsp;preord_set&nbsp;have&nbsp;a&nbsp;canonical&nbsp;representation.&nbsp;Note&nbsp;that&nbsp;in&nbsp;the<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;proof&nbsp;of&nbsp;it,&nbsp;we&nbsp;use&nbsp;LEM:&nbsp;as&nbsp;Ensembles&nbsp;are&nbsp;functions&nbsp;to&nbsp;Prop&nbsp;in&nbsp;Coq,&nbsp;and&nbsp;thus&nbsp;our&nbsp;upsets&nbsp;are&nbsp;defined&nbsp;over<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;these&nbsp;functions,&nbsp;to&nbsp;prove&nbsp;that&nbsp;two&nbsp;functions&nbsp;are&nbsp;equal&nbsp;we&nbsp;can&nbsp;assume&nbsp;LEM.&nbsp;We&nbsp;could&nbsp;get&nbsp;rid&nbsp;of&nbsp;this&nbsp;feature<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;by&nbsp;requiring&nbsp;that&nbsp;our&nbsp;semantics&nbsp;accepts&nbsp;only&nbsp;upsets&nbsp;which&nbsp;are&nbsp;decidable.&nbsp;*)</span><br/>
+<br/>
+Lemma&nbsp;canonical_form_upset_P&nbsp;:&nbsp;forall&nbsp;(u&nbsp;:&nbsp;upset&nbsp;P),&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Triple&nbsp;_&nbsp;A&nbsp;B&nbsp;C)&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Couple&nbsp;_&nbsp;A&nbsp;B)&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Couple&nbsp;_&nbsp;B&nbsp;C)&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Singleton&nbsp;_&nbsp;B)&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Singleton&nbsp;_&nbsp;C)&nbsp;\/<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Empty_set&nbsp;_).<br/>
+Proof.<br/>
+intros.&nbsp;destruct&nbsp;u.&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+destruct&nbsp;(LEM&nbsp;(uset&nbsp;A)).<br/>
+-&nbsp;destruct&nbsp;(LEM&nbsp;(uset&nbsp;C)).<br/>
+&nbsp;&nbsp;+&nbsp;left.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;+&nbsp;right.&nbsp;left.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;destruct&nbsp;(LEM&nbsp;(uset&nbsp;B)).<br/>
+&nbsp;&nbsp;+&nbsp;destruct&nbsp;(LEM&nbsp;(uset&nbsp;C)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;right.&nbsp;right.&nbsp;left.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;right.&nbsp;right.&nbsp;right.&nbsp;left.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;+&nbsp;destruct&nbsp;(LEM&nbsp;(uset&nbsp;C)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;right.&nbsp;right.&nbsp;right.&nbsp;right.&nbsp;left.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;right.&nbsp;right.&nbsp;right.&nbsp;right.&nbsp;right.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_ABC&nbsp;:&nbsp;forall&nbsp;(u&nbsp;:&nbsp;upset&nbsp;P),&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Triple&nbsp;_&nbsp;A&nbsp;B&nbsp;C)&nbsp;-&gt;&nbsp;(@uset&nbsp;_&nbsp;(i_P&nbsp;u)&nbsp;=&nbsp;Triple&nbsp;_&nbsp;A&nbsp;B&nbsp;C).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;destruct&nbsp;u&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+-&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.&nbsp;left.&nbsp;rewrite&nbsp;H&nbsp;;&nbsp;firstorder.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_AB&nbsp;:&nbsp;forall&nbsp;(u&nbsp;:&nbsp;upset&nbsp;P),&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Couple&nbsp;_&nbsp;A&nbsp;B)&nbsp;-&gt;&nbsp;(@uset&nbsp;_&nbsp;(i_P&nbsp;u)&nbsp;=&nbsp;Singleton&nbsp;_&nbsp;B).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;destruct&nbsp;u&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+-&nbsp;subst.&nbsp;destruct&nbsp;HD&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">H0</span>]]]</span>&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;1,4,6:&nbsp;inversion&nbsp;H1.<br/>
+&nbsp;&nbsp;1-3:&nbsp;rewrite&nbsp;H2&nbsp;;&nbsp;apply&nbsp;In_singleton.<br/>
+-&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;subst.&nbsp;right.&nbsp;left&nbsp;;&nbsp;firstorder.&nbsp;intro.&nbsp;inversion&nbsp;H.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_BC&nbsp;:&nbsp;forall&nbsp;(u&nbsp;:&nbsp;upset&nbsp;P),&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Couple&nbsp;_&nbsp;B&nbsp;C)&nbsp;-&gt;&nbsp;(@uset&nbsp;_&nbsp;(i_P&nbsp;u)&nbsp;=&nbsp;Couple&nbsp;_&nbsp;B&nbsp;C).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;destruct&nbsp;u&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+-&nbsp;subst.&nbsp;destruct&nbsp;HD&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">H0</span>]]]</span>&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;1-2:&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;1-4:&nbsp;rewrite&nbsp;H2&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;right.&nbsp;right.&nbsp;subst.&nbsp;right.&nbsp;right.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;1-2:&nbsp;intro&nbsp;;&nbsp;inversion&nbsp;H.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_B&nbsp;:&nbsp;forall&nbsp;(u&nbsp;:&nbsp;upset&nbsp;P),&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Singleton&nbsp;_&nbsp;B)&nbsp;-&gt;&nbsp;(@uset&nbsp;_&nbsp;(i_P&nbsp;u)&nbsp;=&nbsp;Singleton&nbsp;_&nbsp;B).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;destruct&nbsp;u&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+-&nbsp;subst.&nbsp;destruct&nbsp;HD&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">H0</span>]]]</span>&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;1-2:&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;1-3:&nbsp;rewrite&nbsp;H2&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;right.&nbsp;right.&nbsp;subst.&nbsp;left.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;1-2:&nbsp;intro&nbsp;;&nbsp;inversion&nbsp;H.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_C&nbsp;:&nbsp;forall&nbsp;(u&nbsp;:&nbsp;upset&nbsp;P),&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Singleton&nbsp;_&nbsp;C)&nbsp;-&gt;&nbsp;(@uset&nbsp;_&nbsp;(i_P&nbsp;u)&nbsp;=&nbsp;Singleton&nbsp;_&nbsp;C).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;destruct&nbsp;u&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+-&nbsp;subst.&nbsp;destruct&nbsp;HD&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">H0</span>]]]</span>&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;1:&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;1-3:&nbsp;rewrite&nbsp;H2&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;right.&nbsp;right.&nbsp;subst.&nbsp;right&nbsp;;&nbsp;left.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;1-2:&nbsp;intro&nbsp;;&nbsp;inversion&nbsp;H.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_Empty&nbsp;:&nbsp;forall&nbsp;(u&nbsp;:&nbsp;upset&nbsp;P),&nbsp;(@uset&nbsp;_&nbsp;u&nbsp;=&nbsp;Empty_set&nbsp;_)&nbsp;-&gt;&nbsp;(@uset&nbsp;_&nbsp;(i_P&nbsp;u)&nbsp;=&nbsp;Empty_set&nbsp;_).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;destruct&nbsp;u&nbsp;;&nbsp;simpl&nbsp;in&nbsp;*.<br/>
+apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;auto.<br/>
+-&nbsp;destruct&nbsp;HD&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">H0</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">H0</span>]]]</span>&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;inversion&nbsp;HD.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_P_unit&nbsp;:&nbsp;i_P&nbsp;(unit_upset&nbsp;P)&nbsp;=&nbsp;(unit_upset&nbsp;P).<br/>
+Proof.<br/>
+apply&nbsp;upset_prf_irrel.&nbsp;rewrite&nbsp;i_ABC&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;;&nbsp;unfold&nbsp;nodes&nbsp;in&nbsp;*.<br/>
+all:&nbsp;unfold&nbsp;unit_upset&nbsp;;&nbsp;apply&nbsp;Extensionality_Ensembles&nbsp;;&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;<br/>
+destruct&nbsp;D&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_P_inter&nbsp;:&nbsp;forall&nbsp;u0&nbsp;u1,&nbsp;@uset&nbsp;_&nbsp;(i_P&nbsp;(inter_upset&nbsp;P&nbsp;u0&nbsp;u1))&nbsp;=&nbsp;@uset&nbsp;_&nbsp;(inter_upset&nbsp;P&nbsp;(i_P&nbsp;u0)&nbsp;(i_P&nbsp;u1)).<br/>
+Proof.<br/>
+intros&nbsp;u0&nbsp;u1.&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+destruct&nbsp;(canonical_form_upset_P&nbsp;u0)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu0</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu0</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu0</span>]]]]</span>.<br/>
+-&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;Hu0).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;destruct&nbsp;(canonical_form_upset_P&nbsp;u1)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu1</span>]]]]</span>&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-4:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2,4:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1,3:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;inversion&nbsp;H4.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;simpl&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu0).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;destruct&nbsp;(canonical_form_upset_P&nbsp;u1)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu1</span>]]]]</span>&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H4.&nbsp;3-5:&nbsp;inversion&nbsp;H1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H4.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-3:&nbsp;inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H3.&nbsp;1-3:&nbsp;inversion&nbsp;H1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H3&nbsp;in&nbsp;H6&nbsp;;&nbsp;inversion&nbsp;H6.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;simpl&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu0).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;destruct&nbsp;(canonical_form_upset_P&nbsp;u1)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu1</span>]]]]</span>&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-4:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;4:&nbsp;inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-3:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-4:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-3:&nbsp;inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-4:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;inversion&nbsp;H4.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;simpl&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu0).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;destruct&nbsp;(canonical_form_upset_P&nbsp;u1)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu1</span>]]]]</span>&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1,3:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;all:&nbsp;inversion&nbsp;H1.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;4:&nbsp;inversion&nbsp;H3.&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;1-2:&nbsp;inversion&nbsp;H1.&nbsp;inversion&nbsp;H.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2,4:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;1-2:&nbsp;inversion&nbsp;H1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;all:&nbsp;inversion&nbsp;H1.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H3.&nbsp;inversion&nbsp;H1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;inversion&nbsp;H4.&nbsp;inversion&nbsp;H3.&nbsp;inversion&nbsp;H1.&nbsp;inversion&nbsp;H4.&nbsp;inversion&nbsp;H4.&nbsp;inversion&nbsp;H.&nbsp;rewrite&nbsp;H3&nbsp;in&nbsp;H6&nbsp;;&nbsp;inversion&nbsp;H6.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;simpl&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu0).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;destruct&nbsp;(canonical_form_upset_P&nbsp;u1)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu1</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu1</span>]]]]</span>&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H0.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1,3:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;inversion&nbsp;H0.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;4:&nbsp;inversion&nbsp;H3.&nbsp;inversion&nbsp;H0.&nbsp;1-2:&nbsp;inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H3&nbsp;in&nbsp;H6&nbsp;;&nbsp;inversion&nbsp;H6.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;inversion&nbsp;H0.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1,3:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;left&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;1-2:&nbsp;inversion&nbsp;H0.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H2&nbsp;in&nbsp;*&nbsp;;&nbsp;simpl&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;right&nbsp;;&nbsp;firstorder&nbsp;;&nbsp;intro&nbsp;G&nbsp;;&nbsp;inversion&nbsp;G.&nbsp;all:&nbsp;inversion&nbsp;H0.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.&nbsp;1,3-5,7-8:&nbsp;inversion&nbsp;H0.&nbsp;1-2:inversion&nbsp;H3.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;rewrite&nbsp;H3&nbsp;in&nbsp;H6&nbsp;;&nbsp;inversion&nbsp;H6.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;firstorder.<br/>
+&nbsp;&nbsp;+&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;Hu1).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;simpl&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.&nbsp;apply&nbsp;Extensionality_Ensembles.&nbsp;split&nbsp;;&nbsp;intros&nbsp;D&nbsp;HD&nbsp;;&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;&nbsp;1-2:&nbsp;simpl&nbsp;in&nbsp;*&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;subst&nbsp;;&nbsp;destruct&nbsp;u0&nbsp;;&nbsp;destruct&nbsp;u1&nbsp;;&nbsp;subst&nbsp;;&nbsp;simpl&nbsp;;&nbsp;firstorder.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_P_T&nbsp;:&nbsp;forall&nbsp;u,&nbsp;Included&nbsp;_&nbsp;(@uset&nbsp;P&nbsp;(i_P&nbsp;u))&nbsp;(@uset&nbsp;P&nbsp;u).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset.&nbsp;intros&nbsp;D&nbsp;HD.&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+destruct&nbsp;(canonical_form_upset_P&nbsp;u)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu</span>]]]]</span>&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;Hu&nbsp;in&nbsp;*.<br/>
+-&nbsp;destruct&nbsp;D&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+Qed.<br/>
+<br/>
+Lemma&nbsp;i_P_4&nbsp;:&nbsp;forall&nbsp;u,&nbsp;Included&nbsp;_&nbsp;(@uset&nbsp;P&nbsp;(i_P&nbsp;u))&nbsp;(@uset&nbsp;P&nbsp;(i_P&nbsp;(i_P&nbsp;u))).<br/>
+Proof.<br/>
+intros.&nbsp;unfold&nbsp;uset.&nbsp;intros&nbsp;D&nbsp;HD.&nbsp;unfold&nbsp;In&nbsp;in&nbsp;*.<br/>
+destruct&nbsp;(canonical_form_upset_P&nbsp;u)&nbsp;as&nbsp;<span class="inlinecode"><span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode">[<span class="id" title="var">Hu</span></span> <span class="inlinecode">|</span> <span class="inlinecode"><span class="id" title="var">Hu</span>]]]]</span>&nbsp;;&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*.<br/>
+-&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;pose&nbsp;(i_ABC&nbsp;_&nbsp;e).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e0&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_AB&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;e).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e0&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;pose&nbsp;(i_BC&nbsp;_&nbsp;e).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e0&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;pose&nbsp;(i_B&nbsp;_&nbsp;e).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e0&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;pose&nbsp;(i_C&nbsp;_&nbsp;e).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e0&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+-&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;Hu).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e&nbsp;in&nbsp;*.<br/>
+&nbsp;&nbsp;pose&nbsp;(i_Empty&nbsp;_&nbsp;e).&nbsp;unfold&nbsp;uset&nbsp;in&nbsp;*&nbsp;;&nbsp;rewrite&nbsp;e0&nbsp;in&nbsp;*.&nbsp;inversion&nbsp;HD&nbsp;;&nbsp;firstorder.<br/>
+Qed.<br/>
+<br/>
+Definition&nbsp;val_P&nbsp;:&nbsp;nat&nbsp;-&gt;&nbsp;(upset&nbsp;P)&nbsp;:=<br/>
+fun&nbsp;n&nbsp;=&gt;&nbsp;match&nbsp;n&nbsp;with<br/>
+|&nbsp;0&nbsp;=&gt;&nbsp;B_upset<br/>
+|&nbsp;S&nbsp;n&nbsp;=&gt;&nbsp;Empty_upset<br/>
+end.<br/>
+<br/>
+<span class="comment">(*&nbsp;We&nbsp;finally&nbsp;can&nbsp;define&nbsp;our&nbsp;model.&nbsp;*)</span><br/>
+<br/>
+Instance&nbsp;M&nbsp;:&nbsp;model&nbsp;:=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pre&nbsp;:=&nbsp;P&nbsp;;<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i&nbsp;:=&nbsp;i_P&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_unit&nbsp;:=&nbsp;i_P_unit&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_inter&nbsp;:=&nbsp;i_P_inter&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_T&nbsp;:=&nbsp;i_P_T&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_4&nbsp;:=&nbsp;i_P_4&nbsp;;<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;val&nbsp;:=&nbsp;val_P&nbsp;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+<br/>
+<span class="comment">(*&nbsp;We&nbsp;show&nbsp;that&nbsp;our&nbsp;model&nbsp;is&nbsp;indeed&nbsp;a&nbsp;countermodel<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;the&nbsp;formula&nbsp;mentioned&nbsp;initially.&nbsp;*)</span><br/>
+<br/>
+Lemma&nbsp;Failure&nbsp;:&nbsp;(iS4H_prv&nbsp;(Empty_set&nbsp;_,&nbsp;(¬&nbsp;(¬&nbsp;(Box&nbsp;( 0)))) --> Box (¬ (¬ (&nbsp;0)))))&nbsp;-&gt;&nbsp;False.<br/>
+Proof.<br/>
+intro.&nbsp;apply&nbsp;Soundness&nbsp;in&nbsp;H.&nbsp;simpl&nbsp;in&nbsp;H.<br/>
+epose&nbsp;(H&nbsp;M&nbsp;A).<br/>
+assert&nbsp;(H0:&nbsp;forall&nbsp;ψ&nbsp;:&nbsp;form,&nbsp;In&nbsp;form&nbsp;(Empty_set&nbsp;form)&nbsp;ψ&nbsp;-&gt;&nbsp;forces&nbsp;M&nbsp;A&nbsp;ψ).<br/>
+intros&nbsp;psi&nbsp;Hpsi&nbsp;;&nbsp;inversion&nbsp;Hpsi.<br/>
+<br/>
+<span class="comment">(*&nbsp;A&nbsp;forces&nbsp;the&nbsp;antecendent.&nbsp;*)</span><br/>
+assert&nbsp;(H1:&nbsp;forces&nbsp;M&nbsp;A&nbsp;((¬&nbsp;(¬&nbsp;Box&nbsp; 0)))).
+intros D reachAD HD. unfold reachable in reachAD. simpl in reachAD.
+destruct D ; auto ; simpl.
+1-2: apply HD with B ; auto ; intros ; unfold uset in * ; simpl in H1.
+1-2: assert (J: (let (uset, _) := u in uset) = Singleton ABC B).
+1,3: apply Extensionality_Ensembles ; split ; intros E HE ; firstorder.
+1-2: pose (i_B u J) ; unfold uset in e ; unfold i ; simpl ; rewrite <- e in H1.
+1-2: apply H1 ; destruct u ; rewrite J ; firstorder.
+
+(* But A forcing the consequent leads to a contradiction. *)</span><br/>
+<span class="id" title="tactic">assert</span> (<span class="id" title="var">F</span>: <span class="id" title="var">forces</span> <span class="id" title="var">M</span> <span class="id" title="var">A</span> (<span class="id" title="var">Box</span> (¬ (¬ # 0)))).<br/>
+<span class="id" title="tactic">pose</span> (<span class="id" title="var">f</span> <span class="id" title="var">H0</span> <span class="id" title="var">A</span> (<span class="id" title="var">reach_refl</span> <span class="id" title="var">A</span>)). <span class="id" title="tactic">simpl</span> <span class="id" title="tactic">in</span> <span class="id" title="var">f0</span>. <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">intros</span>.<br/>
+<span class="id" title="tactic">apply</span> <span class="id" title="var">f0</span> ; <span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="var">epose</span> (<span class="id" title="var">force_Box_interior_truthset</span> <span class="id" title="var">_</span> <span class="id" title="var">M</span> <span class="id" title="var">A</span>). <span class="id" title="tactic">destruct</span> <span class="id" title="var">i</span>.<br/>
+<span class="id" title="tactic">clear</span> <span class="id" title="var">H3</span>. <span class="id" title="tactic">pose</span> (<span class="id" title="var">H2</span> <span class="id" title="var">F</span>). <span class="id" title="tactic">unfold</span> <span class="id" title="var">uset</span> <span class="id" title="tactic">in</span> <span class="id" title="var">u</span>.<br/>
+<span class="id" title="tactic">assert</span> ((<span class="id" title="keyword">let</span> (<span class="id" title="var">uset</span>, <span class="id" title="var">_</span>) := (<span class="id" title="var">truthset_upset</span> <span class="id" title="var">M</span> (¬ (¬ # 0))) <span class="id" title="tactic">in</span> <span class="id" title="var">uset</span>) = <span class="id" title="var">Couple</span> <span class="id" title="var">_</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span>).<br/>
+{ <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">Extensionality_Ensembles</span>. <span class="id" title="tactic">split</span> ; <span class="id" title="tactic">intros</span> <span class="id" title="var">D</span> <span class="id" title="var">HD</span> ; <span class="id" title="tactic">unfold</span> <span class="id" title="var">In</span> <span class="id" title="tactic">in</span> *.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">destruct</span> <span class="id" title="var">D</span>. 1-2: <span class="id" title="tactic">firstorder</span>. <span class="id" title="var">exfalso</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">HD</span> <span class="id" title="keyword">with</span> <span class="id" title="var">C</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">I</span>. <span class="id" title="tactic">intros</span>. <span class="id" title="tactic">destruct</span> <span class="id" title="var">v</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">inversion</span> <span class="id" title="var">H4</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">inversion</span> <span class="id" title="var">HD</span> ; <span class="id" title="tactic">subst</span>. <span class="id" title="tactic">intros</span>. <span class="id" title="tactic">destruct</span> <span class="id" title="var">v</span> ; <span class="id" title="tactic">auto</span>. 1-2: <span class="id" title="tactic">apply</span> <span class="id" title="var">H4</span> <span class="id" title="keyword">with</span> <span class="id" title="var">B</span> ; <span class="id" title="tactic">auto</span> ; <span class="id" title="tactic">apply</span> <span class="id" title="var">In_singleton</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>. <span class="id" title="tactic">destruct</span> <span class="id" title="var">v</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">H4</span> <span class="id" title="keyword">with</span> <span class="id" title="var">B</span> ; <span class="id" title="tactic">auto</span> ; <span class="id" title="tactic">apply</span> <span class="id" title="var">In_singleton</span>. }<br/>
+<span class="id" title="tactic">apply</span> <span class="id" title="var">i_AB</span> <span class="id" title="tactic">in</span> <span class="id" title="var">H3</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="var">uset</span> <span class="id" title="tactic">in</span> <span class="id" title="var">H3</span>.<br/>
+<span class="id" title="tactic">unfold</span> <span class="id" title="var">i</span> <span class="id" title="tactic">in</span> <span class="id" title="var">u</span>. <span class="id" title="tactic">destruct</span> (<span class="id" title="var">truthset_upset</span> <span class="id" title="var">M</span> (¬ (¬ # 0))). <span class="id" title="tactic">simpl</span> <span class="id" title="tactic">in</span> <span class="id" title="var">u</span>. <span class="id" title="tactic">simpl</span> <span class="id" title="tactic">in</span> <span class="id" title="var">H3</span>.<br/>
+<span class="id" title="tactic">assert</span> (<span class="id" title="var">Singleton</span> <span class="id" title="var">ABC</span> <span class="id" title="var">B</span> <span class="id" title="var">A</span>). <span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="var">H3</span>.<br/>
+<span class="id" title="tactic">destruct</span> <span class="id" title="var">u</span> <span class="id" title="keyword">as</span> [(<span class="id" title="var">u0</span> &amp; <span class="id" title="var">u1</span> &amp; <span class="id" title="var">u2</span>) | [(<span class="id" title="var">u0</span> &amp; <span class="id" title="var">u1</span> &amp; <span class="id" title="var">u2</span> &amp; <span class="id" title="var">u3</span>) | [(<span class="id" title="var">u0</span> &amp; <span class="id" title="var">u1</span> &amp; <span class="id" title="var">u2</span> &amp; <span class="id" title="var">u3</span>) | [(<span class="id" title="var">u0</span> &amp; <span class="id" title="var">u1</span> &amp; <span class="id" title="var">u2</span> &amp; <span class="id" title="var">u3</span>) | (<span class="id" title="var">u0</span> &amp; <span class="id" title="var">u1</span> &amp; <span class="id" title="var">u2</span> &amp; <span class="id" title="var">u3</span>)]]]] ; <span class="id" title="tactic">subst</span> ; <span class="id" title="tactic">auto</span>.<br/>
+1-4: <span class="id" title="tactic">inversion</span> <span class="id" title="var">u3</span> ; <span class="id" title="tactic">inversion</span> <span class="id" title="var">H4</span>. <span class="id" title="tactic">inversion</span> <span class="id" title="var">H4</span>.<br/>
+<span class="id" title="keyword">Qed</span>. *)<br/>
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="GG_translation.html#GG"><span class="id" title="section">GG</span></a>.<br/>
+</div>
+</div>
+<div id="footer">
+  Generated by <a href="http://coq.inria.fr/">coqdoc</a> and improved with <a href="https://github.com/tebbi/coqdocjs">CoqdocJS</a>
+</div>
+</div>
+</body>
+
+</html>

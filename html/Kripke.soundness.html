@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<link href="coqdocjs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="coqdocjs.js"></script>
+</head>
+
+<body onload="document.getElementById('content').focus()">
+  <div id="header">
+    <span class="left">
+      <span class="modulename"> <script> document.write(document.title) </script> </span>
+    </span>
+
+    <span class="button" id="toggle-proofs"></span>
+
+    <span class="right">
+      <a href="https://github.com/ianshil/iS4">Project Page</a>
+      <a href="./indexpage.html"> Index </a>
+      <a href="./toc.html"> Table of Contents </a>
+    </span>
+</div>
+    <div id="content" tabindex="-1" onblur="document.getElementById('content').focus()">
+    <div id="main">
+<h1 class="libtitle">Kripke.soundness</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Lists.List.html#"><span class="id" title="library">List</span></a>.<br/>
+<span class="id" title="keyword">Export</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Lists.List.html#ListNotations"><span class="id" title="module">ListNotations</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Arith.Arith.html#"><span class="id" title="library">Arith</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.micromega.Lia.html#"><span class="id" title="library">Lia</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Sets.Ensembles.html#"><span class="id" title="library">Ensembles</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Syntax.im_syntax.html#"><span class="id" title="library">im_syntax</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="GHC.CKH_export.html#"><span class="id" title="library">CKH_export</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Kripke.kripke_sem.html#"><span class="id" title="library">kripke_sem</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="Ax_valid" class="idref" href="#Ax_valid"><span class="id" title="lemma">Ax_valid</span></a> : <span class="id" title="keyword">forall</span> <a id="A:1" class="idref" href="#A:1"><span class="id" title="binder">A</span></a>, <a class="idref" href="GHC.CKH.html#Axioms"><span class="id" title="definition">Axioms</span></a> <a class="idref" href="Kripke.soundness.html#A:1"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">(</span></a><span class="id" title="keyword">forall</span> <a id="M:2" class="idref" href="#M:2"><span class="id" title="binder">M</span></a> <a id="w:3" class="idref" href="#w:3"><span class="id" title="binder">w</span></a>, <a class="idref" href="Kripke.kripke_sem.html#forces"><span class="id" title="definition">forces</span></a> <a class="idref" href="Kripke.soundness.html#M:2"><span class="id" title="variable">M</span></a> <a class="idref" href="Kripke.soundness.html#w:3"><span class="id" title="variable">w</span></a> <a class="idref" href="Kripke.soundness.html#A:1"><span class="id" title="variable">A</span></a><a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">)</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+<span class="id" title="tactic">intros</span> <span class="id" title="var">A</span> <span class="id" title="var">Ax</span>. <span class="id" title="tactic">destruct</span> <span class="id" title="var">Ax</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Ax</span> | <span class="id" title="var">Ax</span>].<br/>
+<span class="comment">(*&nbsp;Intuitionistic&nbsp;axioms&nbsp;*)</span><br/>
++ <span class="id" title="tactic">inversion</span> <span class="id" title="var">Ax</span> ; <span class="id" title="var">cbn</span> ; <span class="id" title="tactic">intros</span> ; <span class="id" title="tactic">subst</span> ; <span class="id" title="var">cbn</span> ; <span class="id" title="tactic">intros</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#Persistence"><span class="id" title="lemma">Persistence</span></a> <span class="id" title="keyword">with</span> (<span class="id" title="var">w</span>:=<span class="id" title="var">v</span>) ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> <span class="id" title="var">H0</span> <span class="id" title="keyword">with</span> <span class="id" title="var">v1</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_tran"><span class="id" title="method">ireach_tran</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">v0</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_refl"><span class="id" title="method">ireach_refl</span></a>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">destruct</span> <span class="id" title="var">H4</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">H0</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_tran"><span class="id" title="method">ireach_tran</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">v0</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">destruct</span> <span class="id" title="var">H0</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">destruct</span> <span class="id" title="var">H0</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">split</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">H0</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_tran"><span class="id" title="method">ireach_tran</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">v0</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">H2</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">subst</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#Expl"><span class="id" title="lemma">Expl</span></a>.<br/>
+<span class="comment">(*&nbsp;Modal&nbsp;axioms&nbsp;*)</span><br/>
++ <span class="id" title="tactic">inversion</span> <span class="id" title="var">Ax</span> ; <span class="id" title="var">cbn</span> ; <span class="id" title="tactic">intros</span> ; <span class="id" title="tactic">subst</span> ; <span class="id" title="var">cbn</span> ; <span class="id" title="tactic">intros</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;K1&nbsp;*)</span><br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> <span class="id" title="var">H0</span> <span class="id" title="keyword">with</span> <span class="id" title="var">v1</span> <span class="id" title="var">u</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_tran"><span class="id" title="method">ireach_tran</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">v0</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_refl"><span class="id" title="method">ireach_refl</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="var">H2</span> <span class="id" title="keyword">with</span> <span class="id" title="var">v1</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;K2&nbsp;*)</span><br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">destruct</span> (<span class="id" title="var">H2</span> <span class="id" title="var">_</span> <span class="id" title="var">H3</span>) <span class="id" title="keyword">as</span> (<span class="id" title="var">u</span> &amp; <span class="id" title="var">Hu1</span> &amp; <span class="id" title="var">Hu2</span>). <span class="id" title="tactic">exists</span> <span class="id" title="var">u</span>. <span class="id" title="tactic">split</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">H0</span> <span class="id" title="keyword">with</span> <span class="id" title="var">v1</span> <span class="id" title="var">u</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_tran"><span class="id" title="method">ireach_tran</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">v0</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_refl"><span class="id" title="method">ireach_refl</span></a>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="Soundness" class="idref" href="#Soundness"><span class="id" title="lemma">Soundness</span></a> : <span class="id" title="keyword">forall</span> <a id="9cfd66c80bf9988ea8f7104e167ac5cd" class="idref" href="#9cfd66c80bf9988ea8f7104e167ac5cd"><span class="id" title="binder">Γ</span></a> <a id="phi:5" class="idref" href="#phi:5"><span class="id" title="binder">phi</span></a>, <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">(</span></a><a class="idref" href="GHC.CKH.html#CKH_prv"><span class="id" title="inductive">CKH_prv</span></a> <a class="idref" href="Kripke.soundness.html#9cfd66c80bf9988ea8f7104e167ac5cd"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Kripke.soundness.html#phi:5"><span class="id" title="variable">phi</span></a><a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a>  <a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">(</span></a><a class="idref" href="Kripke.kripke_sem.html#loc_conseq"><span class="id" title="definition">loc_conseq</span></a> <a class="idref" href="Kripke.soundness.html#9cfd66c80bf9988ea8f7104e167ac5cd"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Kripke.soundness.html#phi:5"><span class="id" title="variable">phi</span></a><a class="idref" href="http://coq.inria.fr/distrib/V8.18.0/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">)</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+<span class="id" title="tactic">intros</span> <span class="id" title="var">Γ</span> <span class="id" title="var">phi</span> <span class="id" title="var">D</span>. <span class="id" title="tactic">induction</span> <span class="id" title="var">D</span> ; <span class="id" title="tactic">intros</span> <span class="id" title="var">C</span> <span class="id" title="var">w</span> <span class="id" title="var">Hw</span>.<br/>
+<span class="comment">(*&nbsp;Id&nbsp;*)</span><br/>
+- <span class="id" title="tactic">apply</span> <span class="id" title="var">Hw</span> ; <span class="id" title="tactic">auto</span>.<br/>
+<span class="comment">(*&nbsp;Ax&nbsp;*)</span><br/>
+- <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.soundness.html#Ax_valid"><span class="id" title="lemma">Ax_valid</span></a> ; <span class="id" title="tactic">auto</span>.<br/>
+<span class="comment">(*&nbsp;MP&nbsp;*)</span><br/>
+- <span class="id" title="tactic">unfold</span> <a class="idref" href="Kripke.kripke_sem.html#loc_conseq"><span class="id" title="definition">loc_conseq</span></a> <span class="id" title="tactic">in</span> *. <span class="id" title="var">cbn</span> <span class="id" title="tactic">in</span> *. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHD1</span> <span class="id" title="keyword">with</span> <span class="id" title="var">w</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_refl"><span class="id" title="method">ireach_refl</span></a>.<br/>
+<span class="comment">(*&nbsp;Nec&nbsp;*)</span><br/>
+- <span class="id" title="tactic">subst</span>. <span class="id" title="tactic">unfold</span> <a class="idref" href="Kripke.kripke_sem.html#loc_conseq"><span class="id" title="definition">loc_conseq</span></a> <span class="id" title="tactic">in</span> *. <span class="id" title="var">cbn</span> <span class="id" title="tactic">in</span> *. <span class="id" title="tactic">intros</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHD</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> ; <span class="id" title="var">contradiction</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+</div>
+<div id="footer">
+  Generated by <a href="http://coq.inria.fr/">coqdoc</a> and improved with <a href="https://github.com/tebbi/coqdocjs">CoqdocJS</a>
+</div>
+</div>
+</body>
+
+</html>
