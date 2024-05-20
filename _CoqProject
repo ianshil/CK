@@ -1,0 +1,5 @@
+-R theories/general General
+-R theories/GHC GHC
+-R theories/Syntax Syntax
+-R theories/Kripke Kripke
+theories
