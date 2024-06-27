@@ -1,0 +1,11 @@
+-R theories/general General
+-R theories/GHC GHC
+-R theories/Syntax Syntax
+-R theories/Kripke Kripke
+-R theories/Soundness Soundness
+-R theories/Completeness_th Complth
+-R theories/Completeness_seg Complseg
+-R theories/Completeness_segAB ComplsegAB
+-R theories/Completeness_segP ComplsegP
+-R theories/Conservativity Conservativity
+theories

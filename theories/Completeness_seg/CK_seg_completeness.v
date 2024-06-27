@@ -1,0 +1,22 @@
+Require Import List.
+Export ListNotations.
+Require Import PeanoNat.
+Require Import Lia.
+Require Import Ensembles.
+
+Require Import im_syntax.
+Require Import CKH_export.
+Require Import kripke_export.
+Require Import general_seg_completeness.
+
+Section CK_completeness.
+
+Definition NoAdAx := fun (x : form) => False.
+
+Theorem CK_Strong_Completeness : forall Γ φ,
+    loc_conseq (fun x => True) Γ φ -> CKH_prv Γ φ.
+Proof.
+apply Strong_Completeness with (FraP:= fun x => True) ; auto.
+Qed.
+
+End CK_completeness.
