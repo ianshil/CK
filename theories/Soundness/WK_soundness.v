@@ -11,10 +11,10 @@ Require Import general_soundness.
 
 Section WK_soundness.
 
-Theorem WK_Soundness : forall Γ phi, (WKH_prv Γ phi) ->  (loc_conseq k5_frame Γ phi).
+Theorem WK_Soundness : forall Γ phi, (WKH_prv Γ phi) ->  (loc_conseq Nd_frame Γ phi).
 Proof.
-apply Soundness. pose correspond_k5.
-intro F ; split ; [intros H A HA ; inversion HA ; subst ; apply i ; auto | intros H ; apply i ; apply H ; unfold k5 ; auto].
+apply Soundness. pose correspond_Nd.
+intro F ; split ; [intros H A HA ; inversion HA ; subst ; apply i ; auto | intros H ; apply i ; apply H ; unfold Nd ; auto].
 Qed.
 
 End WK_soundness.

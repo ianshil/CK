@@ -23,14 +23,14 @@ Inductive IAxioms (F : form) : Prop :=
 (* We then define the modal axioms. *)
 
 Inductive MAxioms (F : form) : Prop :=
- | k1 A B : F = Box (A --> B) --> (Box A --> Box B) -> MAxioms F
- | k2 A B : F = Box (A --> B) --> (Diam A --> Diam B) -> MAxioms F.
+ | Kb A B : F = Box (A --> B) --> (Box A --> Box B) -> MAxioms F
+ | Kd A B : F = Box (A --> B) --> (Diam A --> Diam B) -> MAxioms F.
 
 Definition Axioms (A : form) : Prop := IAxioms A \/ MAxioms A.
 
-Definition k3 A B := (⬦A ∨ B)-->  (⬦A) ∨ (⬦B).
-Definition k4 A B := ((⬦A) --> (☐B)) -->  ☐(A --> B).
-Definition k5 := (⬦⊥) --> ⊥.
+Definition Cd A B := (⬦A ∨ B)-->  (⬦A) ∨ (⬦B).
+Definition Idb A B := ((⬦A) --> (☐B)) -->  ☐(A --> B).
+Definition Nd := (⬦⊥) --> ⊥.
 Definition Ndb := (⬦⊥) --> (☐⊥).
 
 Inductive extCKH_prv (AdAx: form -> Prop) : (form -> Prop) -> form -> Prop :=
@@ -41,17 +41,17 @@ Inductive extCKH_prv (AdAx: form -> Prop) : (form -> Prop) -> form -> Prop :=
 
 Definition CKH_prv := extCKH_prv (fun x => False).
 (* One axiom. *)
-Definition CK3H_prv := extCKH_prv (fun x => exists A B, k3 A B = x).
-Definition CK4H_prv := extCKH_prv (fun x => exists A B, k4 A B = x).
-Definition WKH_prv := extCKH_prv (fun x => k5 = x).
+Definition CKCdH_prv := extCKH_prv (fun x => exists A B, Cd A B = x).
+Definition CKIdbH_prv := extCKH_prv (fun x => exists A B, Idb A B = x).
+Definition WKH_prv := extCKH_prv (fun x => Nd = x).
 Definition CKNdbH_prv := extCKH_prv (fun x => Ndb = x).
 (* Two axioms. *)
-Definition CK34H_prv := extCKH_prv (fun x => exists A B, k3 A B = x \/ k4 A B = x).
-Definition CK35H_prv := extCKH_prv (fun x => (exists A B, k3 A B = x) \/ k5 = x).
-Definition CK45H_prv := extCKH_prv (fun x => (exists A B, k4 A B = x) \/ k5 = x).
-Definition CK3NdbH_prv := extCKH_prv (fun x => (exists A B, k3 A B = x) \/ Ndb = x).
-Definition CK4NdbH_prv := extCKH_prv (fun x => (exists A B, k4 A B = x) \/ Ndb = x).
+Definition CKCdIdbH_prv := extCKH_prv (fun x => exists A B, Cd A B = x \/ Idb A B = x).
+Definition CKCdNdH_prv := extCKH_prv (fun x => (exists A B, Cd A B = x) \/ Nd = x).
+Definition CKIdbNdH_prv := extCKH_prv (fun x => (exists A B, Idb A B = x) \/ Nd = x).
+Definition CKCdNdbH_prv := extCKH_prv (fun x => (exists A B, Cd A B = x) \/ Ndb = x).
+Definition CKIdbNdbH_prv := extCKH_prv (fun x => (exists A B, Idb A B = x) \/ Ndb = x).
 (* Three axioms. *)
-Definition CK34NdbH_prv := extCKH_prv (fun x => (exists A B, k3 A B = x \/ k4 A B = x) \/ Ndb = x).
-Definition IKH_prv := extCKH_prv (fun x => (exists A B, k3 A B = x \/ k4 A B = x) \/ k5 = x).
+Definition CKCdIdbNdbH_prv := extCKH_prv (fun x => (exists A B, Cd A B = x \/ Idb A B = x) \/ Ndb = x).
+Definition IKH_prv := extCKH_prv (fun x => (exists A B, Cd A B = x \/ Idb A B = x) \/ Nd = x).
 

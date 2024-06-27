@@ -8,8 +8,7 @@ Require Import im_syntax.
 Require Import CKH_export.
 Require Import kripke_export.
 
-Require Import Classical.
-
+Axiom LEM : forall P, P \/ ~ P.
 
 Section general_seg_completeness.
 
@@ -212,7 +211,7 @@ Qed.
 
 Lemma cval_expl Γ : forall p, (cval Γ) (cexpl Γ) p.
 Proof.
-intros. unfold cval. destruct (classic (Clos Γ # p)) ; auto.
+intros. unfold cval. destruct (LEM (Clos Γ # p)) ; auto.
 Qed.
 
 
@@ -311,7 +310,7 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   assert (Jψ2: Clos Γ ψ2).
   apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 --> ψ2). split ; simpl ; auto. right.
   apply in_or_app ; right ; destruct ψ2 ; simpl ; auto.
-  destruct (classic (head (ψ1 --> ψ2))) ; auto. exfalso.
+  destruct (LEM (head (ψ1 --> ψ2))) ; auto. exfalso.
   assert (~ extCKH_prv AdAx (Union _ head (Singleton _ ψ1)) ψ2).
   intro. apply extCKH_Deduction_Theorem in H2. apply H1. apply segClosed ; auto.
   assert (Included form (Union _ head (Singleton form ψ1)) (Clos Γ)).
@@ -338,7 +337,7 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
 - assert (Jψ: Clos Γ ψ).
   apply Incl_ClosSubform_Clos. unfold In. exists (Box ψ). split ; simpl ; auto. right.
   destruct ψ ; simpl ; auto. simpl in H0.
-  destruct (classic (head (☐ ψ))) ; auto. exfalso.
+  destruct (LEM (head (☐ ψ))) ; auto. exfalso.
   assert (~ extCKH_prv AdAx (fun x => exists A, (@head _ s) (☐ A) /\ x = A) ψ).
   intro. apply H1. apply segClosed ; auto. apply K_rule in H2.
   apply (extCKH_monot _ _ _ H2). intros B HB. unfold In in *.
@@ -390,11 +389,11 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   apply Incl_ClosSubform_Clos. unfold In. exists (⬦ ψ). split ; simpl ; auto. right.
   destruct ψ ; simpl ; auto.
   simpl in H0.
-  destruct (classic (head (⬦ ψ))) ; auto. exfalso.
+  destruct (LEM (head (⬦ ψ))) ; auto. exfalso.
   assert (R0: forall B, head (⬦ B) -> ~ extCKH_prv AdAx (fun x => exists A, B = x \/ ((@head _ s) (☐ A) /\ x = A)) ψ).
   intros B HB D. apply H1. apply segClosed ; auto.
   apply extCKH_monot with (Γ1:= Union _ (fun x : form => exists A : form, head (☐ A) /\ x = A) (Singleton _ B)) in D.
-  apply extCKH_Deduction_Theorem in D. eapply MP. eapply MP. apply Ax ; left ; right ; eapply k2 ; reflexivity.
+  apply extCKH_Deduction_Theorem in D. eapply MP. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
   apply K_rule in D. apply (extCKH_monot _ _ _ D). intros C HC. unfold In in *.
   destruct HC as (E & (F & HF0 & HF1) & HCE) ; subst ; auto. apply Id ; auto.
   intros C HC. unfold In in *. destruct HC as (E & [HE | (HE0 & HE1)]) ; subst ; auto.
@@ -484,7 +483,7 @@ Theorem Strong_Completeness : forall Γ φ,
     loc_conseq FraP Γ φ -> extCKH_prv AdAx Γ φ.
 Proof.
 intros Γ φ LC. pose (QuasiCompleteness Γ φ).
-destruct (classic (extCKH_prv AdAx Γ φ)) ; auto. exfalso.
+destruct (LEM (extCKH_prv AdAx Γ φ)) ; auto. exfalso.
 apply n ; assumption.
 Qed.
 

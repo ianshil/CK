@@ -14,19 +14,20 @@ Require Import properties.
 Require Import Lindenbaum_lem.
 Require Import Lindenbaum_lem_pair.
 
-Require Import Classical.
 
-Section classical_facts.
+Section LEMal_facts.
 
-  (* To prove strong completeness, we require the strength of classical
+Axiom LEM : forall P, P \/ ~ P.
+
+  (* To prove strong completeness, we require the strength of LEMal
       logic. For this, we declare LEM as an axiom. *)
 
 Lemma LEM_prime Δ :
   quasi_prime Δ  -> prime Δ .
 Proof.
   intros H1 A B H2.
-  apply H1 in H2 ; auto. destruct (classic (Δ  A)) ; auto.
-  destruct (classic (Δ  B)) ; auto. exfalso. apply H2.
+  apply H1 in H2 ; auto. destruct (LEM (Δ  A)) ; auto.
+  destruct (LEM (Δ  B)) ; auto. exfalso. apply H2.
   intro. destruct H3 ; auto.
 Qed.
 
@@ -40,7 +41,7 @@ induction l ; cbn ; intros.
 - exists []. intros ; split ; intros ; auto. inversion H0.
 - assert ((Union form Γ0 Γ1) a). apply H ; auto.
   inversion H0 ; subst.
-  + destruct (classic (Γ1 a)).
+  + destruct (LEM (Γ1 a)).
      { destruct (IHl Γ0 Γ1).
        intros A HA. apply H. auto. exists (a :: x). intros. split ; intros ; cbn ; auto.
        destruct H5 ; subst ; cbn ; auto. right. apply H3 ; auto.
@@ -72,4 +73,4 @@ exists l1. split ; auto.
   right. apply H3 ; auto.
 Qed.
 
-End classical_facts.
+End LEMal_facts.

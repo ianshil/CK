@@ -11,11 +11,11 @@ Require Import general_soundness.
 
 Section IK_soundness.
 
-Definition k345_frame := fun F => k3_frame F /\ k4_frame F /\ k5_frame F.
+Definition CdIdbNb_frame := fun F => Cd_frame F /\ Idb_frame F /\ Nd_frame F.
 
-Theorem IK_Soundness : forall Γ phi, (IKH_prv Γ phi) ->  (loc_conseq k345_frame Γ phi).
+Theorem IK_Soundness : forall Γ phi, (IKH_prv Γ phi) ->  (loc_conseq CdIdbNb_frame Γ phi).
 Proof.
-apply Soundness. pose correspond_k3. pose correspond_k4. pose correspond_k5.
+apply Soundness. pose correspond_Cd. pose correspond_Idb. pose correspond_Nd.
 intro F ; split ; [intros H A HA | intros H ].
 - destruct HA as [ (B & C & J) | J] ; destruct H as (H0 & H1 & H2) ; subst.
   + destruct J ; subst. apply i ; auto. apply i0 ; auto.

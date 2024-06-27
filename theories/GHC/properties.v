@@ -333,7 +333,7 @@ Proof.
 induction l ; cbn ; intros.
 - apply imp_Id_gen.
 - repeat apply extCKH_Deduction_Theorem. eapply MP. auto. eapply MP.
-  eapply MP. apply Ax ; left ; right ; eapply k1 ; reflexivity.
+  eapply MP. apply Ax ; left ; right ; eapply Kb ; reflexivity.
   apply Id ; left ; right ; apply In_singleton. apply Id ; right ;
   apply In_singleton.
 Qed.
@@ -345,7 +345,7 @@ Proof.
 induction l ; cbn ; intros.
 - eapply Nec ; auto.
 - eapply MP. eapply MP. apply Imp_trans. eapply MP.
-  apply Ax ; left ; right ; eapply k1 ; reflexivity.
+  apply Ax ; left ; right ; eapply Kb ; reflexivity.
   eapply Nec ; auto. exact H. apply K_list_Imp.
 Qed.
 
@@ -469,10 +469,10 @@ Proof.
 induction l ; cbn ; intros.
 - apply EFQ.
 - eapply MP. eapply MP. apply Ax ; left ; left ; eapply IA5 ; reflexivity.
-  eapply MP. apply Ax ; left ; right ; eapply k1 ; reflexivity.
+  eapply MP. apply Ax ; left ; right ; eapply Kb ; reflexivity.
   apply Nec. apply Ax ; left ; left ; eapply IA3 ; reflexivity.
   eapply MP. eapply MP. apply Imp_trans.
-  apply IHl. eapply MP. apply Ax ; left ; right ; eapply k1 ; reflexivity.
+  apply IHl. eapply MP. apply Ax ; left ; right ; eapply Kb ; reflexivity.
   apply Nec. apply Ax ; left ; left ; eapply IA4 ; reflexivity.
 Qed.
 
@@ -526,10 +526,10 @@ Proof.
 induction l ; cbn ; intros.
 - eapply MP. apply Thm_irrel. apply prv_Top.
 - eapply MP. eapply MP. apply Ax ; left ; left ; eapply IA8 ; reflexivity.
-  eapply MP. apply Ax ; left ; right ; eapply k2 ; reflexivity.
+  eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
   apply Nec. apply Ax ; left ; left ; eapply IA6 ; reflexivity.
   eapply MP. eapply MP. apply Imp_trans.
-  eapply MP. apply Ax ; left ; right ; eapply k2 ; reflexivity.
+  eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
   apply Nec. apply Ax ; left ; left ; eapply IA7 ; reflexivity.
   apply IHl.
 Qed.
@@ -602,16 +602,16 @@ Qed.
 
 Variable AdAx : form -> Prop.
 
-Definition AdAxk3 := fun x => AdAx x \/ (exists A B, (k3 A B) = x).
+Definition AdAxCd := fun x => AdAx x \/ (exists A B, (Cd A B) = x).
 
 Lemma Diam_distrib_list_disj l : (l <> []) -> (* Sufficient, but necessary? *)
-  forall Γ, extCKH_prv AdAxk3 Γ (⬦ (list_disj l)) -> extCKH_prv AdAxk3 Γ (list_disj (map Diam l)).
+  forall Γ, extCKH_prv AdAxCd Γ (⬦ (list_disj l)) -> extCKH_prv AdAxCd Γ (list_disj (map Diam l)).
 Proof.
 induction l ; cbn ; intros.
 - contradiction.
 - destruct l ; cbn in * ; auto.
   + eapply MP. apply Ax ; left ; left ; eapply IA3 ; reflexivity.
-     eapply MP. 2: exact H0. eapply MP. apply Ax ; left ; right ; eapply k2 ; reflexivity.
+     eapply MP. 2: exact H0. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
      apply Nec. eapply MP. eapply MP. apply Ax ; left ; left ; eapply IA5 ; reflexivity.
      apply imp_Id_gen. apply EFQ.
   + eapply MP. eapply MP. eapply MP. apply Ax ; left ; left ; eapply IA5 ; reflexivity.

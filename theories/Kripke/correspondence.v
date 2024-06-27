@@ -8,12 +8,10 @@ Require Import im_syntax.
 Require Import CKH_export.
 Require Import kripke_sem.
 
-(* Not sure if we need it, but some arguments become much easier with it. *)
-Require Import Classical.
 
+Axiom LEM : forall P, P \/ ~ P.
 
-
-Section k3.
+Section Cd.
 
 
 Definition mupcone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /\ mreachable v w.
@@ -21,13 +19,13 @@ Definition mdowncone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /
 Definition iupcone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /\ ireachable v w.
 Definition idowncone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /\ ireachable w v.
 
-(* A sufficient condition to prove the axiom k3 (⬦φ ∨ ψ)-->  (⬦φ) ∨ (⬦ψ) is given below. *)
+(* A sufficient condition to prove the axiom Cd (⬦φ ∨ ψ)-->  (⬦φ) ∨ (⬦ψ) is given below. *)
 
-Definition suff_k3_frame (F : frame) := forall x, exists x', ireachable x x' /\
+Definition suff_Cd_frame (F : frame) := forall x, exists x', ireachable x x' /\
         forall y z, ireachable x y -> mreachable x' z -> exists w, mreachable y w /\ ireachable z w.
 
-Lemma sufficient_k3 : forall F,
-                  suff_k3_frame F -> forall φ ψ, fvalid F (k3 φ ψ).
+Lemma sufficient_Cd : forall F,
+                  suff_Cd_frame F -> forall φ ψ, fvalid F (Cd φ ψ).
 Proof.
 intros F H φ ψ M frameEq w v iwv Hv ; subst ; cbn in *.
 destruct (H v) as (x & Hx0 & Hx1).
@@ -37,38 +35,38 @@ destruct Hu1.
 - right. intros. destruct (Hx1 _ _ H1 Hu0) as (y & Hy0 & Hy1). exists y ; split;  auto. apply Persistence with u ; auto.
 Qed.
 
-Definition strong_k3_frame (F : frame) := forall w v u, ireachable w v -> mreachable w u -> exists x, mreachable v x /\ ireachable u x.
+Definition strong_Cd_frame (F : frame) := forall w v u, ireachable w v -> mreachable w u -> exists x, mreachable v x /\ ireachable u x.
 
-Lemma strong_is_suff_k3 : forall F,
-                  strong_k3_frame F -> suff_k3_frame F.
+Lemma strong_is_suff_Cd : forall F,
+                  strong_Cd_frame F -> suff_Cd_frame F.
 Proof.
 intros F HF x. exists x ; repeat split.
 - apply ireach_refl.
 - intros. destruct (HF _ _ _ H H0). exists x0 ; firstorder.
 Qed.
 
-(* The axiom k3 corresponds to the following frame property. *)
+(* The axiom Cd corresponds to the following frame property. *)
 
-Definition k3_frame (F : frame) := forall x y z, ireachable x y -> ireachable x z ->
+Definition Cd_frame (F : frame) := forall x y z, ireachable x y -> ireachable x z ->
                                      ~ (mdowncone F (Singleton _ expl) y) -> ~ (mdowncone F (Singleton _ expl) z) ->
                     exists w, ireachable x w /\
                                   Included _ (mupcone F (Singleton _ w)) (idowncone F (mupcone F (Singleton _ y))) /\
                                   Included _ (mupcone F (Singleton _ w)) (idowncone F (mupcone F (Singleton _ z))).
 
-Lemma correspond_k3: forall F,
-                  k3_frame F <-> forall φ ψ, fvalid F (k3 φ ψ).
+Lemma correspond_Cd: forall F,
+                  Cd_frame F <-> forall φ ψ, fvalid F (Cd φ ψ).
 Proof.
 intros F ; split ; intro H.
 - intros φ ψ M frameEq w v iwv Hv ; subst.
-  epose (classic _). destruct o as [P | NP] ; [exact P | exfalso ].
+  epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso ].
   assert (exists y, ireachable v y /\ forall s, mreachable y s -> ~ forces M s φ).
-  { epose (classic _). destruct o as [P0 | NP0] ; [exact P0 | exfalso ].
-    apply NP. left. intros u ivu. epose (classic _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
+  { epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | exfalso ].
+    apply NP. left. intros u ivu. epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
     apply NP0. exists u. split ; auto. intros. intro. apply NP1. exists s ; split ; auto. }
   destruct H0 as (y &Hy0 & Hy1).
   assert (exists z, ireachable v z /\ forall s, mreachable z s -> ~ forces M s ψ).
-  { epose (classic _). destruct o as [P0 | NP0] ; [exact P0 | exfalso ].
-    apply NP. right. intros u ivu. epose (classic _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
+  { epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | exfalso ].
+    apply NP. right. intros u ivu. epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
     apply NP0. exists u. split ; auto. intros. intro. apply NP1. exists s ; split ; auto. }
   destruct H0 as (z &Hz0 & Hz1).
   destruct (H _ _ _ Hy0 Hz0) as (w0 & J0 & J1 & J2).
@@ -85,7 +83,7 @@ intros F ; split ; intro H.
   destruct H0 as (t & K0 & K1). destruct K0 as (s & K2 & K3).
   inversion K2 ; subst. apply Hz1 with t ; auto. apply Persistence with u ; auto.
 - intros x y z H0 H1 R0 R1.
-  epose (classic _). destruct o as [P | NP] ; [exact P | exfalso ].
+  epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso ].
   remember (fun (v : nodes) (p : nat) => (~ (idowncone F (mupcone F (Singleton _ y)) v) /\ p = 0) \/
                                                                (~ (idowncone F (mupcone F (Singleton _ z)) v) /\ p = 1) \/ v = expl) as Val.
   assert (J0: forall u v : nodes, ireachable u v -> forall p : nat, Val u p -> Val v p).
@@ -107,19 +105,19 @@ intros F ; split ; intro H.
        - apply K1. exists x0. split. exists z ; split ; auto. apply In_singleton. apply ireach_refl.
        - subst. apply R1. exists expl. split ; auto. apply In_singleton. }
   assert (forces m x (⬦ ((#0) ∨ (#1)))).
-  { intros v ixv. epose (classic _). destruct o as [P0 | NP0] ; [exact P0 | exfalso ].
+  { intros v ixv. epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | exfalso ].
     apply NP. exists v. repeat split ; auto. 1-2: intros s Hs.
-    epose (classic _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
+    epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
     apply NP0. exists s. split. destruct Hs as (k & HK0 & HK1) ; inversion HK0 ; subst ; auto.
     left. cbn. subst. left ; split ; auto.
-    epose (classic _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
+    epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
     apply NP0. exists s. split. destruct Hs as (k & HK0 & HK1) ; inversion HK0 ; subst ; auto.
     right. cbn. subst. right ; left ; split ; auto. }
    apply H2. cbn. pose (H (# 0) (# 1) m (eq_refl) x). apply f. apply ireach_refl.
     apply H3.
 Qed.
 
-Lemma suff_impl_k3  : forall F, suff_k3_frame F -> k3_frame F.
+Lemma suff_impl_Cd  : forall F, suff_Cd_frame F -> Cd_frame F.
 Proof.
 intros F H x y z ixy ixz Hy Hz.
 destruct (H x) as (w & Hw0 & Hw1). exists w. repeat split ; auto.
@@ -131,7 +129,7 @@ destruct (H x) as (w & Hw0 & Hw1). exists w. repeat split ; auto.
   exists z ; auto. repeat split ; auto.
 Qed.
 
-End k3.
+End Cd.
 
 
 
@@ -139,21 +137,21 @@ End k3.
 
 
 
-Section k4.
+Section Idb.
 
-Definition suff_k4_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z ->
+Definition suff_Idb_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z ->
                     exists u, ireachable x u /\
                                   Included _ (iupcone F (Singleton _ u)) (mdowncone F (iupcone F (Singleton _ z))) /\
                                   mreachable u z.
 
-Lemma sufficient_k4 : forall F,
-                  suff_k4_frame F -> forall φ ψ, fvalid F (k4 φ ψ).
+Lemma sufficient_Idb : forall F,
+                  suff_Idb_frame F -> forall φ ψ, fvalid F (Idb φ ψ).
 Proof.
 intros F H φ ψ M frameEq x y ixy Hy ; subst.
-- epose (classic _). destruct o as [P | NP] ; [exact P | exfalso ].
+- epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso ].
   assert (exists u v w, ireachable y u /\ mreachable u v /\ ireachable v w /\ forces M w φ /\ ~ forces M w ψ).
-  { epose (classic _). destruct o as [P0 | NP0] ; [exact P0 | ].
-    exfalso. apply NP. intros u ivu r mur s irs Hs ; subst. epose (classic _). destruct o as [P1 | NP1] ; [exact P1 | ].
+  { epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | ].
+    exfalso. apply NP. intros u ivu r mur s irs Hs ; subst. epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | ].
     exfalso. apply NP0. exists u,r,s. repeat split ; auto. }
   destruct H0 as (u & v & w & iyu & muv & ivw & Hw & NHw).
   destruct (H _ _ _ muv ivw) as (u0 & iuu0 & cones & mu0w).
@@ -170,24 +168,24 @@ intros F H φ ψ M frameEq x y ixy Hy ; subst.
   apply ireach_tran with u ; auto.
 Qed.
 
-(* The axiom k4 ((⬦φ) --> (☐ψ)) -->  ☐(φ --> ψ) corresponds to the following frame property. *)
+(* The axiom Idb ((⬦φ) --> (☐ψ)) -->  ☐(φ --> ψ) corresponds to the following frame property. *)
 
-Definition k4_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z -> z <> expl ->
+Definition Idb_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z -> z <> expl ->
                     exists u v w, ireachable x u /\
                                   Included _ (iupcone F (Singleton _ u)) (Union _ (mdowncone F (iupcone F (Singleton _ z))) (mdowncone F (Singleton _ expl))) /\
                                   ireachable u v /\
                                   mreachable v w /\
                                   ireachable w z.
 
-Lemma correspond_k4: forall F,
-                  k4_frame F <-> forall φ ψ, fvalid F (k4 φ ψ).
+Lemma correspond_Idb: forall F,
+                  Idb_frame F <-> forall φ ψ, fvalid F (Idb φ ψ).
 Proof.
 intros F ; split ; intro Hyp.
 - intros φ ψ M frameEq x y ixy Hyv ; subst.
-  epose (classic _). destruct o as [P | NP] ; [exact P | exfalso ].
+  epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso ].
   assert (exists u v w, ireachable y u /\ mreachable u v /\ ireachable v w /\ forces M w φ /\ ~ forces M w ψ).
-  { epose (classic _). destruct o as [P0 | NP0] ; [exact P0 | ].
-    exfalso. apply NP. intros u ivu r mur s irs Hs ; subst. epose (classic _). destruct o as [P1 | NP1] ; [exact P1 | ].
+  { epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | ].
+    exfalso. apply NP. intros u ivu r mur s irs Hs ; subst. epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | ].
     exfalso. apply NP0. exists u,r,s. repeat split ; auto. }
   destruct H as (u & v & w & iyu & muv & ivw & Hw & NHw).
   destruct (Hyp _ _ _ muv ivw) as (u0 & v0 & w0 & iuu0 & cones & iu0v0 & mv0w0 & iw0w).
@@ -229,26 +227,26 @@ intros F ; split ; intro Hyp.
   { intro. apply H. pose (Hyp (#0) (#1) m eq_refl x).
     cbn in *. apply f ; auto. apply ireach_refl. }
   assert (exists s, ireachable x s /\ forces m s (⬦ # 0) /\ ~ forces m s (☐ # 1)).
-  { epose (classic _). destruct o as [P | NP] ; [exact P | ].
-    exfalso. apply H0. intros v ixv Hv. epose (classic _). destruct o as [P0 | NP0] ; [exact P0 | ].
+  { epose (LEM _). destruct o as [P | NP] ; [exact P | ].
+    exfalso. apply H0. intros v ixv Hv. epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | ].
     exfalso. apply NP. exists v ; repeat split ; auto. }
   destruct H1 as (s & Hs0 & Hs1 & Hs2).
   exists s.
   assert (exists v w, ireachable s v /\ mreachable v w /\ ~ forces m w (# 1)).
-  { epose (classic _). destruct o as [P | NP] ; [exact P | exfalso].
-     apply Hs2. intros v isv w mvw. epose (classic _). destruct o as [P0 | NP0] ; [exact P0 | exfalso].
+  { epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso].
+     apply Hs2. intros v isv w mvw. epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | exfalso].
      apply NP. exists v. exists w. repeat split ; auto. }
   destruct H1 as (v & w & isv & mvw & Hw).
   exists v. exists w. repeat split ; auto.
   + intros u Hu. destruct Hu as (t & K0 & K1). inversion K0 ; subst. unfold In.
      destruct (Hs1 _ K1) as (e & K2 & K3). destruct K3. destruct H1 ; left ; exists e ; split ; auto.
      destruct H1. exfalso ; lia. subst. right. exists expl ; split ; auto. apply In_singleton.
-  + cbn in Hw. subst. epose (classic _). destruct o as [P | NP] ; [exact P | exfalso].
+  + cbn in Hw. subst. epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso].
     apply Hw. right. left. split ; auto. intro. apply NP. destruct H1 as (x0 & K0 & K1).
     inversion K0 ; subst ; auto.
 Qed.
 
-Lemma suff_impl_k4  : forall F, suff_k4_frame F -> k4_frame F.
+Lemma suff_impl_Idb  : forall F, suff_Idb_frame F -> Idb_frame F.
 Proof.
 intros F H x y z ixy myz Hz. destruct (H _ _ _ ixy myz) as (u & Hu0 & Hu1 & Hu2).
 exists u. exists u. exists z. repeat split ; auto.
@@ -256,7 +254,7 @@ exists u. exists u. exists z. repeat split ; auto.
 intros w Hw. left ; auto.
 Qed.
 
-End k4.
+End Idb.
 
 
 
@@ -264,26 +262,26 @@ End k4.
 
 
 
-Section k5.
+Section Nd.
 
-(* A sufficient condition to prove the axiom k5 (⬦⊥) --> ⊥ is that only expl can modally reach expl. *)
+(* A sufficient condition to prove the axiom Nd (⬦⊥) --> ⊥ is that only expl can modally reach expl. *)
 
-Definition suff_k5_frame (F : frame) := forall w, mreachable w expl -> w = expl.
+Definition suff_Nd_frame (F : frame) := forall w, mreachable w expl -> w = expl.
 
-Lemma sufficient_k5 : forall F,
-                  suff_k5_frame F -> fvalid F k5.
+Lemma sufficient_Nd : forall F,
+                  suff_Nd_frame F -> fvalid F Nd.
 Proof.
 intros F H M frameEq w v iwv Hv ; subst ; cbn in *.
 apply H. destruct (Hv _ (ireach_refl v)) as (u & Hu0 & Hu1) ; subst ; auto.
 Qed.
 
-(* The axiom k5 corresponds to the following frame property: if all intuitionistic
+(* The axiom Nd corresponds to the following frame property: if all intuitionistic
     successors of a world w are such that the can modally reach expl, then w is expl. *)
 
-Definition k5_frame (F : frame) := forall w, (forall v, ireachable w v -> mreachable v expl) -> w = expl.
+Definition Nd_frame (F : frame) := forall w, (forall v, ireachable w v -> mreachable v expl) -> w = expl.
 
-Lemma correspond_k5 : forall F,
-                  k5_frame F <-> fvalid F k5.
+Lemma correspond_Nd : forall F,
+                  Nd_frame F <-> fvalid F Nd.
 Proof.
 intro F ; split ; intro H.
 - intros M frameEq w v iwv Hv ; subst ; cbn in *. apply H.
@@ -298,40 +296,40 @@ intro F ; split ; intro H.
   apply ireach_refl. intros. exists expl ; split ; auto.
 Qed.
 
-Lemma suff_impl_k5  : forall F, suff_k5_frame F -> k5_frame F.
+Lemma suff_impl_Nd  : forall F, suff_Nd_frame F -> Nd_frame F.
 Proof.
 intros F H x Hx. apply H. apply Hx. apply ireach_refl.
 Qed.
 
-End k5.
+End Nd.
 
 
 
 
 
 
-Section suff_k34.
+Section suff_Cd4.
 
 
-(* While we did not present a sufficient condition for k4, we can find one once
-    both k3 and k4 are present. *)
+(* While we did not present a sufficient condition for Idb, we can find one once
+    both Cd and Idb are present. *)
 
-Definition weak_k4_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z -> exists w, ireachable x w /\ mreachable w z.
+Definition weak_Idb_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z -> exists w, ireachable x w /\ mreachable w z.
 
-Definition strong_k3_weak_k4_frame (F : frame) := strong_k3_frame F /\ weak_k4_frame F.
+Definition strong_Cd_weak_Idb_frame (F : frame) := strong_Cd_frame F /\ weak_Idb_frame F.
 
-Lemma strong_k3_weak_k4_k34 : forall F, strong_k3_weak_k4_frame F -> (k3_frame F /\ k4_frame F).
+Lemma strong_Cd_weak_Idb_Cd_Idb : forall F, strong_Cd_weak_Idb_frame F -> (Cd_frame F /\ Idb_frame F).
 Proof.
 intros F H. destruct H ; split.
-- apply correspond_k3. intros. apply strong_is_suff_k3 in H. apply sufficient_k3 with (φ:=φ) (ψ:=ψ) in H ; auto.
+- apply correspond_Cd. intros. apply strong_is_suff_Cd in H. apply sufficient_Cd with (φ:=φ) (ψ:=ψ) in H ; auto.
 - intros x y z mxy iyz Hz. destruct (H0 _ _ _ mxy iyz). destruct H1. exists x0. exists x0. exists z.
   repeat split ; auto. 2-3: apply ireach_refl.
   intros v Hv. destruct Hv as (w & Hw1 & Hw2). unfold In. inversion Hw1 ; subst.
-  unfold suff_k3_frame in H. destruct (H _ _ _ Hw2 H2). destruct H3. left. exists x0.
+  unfold suff_Cd_frame in H. destruct (H _ _ _ Hw2 H2). destruct H3. left. exists x0.
   split ; auto. exists z ; split ; auto. apply In_singleton.
 Qed.
 
-End suff_k34.
+End suff_Cd4.
 
 
 
@@ -339,7 +337,7 @@ End suff_k34.
 
 Section Ndb.
 
-(* A sufficient condition to prove the axiom k5 (⬦⊥) --> (☐ ⊥) is that only expl can modally reach expl. *)
+(* A sufficient condition to prove the axiom Nd (⬦⊥) --> (☐ ⊥) is that only expl can modally reach expl. *)
 
 Definition suff_Ndb_frame (F : frame) := forall w, mreachable w expl -> (forall v, mreachable w v -> v = expl).
 

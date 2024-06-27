@@ -18,7 +18,7 @@ intros A f Ax. destruct Ax.
    [ eapply IA1 ; reflexivity | eapply IA2 ; reflexivity | eapply IA3 ; reflexivity |
      eapply IA4 ; reflexivity | eapply IA5 ; reflexivity | eapply IA6 ; reflexivity |
      eapply IA7 ; reflexivity | eapply IA8 ; reflexivity | eapply IA9 ; reflexivity].
-+ destruct H ; right ; subst ; cbn ; [ eapply k1 ; reflexivity | eapply k2 ; reflexivity].
++ destruct H ; right ; subst ; cbn ; [ eapply Kb ; reflexivity | eapply Kd ; reflexivity].
 Qed.
 
 Theorem extCKH_monot : forall Γ A,
