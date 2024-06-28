@@ -24,17 +24,6 @@ Definition idowncone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /
 Definition suff_Cd_frame (F : frame) := forall x, exists x', ireachable x x' /\
         forall y z, ireachable x y -> mreachable x' z -> exists w, mreachable y w /\ ireachable z w.
 
-Lemma sufficient_Cd : forall F,
-                  suff_Cd_frame F -> forall φ ψ, fvalid F (Cd φ ψ).
-Proof.
-intros F H φ ψ M frameEq w v iwv Hv ; subst ; cbn in *.
-destruct (H v) as (x & Hx0 & Hx1).
-destruct (Hv _ Hx0) as (u & Hu0 & Hu1) ; subst ; auto.
-destruct Hu1.
-- left. intros. destruct (Hx1 _ _ H1 Hu0) as (y & Hy0 & Hy1). exists y ; split;  auto. apply Persistence with u ; auto.
-- right. intros. destruct (Hx1 _ _ H1 Hu0) as (y & Hy0 & Hy1). exists y ; split;  auto. apply Persistence with u ; auto.
-Qed.
-
 Definition strong_Cd_frame (F : frame) := forall w v u, ireachable w v -> mreachable w u -> exists x, mreachable v x /\ ireachable u x.
 
 Lemma strong_is_suff_Cd : forall F,
@@ -129,6 +118,12 @@ destruct (H x) as (w & Hw0 & Hw1). exists w. repeat split ; auto.
   exists z ; auto. repeat split ; auto.
 Qed.
 
+Lemma sufficient_Cd : forall F,
+                  suff_Cd_frame F -> forall φ ψ, fvalid F (Cd φ ψ).
+Proof.
+intros F H φ ψ. apply correspond_Cd. apply suff_impl_Cd ; auto.
+Qed.
+
 End Cd.
 
 
@@ -143,30 +138,6 @@ Definition suff_Idb_frame (F : frame) := forall x y z, mreachable x y -> ireacha
                     exists u, ireachable x u /\
                                   Included _ (iupcone F (Singleton _ u)) (mdowncone F (iupcone F (Singleton _ z))) /\
                                   mreachable u z.
-
-Lemma sufficient_Idb : forall F,
-                  suff_Idb_frame F -> forall φ ψ, fvalid F (Idb φ ψ).
-Proof.
-intros F H φ ψ M frameEq x y ixy Hy ; subst.
-- epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso ].
-  assert (exists u v w, ireachable y u /\ mreachable u v /\ ireachable v w /\ forces M w φ /\ ~ forces M w ψ).
-  { epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | ].
-    exfalso. apply NP. intros u ivu r mur s irs Hs ; subst. epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | ].
-    exfalso. apply NP0. exists u,r,s. repeat split ; auto. }
-  destruct H0 as (u & v & w & iyu & muv & ivw & Hw & NHw).
-  destruct (H _ _ _ muv ivw) as (u0 & iuu0 & cones & mu0w).
-  assert (forces M u0 (⬦ φ)).
-  { intros v1 iu0v1.
-    assert ((iupcone fra (Singleton nodes u0)) v1). exists u0. split ; auto.
-    apply In_singleton.
-    apply cones in H0. destruct H0. destruct H0. destruct H0. destruct H0. inversion H0 ; subst.
-    exists x0. split ; auto. apply Persistence with x1 ; auto. }
-  assert (~ forces M u0 (☐ ψ)).
-  { intro ctr. pose (ctr _ (ireach_refl u0) _ mu0w). apply NHw. apply Persistence with w ; auto.
-    apply ireach_refl. }
-  apply H1. intros v1 iu0v1 u1 mv1u1. cbn in Hy. apply Hy with u0 v1 ; auto.
-  apply ireach_tran with u ; auto.
-Qed.
 
 (* The axiom Idb ((⬦φ) --> (☐ψ)) -->  ☐(φ --> ψ) corresponds to the following frame property. *)
 
@@ -254,6 +225,12 @@ exists u. exists u. exists z. repeat split ; auto.
 intros w Hw. left ; auto.
 Qed.
 
+Lemma sufficient_Idb : forall F,
+                  suff_Idb_frame F -> forall φ ψ, fvalid F (Idb φ ψ).
+Proof.
+intros F H φ ψ. apply correspond_Idb. apply suff_impl_Idb ; auto.
+Qed.
+
 End Idb.
 
 
@@ -267,13 +244,6 @@ Section Nd.
 (* A sufficient condition to prove the axiom Nd (⬦⊥) --> ⊥ is that only expl can modally reach expl. *)
 
 Definition suff_Nd_frame (F : frame) := forall w, mreachable w expl -> w = expl.
-
-Lemma sufficient_Nd : forall F,
-                  suff_Nd_frame F -> fvalid F Nd.
-Proof.
-intros F H M frameEq w v iwv Hv ; subst ; cbn in *.
-apply H. destruct (Hv _ (ireach_refl v)) as (u & Hu0 & Hu1) ; subst ; auto.
-Qed.
 
 (* The axiom Nd corresponds to the following frame property: if all intuitionistic
     successors of a world w are such that the can modally reach expl, then w is expl. *)
@@ -301,6 +271,12 @@ Proof.
 intros F H x Hx. apply H. apply Hx. apply ireach_refl.
 Qed.
 
+Lemma sufficient_Nd : forall F,
+                  suff_Nd_frame F -> fvalid F Nd.
+Proof.
+intros F H. apply correspond_Nd. apply suff_impl_Nd ; auto.
+Qed.
+
 End Nd.
 
 
@@ -308,7 +284,7 @@ End Nd.
 
 
 
-Section suff_Cd4.
+Section suff_CdIdb.
 
 
 (* While we did not present a sufficient condition for Idb, we can find one once
@@ -329,7 +305,7 @@ intros F H. destruct H ; split.
   split ; auto. exists z ; split ; auto. apply In_singleton.
 Qed.
 
-End suff_Cd4.
+End suff_CdIdb.
 
 
 
@@ -340,14 +316,6 @@ Section Ndb.
 (* A sufficient condition to prove the axiom Nd (⬦⊥) --> (☐ ⊥) is that only expl can modally reach expl. *)
 
 Definition suff_Ndb_frame (F : frame) := forall w, mreachable w expl -> (forall v, mreachable w v -> v = expl).
-
-Lemma sufficient_Ndb : forall F,
-                  suff_Ndb_frame F -> fvalid F Ndb.
-Proof.
-intros F H M frameEq w v iwv Hv u Hu x Hx ; subst ; cbn in *.
-destruct (Hv _ Hu) as (y & Hy0 & Hy1) ; subst ; auto.
-apply (H _ Hy0 _ Hx).
-Qed.
 
 (* The axiom Ndb corresponds to the following frame property. *)
 
@@ -376,6 +344,12 @@ Lemma suff_impl_Ndb  : forall F, suff_Ndb_frame F -> Ndb_frame F.
 Proof.
 intros F H w Hw v u iwv mvu. apply Hw in iwv.
 pose (H _ iwv). apply e ; auto.
+Qed.
+
+Lemma sufficient_Ndb : forall F,
+                  suff_Ndb_frame F -> fvalid F Ndb.
+Proof.
+intros F H. apply correspond_Ndb. apply suff_impl_Ndb ; auto.
 Qed.
 
 End Ndb.
