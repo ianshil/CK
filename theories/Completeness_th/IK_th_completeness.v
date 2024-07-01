@@ -30,7 +30,7 @@ Theorem Strong_Completeness : forall Γ φ,
 Proof.
 intros. apply more_AdAx_more_prv with (AdAxCdIdb is_Nd).
 - intros A HA. destruct HA ; auto.
-- apply Strong_Completeness with (FraP:= fun F => Cd_frame F /\ Idb_frame F /\ Nd_frame F) ; auto.
+- apply Strong_Completeness with (ClassF:= fun F => Cd_frame F /\ Idb_frame F /\ Nd_frame F) ; auto.
   repeat split ; auto. 1-2: apply CF_CdIdb. apply CF_Nd.
 Qed.
 

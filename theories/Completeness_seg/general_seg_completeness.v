@@ -16,8 +16,7 @@ Section general_seg_completeness.
     as worlds of our model. *)
 
 Variable AdAx : form -> Prop.
-Variable FraP : frame -> Prop.
-Hypothesis corresp_AdAx_FraP : forall F, FraP F <-> (forall A, AdAx A -> fvalid F A).
+
 
 Class segment Γ : Type :=
   { head : @Ensemble form ;
@@ -197,6 +196,68 @@ Proof.
     exists (☐ A). split ; auto. cbn. right. destruct A ; cbn ; auto.
   - exists (Clos Γ). split ; auto. apply In_singleton. apply Incl_ClosSubform_Clos.
     exists (⬦ A). split ; auto. cbn. right. destruct A ; cbn ; auto.
+Qed.
+
+(* We can show an existence lemma for diamond. *)
+
+Lemma Diam_existence Γ (s : segment Γ) ψ :
+  In _ (Clos Γ) (⬦ ψ) ->
+  ~ (@head _ s) (⬦ ψ) ->
+  exists w : segment Γ, Included _ (@head _ s) (@head _ w) /\
+                                    forall th, (@tail _ w) th -> ~ th ψ.
+Proof.
+intros.
+assert (Jψ: Clos Γ ψ).
+{ apply Incl_ClosSubform_Clos. unfold In. exists (⬦ ψ). split ; simpl ; auto. right.
+  destruct ψ ; simpl ; auto. }
+assert (R0: forall B, (@head _ s) (⬦ B) -> ~ extCKH_prv AdAx (fun x => exists A, B = x \/ ((@head _ s) (☐ A) /\ x = A)) ψ).
+{ intros B HB D. apply H0. apply segClosed ; auto.
+  apply extCKH_monot with (Γ1:= Union _ (fun x : form => exists A : form, (@head _ s) (☐ A) /\ x = A) (Singleton _ B)) in D.
+  apply extCKH_Deduction_Theorem in D. eapply MP. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
+  apply K_rule in D. apply (extCKH_monot _ _ _ D). intros C HC. unfold In in *.
+  destruct HC as (E & (F & HF0 & HF1) & HCE) ; subst ; auto. apply Id ; auto.
+  intros C HC. unfold In in *. destruct HC as (E & [HE | (HE0 & HE1)]) ; subst ; auto.
+  right ; apply In_singleton. left. exists E ; auto. }
+assert (R2: forall B, (@head _ s) (⬦ B) -> Included form (fun x => exists A, B = x \/ ((@head _ s) (☐ A) /\ x = A)) (Clos Γ)).
+{ intros B HB C HC. destruct HC as (D & [HD | (HD0 & HD1)]) ; subst ; auto.
+  apply Incl_ClosSubform_Clos. exists (⬦ C).
+  split ; cbn ; auto. apply segInclClos in HB ; auto. right ; destruct C ; cbn ; auto.
+  apply Incl_ClosSubform_Clos. exists (☐ D).
+  split ; cbn ; auto. apply segInclClos in HD0 ; auto. right ; destruct D ; cbn ; auto. }
+remember (fun x => exists B (P: (@head _ s) (⬦ B)), x = proj1_sig (Lindenbaum _ _ _ ψ Jψ (R2 _ P) (R0 _ P))) as LindSet.
+assert (forall th : Ensemble form, th = head \/ LindSet th -> Included form th (Clos Γ)).
+intros. destruct H1 ; subst ; auto. pose (@segInclClos _ s). apply i ; auto.
+destruct H1 as (B & HB & J) ; subst. intros C HC. unfold In in *.
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+(R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L1 in HC ; auto.
+assert (forall th : Ensemble form, th = head \/ LindSet th -> restr_closed AdAx (Clos Γ) th).
+intros. destruct H2 ; subst ; auto. apply (@segClosed _ s) ; auto.
+destruct H2 as (B & HB & J) ; subst. intros C HC0 HC1.
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+(R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L2 in HC1 ; auto.
+assert (forall th : Ensemble form, th = head \/ LindSet th -> quasi_prime th).
+intros. destruct H3 ; subst ; auto. eapply (@segPrime _ s) ; auto. 
+destruct H3 as (B & HB & J) ; subst. intros C D Hor G.
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+(R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L3 in Hor ; auto.
+assert (forall A : form, head (☐ A) -> forall th : Ensemble form, LindSet th -> th A).
+intros. rewrite HeqLindSet in H5. destruct H5 as (B & HB & J) ; subst.
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+(R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *.
+apply L0. unfold In. exists A ; auto.
+assert (forall A : form, head (⬦ A) -> exists th : Ensemble form, LindSet th /\ th A).
+intros.
+destruct (Lindenbaum _ Γ (fun x : form => exists B : form, A = x \/ head (☐ B) /\ x = B) ψ Jψ
+(R2 _ H5) (R0 _ H5)) as (Γ0 & L0 & L1 & L2 & L3 & L4) eqn:E; cbn in *.
+exists Γ0. split ; auto. rewrite HeqLindSet. exists A. exists H5 ; auto. rewrite E.
+auto. apply L0. exists A ; auto.
+pose (Build_segment Γ head LindSet H1 H2 H3 H4 H5).
+exists s0. split ; auto. intros C HC ; auto.
+intros th Hth contr. unfold tail in Hth. cbn in Hth. rewrite HeqLindSet in Hth.
+destruct Hth as (B & HB & J) ; subst.
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ
+(R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in * ; subst.
+apply L4. apply Id. auto.
 Qed.
 
 (* We define the canonical valuation. *)
@@ -390,56 +451,9 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   destruct ψ ; simpl ; auto.
   simpl in H0.
   destruct (LEM (head (⬦ ψ))) ; auto. exfalso.
-  assert (R0: forall B, head (⬦ B) -> ~ extCKH_prv AdAx (fun x => exists A, B = x \/ ((@head _ s) (☐ A) /\ x = A)) ψ).
-  intros B HB D. apply H1. apply segClosed ; auto.
-  apply extCKH_monot with (Γ1:= Union _ (fun x : form => exists A : form, head (☐ A) /\ x = A) (Singleton _ B)) in D.
-  apply extCKH_Deduction_Theorem in D. eapply MP. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
-  apply K_rule in D. apply (extCKH_monot _ _ _ D). intros C HC. unfold In in *.
-  destruct HC as (E & (F & HF0 & HF1) & HCE) ; subst ; auto. apply Id ; auto.
-  intros C HC. unfold In in *. destruct HC as (E & [HE | (HE0 & HE1)]) ; subst ; auto.
-  right ; apply In_singleton. left. exists E ; auto.
-  assert (R2: forall B, head (⬦ B) -> Included form (fun x => exists A, B = x \/ ((@head _ s) (☐ A) /\ x = A)) (Clos Γ)).
-  intros B HB C HC. destruct HC as (D & [HD | (HD0 & HD1)]) ; subst ; auto.
-  apply Incl_ClosSubform_Clos. exists (⬦ C).
-  split ; cbn ; auto. apply segInclClos in HB ; auto. right ; destruct C ; cbn ; auto.
-  apply Incl_ClosSubform_Clos. exists (☐ D).
-  split ; cbn ; auto. apply segInclClos in HD0 ; auto. right ; destruct D ; cbn ; auto.
-  remember (fun x => exists B (P: head (⬦ B)), x = proj1_sig (Lindenbaum _ _ _ ψ Jψ (R2 _ P) (R0 _ P))) as LindSet.
-  assert (forall th : Ensemble form, th = head \/ LindSet th -> Included form th (Clos Γ)).
-  intros. destruct H2 ; subst ; auto. pose (@segInclClos _ s). apply i ; auto.
-  destruct H2 as (B & HB & J) ; subst. intros C HC. unfold In in *.
-  destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
-  (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L1 in HC ; auto.
-  assert (forall th : Ensemble form, th = head \/ LindSet th -> restr_closed AdAx (Clos Γ) th).
-  intros. destruct H3 ; subst ; auto. apply (@segClosed _ s) ; auto.
-  destruct H3 as (B & HB & J) ; subst. intros C HC0 HC1.
-  destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
-  (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L2 in HC1 ; auto.
-  assert (forall th : Ensemble form, th = head \/ LindSet th -> quasi_prime th).
-  intros. destruct H4 ; subst ; auto. eapply (@segPrime _ s) ; auto. 
-  destruct H4 as (B & HB & J) ; subst. intros C D Hor G.
-  destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
-  (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L3 in Hor ; auto.
-  assert (forall A : form, head (☐ A) -> forall th : Ensemble form, LindSet th -> th A).
-  intros. rewrite HeqLindSet in H6. destruct H6 as (B & HB & J) ; subst.
-  destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
-  (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *.
-  apply L0. unfold In. exists A ; auto.
-  assert (forall A : form, head (⬦ A) -> exists th : Ensemble form, LindSet th /\ th A).
-  intros.
-  destruct (Lindenbaum _ Γ (fun x : form => exists B : form, A = x \/ head (☐ B) /\ x = B) ψ Jψ
-  (R2 _ H6) (R0 _ H6)) as (Γ0 & L0 & L1 & L2 & L3 & L4) eqn:E; cbn in *.
-  exists Γ0. split ; auto. rewrite HeqLindSet. exists A. exists H6 ; auto. rewrite E.
- auto. apply L0. exists A ; auto.
-  pose (Build_segment Γ head LindSet H2 H3 H4 H5 H6).
-  assert (cireach Γ s s0). intros C HC ; auto.
-  apply H0 in H7. destruct H7 as (u & Hu1 & Hu2). apply IHψ in Hu2.
-  unfold cmreach in Hu1.
-  assert (LindSet head). auto. rewrite HeqLindSet in H7.
-  destruct H7 as (B & HB & J) ; subst.
-  destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ
-  (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in * ; subst.
-  apply L4. apply Id. auto. auto.
+  destruct (Diam_existence _ _ _ H H1) as (s0 & J0 & J1).
+  apply H0 in J0. destruct J0 as (u & Hu1 & Hu2).
+  apply IHψ in Hu2 ; auto. apply J1 with (@head _ u) ; auto.
 - assert (Jψ: Clos Γ ψ).
   apply Incl_ClosSubform_Clos. unfold In. exists (⬦ ψ). split ; simpl ; auto. right.
   destruct ψ ; simpl ; auto.
@@ -463,10 +477,12 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   exists s0. split ; auto. apply IHψ ; auto.
 Qed.
 
-Hypothesis CF_FraP : forall Γ, FraP (CF Γ).
+Variable ClassF : frame -> Prop.
+Hypothesis ClassF_AdAx : forall f, ClassF f -> (forall A, AdAx A -> fvalid f A).
+Hypothesis CF_ClassF : forall Γ, ClassF (CF Γ).
 
 Theorem QuasiCompleteness : forall Γ φ,
-    ~ extCKH_prv AdAx Γ φ -> ~ loc_conseq FraP Γ φ.
+    ~ extCKH_prv AdAx Γ φ -> ~ loc_conseq ClassF Γ φ.
 Proof.
 intros Γ φ D H.
 apply Lindenbaum_segment with (Γ:=Union _ Γ (Singleton _ φ)) in D ; auto.
@@ -474,13 +490,13 @@ apply Lindenbaum_segment with (Γ:=Union _ Γ (Singleton _ φ)) in D ; auto.
   assert ((forall A, Γ A -> forces (CM _) w A)). intros. apply truth_lemma. 2: apply H1 ; auto.
   unfold Clos. left. apply Incl_Set_ClosSubform. left ; auto.
   apply H2. apply truth_lemma ; auto. unfold Clos. left. apply Incl_Set_ClosSubform.
-  right ; apply In_singleton. apply H. apply CF_FraP. auto.
+  right ; apply In_singleton. apply H. apply CF_ClassF. auto.
 - unfold Clos. left. apply Incl_Set_ClosSubform. right ; apply In_singleton.
 - intros A HA. unfold Clos. unfold In in *. left. apply Incl_Set_ClosSubform. left ; auto.
 Qed.
 
 Theorem Strong_Completeness : forall Γ φ,
-    loc_conseq FraP Γ φ -> extCKH_prv AdAx Γ φ.
+    loc_conseq ClassF Γ φ -> extCKH_prv AdAx Γ φ.
 Proof.
 intros Γ φ LC. pose (QuasiCompleteness Γ φ).
 destruct (LEM (extCKH_prv AdAx Γ φ)) ; auto. exfalso.

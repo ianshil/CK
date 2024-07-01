@@ -16,7 +16,7 @@ Definition NoAdAx := fun (x : form) => False.
 Theorem CK_Strong_Completeness : forall Γ φ,
     loc_conseq (fun x => True) Γ φ -> CKH_prv Γ φ.
 Proof.
-apply Strong_Completeness with (FraP:= fun x => True) ; auto.
+intros. apply Strong_Completeness with (ClassF:=fun x => True) ; auto.
 Qed.
 
 End CK_completeness.

@@ -14,8 +14,6 @@ Axiom LEM : forall P, P \/ ~ P.
 Section general_segP_completeness.
 
 Variable AdAx : form -> Prop.
-Variable FraP : frame -> Prop.
-Hypothesis corresp_AdAx_FraP : forall F, FraP F <-> (forall A, AdAx A -> fvalid F A).
 
 Definition AdAxIdb := fun x => AdAx x \/ (exists A B, (Idb A B) = x).
 
@@ -563,10 +561,12 @@ Proof.
 apply suff_impl_Idb. apply CF_suff_Idb.
 Qed.
 
-Hypothesis CF_FraP : FraP CF.
+Variable ClassF : frame -> Prop.
+Hypothesis ClassF_AdAx : forall f, ClassF f -> (forall A, AdAxIdb A -> fvalid f A).
+Hypothesis CF_ClassF : ClassF CF.
 
 Theorem QuasiCompleteness : forall Γ φ,
-    ~ extCKH_prv AdAxIdb Γ φ -> ~ loc_conseq FraP Γ φ.
+    ~ extCKH_prv AdAxIdb Γ φ -> ~ loc_conseq ClassF Γ φ.
 Proof.
 intros Γ φ D H.
 apply Lindenbaum_Psegment in D ; auto.
@@ -576,11 +576,11 @@ apply H2. apply truth_lemma ; auto.
 Qed.
 
 Theorem Strong_Completeness : forall Γ φ,
-    loc_conseq FraP Γ φ -> extCKH_prv AdAxIdb Γ φ.
+    loc_conseq ClassF Γ φ -> extCKH_prv AdAxIdb Γ φ.
 Proof.
 intros Γ φ LC. pose (QuasiCompleteness Γ φ).
 destruct (LEM (extCKH_prv AdAxIdb Γ φ)) ; auto. exfalso.
-apply n ; assumption.
+apply n ; auto.
 Qed.
 
 End general_segP_completeness.

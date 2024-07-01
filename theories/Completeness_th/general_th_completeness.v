@@ -14,8 +14,6 @@ Axiom LEM : forall P, P \/ ~ P.
 Section general_th_completeness.
 
 Variable AdAx : form -> Prop.
-Variable FraP : frame -> Prop.
-Hypothesis corresp_AdAx_FraP : forall F, FraP F <-> (forall A, AdAx A -> fvalid F A).
 
 Definition AdAxCdIdb := fun x => AdAx x \/ (exists A B, (Cd A B) = x \/ (Idb A B) = x).
 
@@ -390,10 +388,12 @@ destruct H3. exists x1. split ; auto. exists z. split ; auto.
 apply In_singleton.
 Qed.
 
-Hypothesis CF_FraP : FraP CF.
+Variable ClassF : frame -> Prop.
+Hypothesis ClassF_AdAx : forall f, ClassF f -> (forall A, AdAxCdIdb A -> fvalid f A).
+Hypothesis CF_ClassF : ClassF CF.
 
 Theorem QuasiCompleteness : forall Γ φ,
-    ~ extCKH_prv AdAxCdIdb Γ φ -> ~ loc_conseq FraP Γ φ.
+    ~ extCKH_prv AdAxCdIdb Γ φ -> ~ loc_conseq ClassF Γ φ.
 Proof.
 intros Γ φ D H.
 assert (J: ~ pair_extCKH_prv AdAxCdIdb Γ (Singleton _ φ)).
@@ -403,11 +403,11 @@ apply Lindenbaum_cworld in J ; auto.
 destruct J as (w & H1 & H2).
 assert ((forall A, Γ A -> forces CM w A)). intros. apply truth_lemma. apply H1 ; auto.
 apply H in H0. apply truth_lemma in H0. pose (H2 φ). apply i ; auto. apply In_singleton.
-apply CF_FraP.
+apply CF_ClassF.
 Qed.
 
 Theorem Strong_Completeness : forall Γ φ,
-    loc_conseq FraP Γ φ -> extCKH_prv AdAxCdIdb Γ φ.
+    loc_conseq ClassF Γ φ -> extCKH_prv AdAxCdIdb Γ φ.
 Proof.
 intros Γ φ LC. pose (QuasiCompleteness Γ φ).
 destruct (LEM (extCKH_prv AdAxCdIdb Γ φ)) ; auto. exfalso.

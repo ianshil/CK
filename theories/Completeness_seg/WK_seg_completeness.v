@@ -32,8 +32,8 @@ Qed.
 Theorem WK_Strong_Completeness : forall Γ φ,
     loc_conseq Nd_frame Γ φ -> WKH_prv Γ φ.
 Proof.
-apply Strong_Completeness with (FraP:= Nd_frame) ; auto.
-apply CF_Nd.
+intros. apply Strong_Completeness with (ClassF:=Nd_frame) ; auto.
+intros ; subst. apply CF_Nd.
 Qed.
 
 End WK_completeness.
