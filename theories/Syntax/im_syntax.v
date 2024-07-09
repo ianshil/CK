@@ -35,6 +35,19 @@ Notation "¬ A" := (A --> ⊥) (at level 42) : My_scope.
 Notation "☐ A" := (Box A) (at level 42) : My_scope.
 Notation "⬦ A" := (Diam A) (at level 42) : My_scope.
 
+(* We define the diamond-free fragment of our language. *)
+
+Fixpoint diam_free φ : Prop :=
+match φ with
+| # p => True
+| ⊥ => True
+| ψ ∧ χ => diam_free ψ /\ diam_free χ
+| ψ ∨ χ => diam_free ψ /\ diam_free χ
+| ψ --> χ => diam_free ψ /\ diam_free χ
+| ☐ ψ => diam_free ψ
+| ⬦ ψ => False
+end.
+
 
 (* Next, we define the set of subformulas of a formula, and
     extend this notion to lists of formulas. *)
@@ -49,6 +62,11 @@ match φ with
 | ☐ ψ => Union _ (Singleton _ (☐ ψ)) (subform ψ)
 | ⬦ ψ => Union _ (Singleton _ (⬦ ψ)) (subform ψ)
 end.
+
+Lemma subform_id : forall φ, (subform φ) φ.
+Proof.
+destruct φ ; cbn. 1-2: split. all: left ; split.
+Qed.
 
 Fixpoint subformlist (φ : form) : list form :=
 match φ with

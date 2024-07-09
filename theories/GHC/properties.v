@@ -582,6 +582,47 @@ End theorems_and_meta.
 
 Section Additional_ax.
 
+Lemma CKIdb_prv_wCD : forall Γ φ ψ, CKIdbH_prv Γ (wCD φ ψ).
+Proof.
+intros ; unfold wCD ; cbn.
+repeat apply extCKH_Deduction_Theorem.
+eapply MP. eapply MP.
+apply Ax ; left ; right ; eapply Kb ; reflexivity.
+eapply MP. eapply MP.
+apply Ax ; left ; right ; eapply Kb ; reflexivity.
+apply Nec.
+repeat apply extCKH_Deduction_Theorem.
+eapply MP. 2: apply Id ; left ; right ; apply In_singleton.
+eapply MP. eapply MP. apply Ax ; left ; left; eapply IA5 ; reflexivity.
+apply Id ; right ; apply In_singleton. apply imp_Id_gen.
+apply Id ; left ; right ; apply In_singleton.
+eapply MP. apply Ax ; right ; eexists ; eexists ; reflexivity.
+apply Id ; right ; split.
+Qed.
+
+Lemma negneg_box_prv : forall Γ φ, CKIdbNdH_prv Γ ((¬ ¬ ☐ φ) --> ☐ ¬ ¬ φ).
+Proof.
+intros.
+eapply MP. eapply MP. apply Imp_trans.
+2: apply Ax ; right ; left ; exists (¬ φ), ⊥ ; reflexivity.
+eapply MP. eapply MP. apply Imp_trans.
+- apply extCKH_Deduction_Theorem. apply extCKH_Deduction_Theorem.
+  eapply MP. apply Id ; left ; right ; split. apply extCKH_Deduction_Theorem.
+  apply extCKH_monot with (Union _ (Union _ Γ (Singleton _ (☐ φ))) (Singleton _ (⬦¬φ))).
+  apply extCKH_Detachment_Theorem.
+  eapply MP. eapply MP. apply Imp_trans. 2: apply Ax ; right ; right ; reflexivity.
+  eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
+  apply extCKH_Detachment_Theorem.
+  eapply MP. apply Ax ; left ; right ; eapply Kb ; reflexivity.
+  apply Nec. repeat apply extCKH_Deduction_Theorem.
+  eapply MP. apply Id ; right ; split. apply Id ; left ; right ; split.
+  intros A HA ; inversion HA ; subst. inversion H ; subst. left ; left ; left ; auto.
+  inversion H0 ; subst. right ; split. inversion H ; subst. left. right ; split.
+- apply extCKH_Deduction_Theorem.
+  eapply MP. eapply extCKH_Detachment_Theorem.
+  apply Imp_trans. apply EFQ.
+Qed.
+
 Lemma list_Box_map_repr : forall l, (forall A : form, List.In A l -> exists B : form, A = ☐ B) ->
       exists l', l = map Box l'.
 Proof.

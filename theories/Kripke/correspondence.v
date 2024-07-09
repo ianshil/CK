@@ -354,3 +354,49 @@ Qed.
 
 End Ndb.
 
+
+
+
+
+
+
+Section Inbbb.
+
+(* A sufficient condition to prove the axiom Inbbb (¬ ☐ ⊥) --> (((¬☐¬ A) --> ☐B) --> ☐ (A --> B)) is given below. *)
+
+Definition suff_Inbbb_frame (F : frame) := forall x,
+          (forall v, ireachable x v -> v <> expl -> exists v' u, ireachable v v' /\ mreachable v' u /\ u <> expl) ->
+          forall y z, mreachable x y -> ireachable y z -> z <> expl ->
+          exists w, (ireachable x w /\ mreachable w z /\ (forall s, ireachable w s -> s <> expl -> exists t, t <> expl /\ mreachable s t /\ ireachable z t)).
+
+Lemma suff_Inbbb : forall F,
+                  suff_Inbbb_frame F -> forall φ ψ, fvalid F (Inbbb φ ψ).
+Proof.
+intros F H φ ψ M frameEq w v iwv Hv u ivu Hu ; subst.
+epose (LEM _) ; destruct o as [P | NP] ; [ exact P | exfalso].
+assert (exists m y z, ireachable u m /\ mreachable m y /\ ireachable y z /\ forces M z φ /\ ~ forces M z ψ).
+{ epose (LEM _) ; destruct o as [P0 | NP0] ; [ exact P0 | exfalso].
+  apply NP. intros y iuy z myz k izk Hk. epose (LEM _) ; destruct o as [P1 | NP1] ; [ exact P1 | exfalso].
+  apply NP0. exists y, z,k ; repeat split ; auto. }
+destruct H0 as (m & y & z & ium & mmy & iyz & Hz0 & Hz1).
+pose (Persistence _ _ _ Hv _ (ireach_tran _ _ _ ivu ium)).
+pose (Persistence _ _ _ Hu _ ium).
+assert (forall v, ireachable m v -> v <> expl -> exists v' g, ireachable v v' /\ mreachable v' g /\ g <> expl).
+{ intros. apply f in H0. epose (LEM _) ; destruct o as [P0 | NP0] ; [ exact P0 | ].
+  exfalso. apply H1. apply H0. intros. epose (LEM _) ; destruct o as [P1 | NP1] ; [ exact P1 | ].
+  exfalso. apply NP0. exists v1, u0 ; repeat split ; auto. }
+pose (H _ H0 _ _ mmy iyz).
+destruct (LEM (z = expl)) ; subst.
+- apply Hz1 ; apply Expl.
+- destruct (e H1) as (q & imq & mqk & Hq) ; clear e.
+  assert (forces M q (¬ (☐ (¬ φ)))).
+  { intros a iqa Ha. cbn. epose (LEM _) ; destruct o as [P0 | NP0] ; [ exact P0 | exfalso].
+    apply Hq in iqa ; auto. destruct iqa as (c & Hc0 & Hc1 & Hc2).
+    pose (Ha _ (ireach_refl a) _ Hc1 _ (ireach_refl c)). apply Hc0. apply f1 ; auto.
+    apply (Persistence _ _ _ Hz0 _ Hc2). }
+   pose (Hu _ (ireach_tran _ _ _ ium imq)). apply Hz1.
+   apply f1 with q ; auto. apply ireach_refl.
+Qed.
+
+End Inbbb.
+
