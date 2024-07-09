@@ -32,7 +32,6 @@ Definition Cd A B := (⬦A ∨ B)-->  (⬦A) ∨ (⬦B).
 Definition Idb A B := ((⬦A) --> (☐B)) -->  ☐(A --> B).
 Definition Nd := (⬦⊥) --> ⊥.
 Definition Ndb := (⬦⊥) --> (☐⊥).
-Definition Inbbb A B := (¬ ☐ ⊥) --> (((¬☐¬ A) --> ☐B) --> ☐ (A --> B)).
 Definition wCD A B := (☐(A ∨ B)) --> ((⬦A) --> (☐B)) -->  ☐ B.
 
 Inductive extCKH_prv (AdAx: form -> Prop) : (form -> Prop) -> form -> Prop :=

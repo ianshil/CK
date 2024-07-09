@@ -441,7 +441,7 @@ induction ψ ; intros s ; split ; intros H0 ; simpl ; try simpl in H0 ; auto.
       exists p. split ; auto. apply IHψ. auto. } }
 Qed.
 
-(* The canonical frames satisfies the sufficient of the axiom Idb. *)
+(* The canonical frames satisfies the sufficient condition of the axiom Idb. *)
 
 Lemma CF_suff_Idb : suff_Idb_frame CF.
 Proof.

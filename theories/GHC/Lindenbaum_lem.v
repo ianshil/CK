@@ -71,9 +71,6 @@ Section Prime.
 Definition choice_form Γ Δ ψ φ: Ensemble form :=
 fun x => Δ x \/ (Γ x /\ ~ (extCKH_prv AdAx (Union _ Δ (Singleton _ x)) ψ) /\ φ = x).
 
-(* For any natural number, check if it is the encoding of a formula, and if it is and this
-   formula happens to be a disjunction and derivable from the set, then pick one of the disjuncts. *)
-
 Definition choice_code Γ Δ ψ (n :nat) : @Ensemble form := (choice_form Γ Δ ψ (form_enum n)).
 
 Fixpoint nLind_theory Γ Δ ψ n : @Ensemble form :=

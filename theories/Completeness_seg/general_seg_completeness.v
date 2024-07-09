@@ -8,9 +8,9 @@ Require Import im_syntax.
 Require Import CKH_export.
 Require Import kripke_export.
 
-Axiom LEM : forall P, P \/ ~ P.
-
 Section general_seg_completeness.
+
+Axiom LEM : forall P, P \/ ~P.
 
 (* We first create segments of our canonical model. They will act
     as worlds of our model. *)

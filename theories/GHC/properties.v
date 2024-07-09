@@ -645,7 +645,7 @@ Variable AdAx : form -> Prop.
 
 Definition AdAxCd := fun x => AdAx x \/ (exists A B, (Cd A B) = x).
 
-Lemma Diam_distrib_list_disj l : (l <> []) -> (* Sufficient, but necessary? *)
+Lemma Diam_distrib_list_disj l : (l <> []) ->
   forall Γ, extCKH_prv AdAxCd Γ (⬦ (list_disj l)) -> extCKH_prv AdAxCd Γ (list_disj (map Diam l)).
 Proof.
 induction l ; cbn ; intros.

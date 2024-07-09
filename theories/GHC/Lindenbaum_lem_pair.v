@@ -33,9 +33,6 @@ Section Prime.
 Definition pair_choice_form Γ Δ Ψ φ: Ensemble form :=
 fun x => Δ x \/ (Γ x /\ ~ (pair_extCKH_prv (Union _ Δ (Singleton _ x)) Ψ) /\ φ = x).
 
-(* For any natural number, check if it is the encoding of a formula, and if it is and this
-   formula happens to be a disjunction and derivable from the set, then pick one of the disjuncts. *)
-
 Definition pair_choice_code Γ Δ Ψ (n :nat) : @Ensemble form := (pair_choice_form Γ Δ Ψ (form_enum n)).
 
 Fixpoint npair_Lind_theory Γ Δ Ψ n : @Ensemble form :=

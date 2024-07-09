@@ -19,7 +19,7 @@ Section LEMal_facts.
 
 Axiom LEM : forall P, P \/ ~ P.
 
-  (* To prove strong completeness, we require the strength of LEMal
+  (* To prove strong completeness, we require the strength of classical
       logic. For this, we declare LEM as an axiom. *)
 
 Lemma LEM_prime Δ :
