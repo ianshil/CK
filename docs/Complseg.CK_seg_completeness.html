@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<link href="coqdocjs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="coqdocjs.js"></script>
+</head>
+
+<body onload="document.getElementById('content').focus()">
+  <div id="header">
+    <span class="left">
+      <span class="modulename"> <script> document.write(document.title) </script> </span>
+    </span>
+
+    <span class="button" id="toggle-proofs"></span>
+
+    <span class="right">
+      <a href="https://github.com/ianshil/iS4">Project Page</a>
+      <a href="./indexpage.html"> Index </a>
+      <a href="./toc.html"> Table of Contents </a>
+    </span>
+</div>
+    <div id="content" tabindex="-1" onblur="document.getElementById('content').focus()">
+    <div id="main">
+<h1 class="libtitle">Complseg.CK_seg_completeness</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Lists.List.html#"><span class="id" title="library">List</span></a>.<br/>
+<span class="id" title="keyword">Export</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Lists.List.html#ListNotations"><span class="id" title="module">ListNotations</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Arith.PeanoNat.html#"><span class="id" title="library">PeanoNat</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.micromega.Lia.html#"><span class="id" title="library">Lia</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Sets.Ensembles.html#"><span class="id" title="library">Ensembles</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Syntax.im_syntax.html#"><span class="id" title="library">im_syntax</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="GHC.CKH_export.html#"><span class="id" title="library">CKH_export</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Kripke.kripke_export.html#"><span class="id" title="library">kripke_export</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Complseg.general_seg_completeness.html#"><span class="id" title="library">general_seg_completeness</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <a id="CK_completeness" class="idref" href="#CK_completeness"><span class="id" title="section">CK_completeness</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="NoAdAx" class="idref" href="#NoAdAx"><span class="id" title="definition">NoAdAx</span></a> := <span class="id" title="keyword">fun</span> (<a id="x:1" class="idref" href="#x:1"><span class="id" title="binder">x</span></a> : <a class="idref" href="Syntax.im_syntax.html#form"><span class="id" title="inductive">form</span></a>) =&gt; <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#False"><span class="id" title="inductive">False</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="CK_Strong_Completeness" class="idref" href="#CK_Strong_Completeness"><span class="id" title="lemma">CK_Strong_Completeness</span></a> : <span class="id" title="keyword">forall</span> <a id="da7a5918a812e0216f4a54d21f7406c4" class="idref" href="#da7a5918a812e0216f4a54d21f7406c4"><span class="id" title="binder">Γ</span></a> <a id="4285642db9f9c7b847d79f5d0db46174" class="idref" href="#4285642db9f9c7b847d79f5d0db46174"><span class="id" title="binder">φ</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Kripke.kripke_sem.html#loc_conseq"><span class="id" title="definition">loc_conseq</span></a> (<span class="id" title="keyword">fun</span> <a id="x:4" class="idref" href="#x:4"><span class="id" title="binder">x</span></a> =&gt; <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a>) <a class="idref" href="Complseg.CK_seg_completeness.html#da7a5918a812e0216f4a54d21f7406c4"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Complseg.CK_seg_completeness.html#4285642db9f9c7b847d79f5d0db46174"><span class="id" title="variable">φ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="GHC.CKH.html#CKH_prv"><span class="id" title="definition">CKH_prv</span></a> <a class="idref" href="Complseg.CK_seg_completeness.html#da7a5918a812e0216f4a54d21f7406c4"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Complseg.CK_seg_completeness.html#4285642db9f9c7b847d79f5d0db46174"><span class="id" title="variable">φ</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+<span class="id" title="tactic">intros</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Complseg.general_seg_completeness.html#Strong_Completeness"><span class="id" title="lemma">Strong_Completeness</span></a> <span class="id" title="keyword">with</span> (<span class="id" title="var">ClassF</span>:=<span class="id" title="keyword">fun</span> <a id="x:5" class="idref" href="#x:5"><span class="id" title="binder"><span id="x:6" class="id">x</span></span></a> =&gt; <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a>) ; <span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="Complseg.CK_seg_completeness.html#CK_completeness"><span class="id" title="section">CK_completeness</span></a>.<br/>
+</div>
+</div>
+<div id="footer">
+  Generated by <a href="http://coq.inria.fr/">coqdoc</a> and improved with <a href="https://github.com/tebbi/coqdocjs">CoqdocJS</a>
+</div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<link href="coqdocjs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="coqdocjs.js"></script>
+</head>
+
+<body onload="document.getElementById('content').focus()">
+  <div id="header">
+    <span class="left">
+      <span class="modulename"> <script> document.write(document.title) </script> </span>
+    </span>
+
+    <span class="button" id="toggle-proofs"></span>
+
+    <span class="right">
+      <a href="https://github.com/ianshil/iS4">Project Page</a>
+      <a href="./indexpage.html"> Index </a>
+      <a href="./toc.html"> Table of Contents </a>
+    </span>
+</div>
+    <div id="content" tabindex="-1" onblur="document.getElementById('content').focus()">
+    <div id="main">
+<h1 class="libtitle">Complseg.WK_seg_completeness</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Lists.List.html#"><span class="id" title="library">List</span></a>.<br/>
+<span class="id" title="keyword">Export</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Lists.List.html#ListNotations"><span class="id" title="module">ListNotations</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Arith.PeanoNat.html#"><span class="id" title="library">PeanoNat</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.micromega.Lia.html#"><span class="id" title="library">Lia</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Sets.Ensembles.html#"><span class="id" title="library">Ensembles</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Syntax.im_syntax.html#"><span class="id" title="library">im_syntax</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="GHC.CKH_export.html#"><span class="id" title="library">CKH_export</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Kripke.kripke_export.html#"><span class="id" title="library">kripke_export</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="Complseg.general_seg_completeness.html#"><span class="id" title="library">general_seg_completeness</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <a id="WK_completeness" class="idref" href="#WK_completeness"><span class="id" title="section">WK_completeness</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="is_Nd" class="idref" href="#is_Nd"><span class="id" title="definition">is_Nd</span></a> := (<span class="id" title="keyword">fun</span> <a id="x:1" class="idref" href="#x:1"><span class="id" title="binder">x</span></a> =&gt; <a class="idref" href="GHC.CKH.html#Nd"><span class="id" title="definition">Nd</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#x:1"><span class="id" title="variable">x</span></a>).<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="CF_Nd" class="idref" href="#CF_Nd"><span class="id" title="lemma">CF_Nd</span></a> <a id="da7a5918a812e0216f4a54d21f7406c4" class="idref" href="#da7a5918a812e0216f4a54d21f7406c4"><span class="id" title="binder">Γ</span></a> : <a class="idref" href="Kripke.correspondence.html#Nd_frame"><span class="id" title="definition">Nd_frame</span></a> (<a class="idref" href="Complseg.general_seg_completeness.html#CF"><span class="id" title="instance">CF</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#is_Nd"><span class="id" title="definition">is_Nd</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#da7a5918a812e0216f4a54d21f7406c4"><span class="id" title="variable">Γ</span></a>).<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+<span class="id" title="tactic">intros</span> <span class="id" title="var">w</span> <span class="id" title="var">Hw</span>.<br/>
+<span class="id" title="tactic">assert</span> (@<a class="idref" href="Complseg.general_seg_completeness.html#head"><span class="id" title="method">head</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">w</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="Syntax.im_syntax.html#Clos"><span class="id" title="definition">Clos</span></a> <span class="id" title="var">Γ</span>).<br/>
+{ <span class="id" title="tactic">apply</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Sets.Ensembles.html#Extensionality_Ensembles"><span class="id" title="axiom">Extensionality_Ensembles</span></a> ; <span class="id" title="tactic">split</span> ; <span class="id" title="tactic">intros</span> <span class="id" title="var">A</span> <span class="id" title="var">HA</span> ; <span class="id" title="tactic">unfold</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Sets.Ensembles.html#In"><span class="id" title="definition">In</span></a>, <a class="idref" href="Complseg.general_seg_completeness.html#head"><span class="id" title="method">head</span></a> <span class="id" title="tactic">in</span> * ; <span class="id" title="var">cbn</span> <span class="id" title="tactic">in</span> *.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> (<a class="idref" href="Complseg.general_seg_completeness.html#segInclClos"><span class="id" title="method">segInclClos</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#is_Nd"><span class="id" title="definition">is_Nd</span></a>) <span class="id" title="tactic">in</span> <span class="id" title="var">HA</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> (<a class="idref" href="Complseg.general_seg_completeness.html#segClosed"><span class="id" title="method">segClosed</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#is_Nd"><span class="id" title="definition">is_Nd</span></a>) ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">eapply</span> <a class="idref" href="GHC.CKH.html#MP"><span class="id" title="constructor">MP</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="GHC.properties.html#EFQ"><span class="id" title="lemma">EFQ</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <a class="idref" href="GHC.CKH.html#MP"><span class="id" title="constructor">MP</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="GHC.CKH.html#Ax"><span class="id" title="constructor">Ax</span></a>. <span class="id" title="tactic">right</span>. <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="GHC.CKH.html#Id"><span class="id" title="constructor">Id</span></a>. <span class="id" title="tactic">apply</span> (<a class="idref" href="Complseg.general_seg_completeness.html#truth_lemma"><span class="id" title="lemma">truth_lemma</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#is_Nd"><span class="id" title="definition">is_Nd</span></a>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">right</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">v</span> <span class="id" title="var">Hv</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">Hw</span> <span class="id" title="tactic">in</span> <span class="id" title="var">Hv</span>. <span class="id" title="tactic">exists</span> (<a class="idref" href="Complseg.general_seg_completeness.html#cexpl"><span class="id" title="instance">cexpl</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#is_Nd"><span class="id" title="definition">is_Nd</span></a> <span class="id" title="var">Γ</span>). <span class="id" title="tactic">split</span> ; <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">cbn</span> ; <span class="id" title="tactic">auto</span>. }<br/>
+<span class="id" title="tactic">apply</span> <a class="idref" href="Complseg.general_seg_completeness.html#cmreach_expl"><span class="id" title="lemma">cmreach_expl</span></a> ; <span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="tactic">unfold</span> <a class="idref" href="Complseg.general_seg_completeness.html#cmreach"><span class="id" title="definition">cmreach</span></a> ; <span class="id" title="var">cbn</span>. <span class="id" title="tactic">rewrite</span> <span class="id" title="var">H</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Sets.Ensembles.html#In_singleton"><span class="id" title="constructor">In_singleton</span></a>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="WK_Strong_Completeness" class="idref" href="#WK_Strong_Completeness"><span class="id" title="lemma">WK_Strong_Completeness</span></a> : <span class="id" title="keyword">forall</span> <a id="55485d85e29df2faa6748490a2d4cd13" class="idref" href="#55485d85e29df2faa6748490a2d4cd13"><span class="id" title="binder">Γ</span></a> <a id="6d99d4a7cb908e141b2f4c9b66be9fba" class="idref" href="#6d99d4a7cb908e141b2f4c9b66be9fba"><span class="id" title="binder">φ</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Kripke.kripke_sem.html#loc_conseq"><span class="id" title="definition">loc_conseq</span></a> <a class="idref" href="Kripke.correspondence.html#Nd_frame"><span class="id" title="definition">Nd_frame</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#55485d85e29df2faa6748490a2d4cd13"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#6d99d4a7cb908e141b2f4c9b66be9fba"><span class="id" title="variable">φ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="GHC.CKH.html#WKH_prv"><span class="id" title="definition">WKH_prv</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#55485d85e29df2faa6748490a2d4cd13"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Complseg.WK_seg_completeness.html#6d99d4a7cb908e141b2f4c9b66be9fba"><span class="id" title="variable">φ</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+<span class="id" title="tactic">intros</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Complseg.general_seg_completeness.html#Strong_Completeness"><span class="id" title="lemma">Strong_Completeness</span></a> <span class="id" title="keyword">with</span> (<span class="id" title="var">ClassF</span>:=<a class="idref" href="Kripke.correspondence.html#Nd_frame"><span class="id" title="definition">Nd_frame</span></a>) ; <span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="tactic">intros</span> ; <span class="id" title="tactic">subst</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Complseg.WK_seg_completeness.html#CF_Nd"><span class="id" title="lemma">CF_Nd</span></a>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="Complseg.WK_seg_completeness.html#WK_completeness"><span class="id" title="section">WK_completeness</span></a>.<br/>
+</div>
+</div>
+<div id="footer">
+  Generated by <a href="http://coq.inria.fr/">coqdoc</a> and improved with <a href="https://github.com/tebbi/coqdocjs">CoqdocJS</a>
+</div>
+</div>
+</body>
+
+</html>
