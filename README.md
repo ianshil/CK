@@ -1,10 +1,10 @@
-# Title
+# Semantical Analysis of Intuitionistic Modal Logics between CK and IK
 
-This project formalises ...
+This project formalises (non-)conservativity results between the intuitionistic modal logics CK and IK, via semantic means.
 
 ## Building
-Compiling the project requires Coq version 8.19.0 and may not compile on other versions. One may enforce this locally by running
-`opam pin coq 8.19.0` in the project folder.
+Compiling the project requires Coq version 8.19.1 and may not compile on other versions. One may enforce this locally by running
+`opam pin coq 8.19.1` in the project folder.
 
 ### Instruction
 
