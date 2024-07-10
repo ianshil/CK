@@ -106,6 +106,12 @@ intros F ; split ; intro H.
     apply H3.
 Qed.
 
+Lemma strong_impl_suff_Cd  : forall F, strong_Cd_frame F -> suff_Cd_frame F.
+Proof.
+intros F H x. exists x ; split. apply ireach_refl. intros.
+destruct (H _ _ _ H0 H1) as (u & myu & izu). exists u ; split ; auto.
+Qed.
+
 Lemma suff_impl_Cd  : forall F, suff_Cd_frame F -> Cd_frame F.
 Proof.
 intros F H x y z ixy ixz Hy Hz.
@@ -142,11 +148,8 @@ Definition suff_Idb_frame (F : frame) := forall x y z, mreachable x y -> ireacha
 (* The axiom Idb ((⬦φ) --> (☐ψ)) -->  ☐(φ --> ψ) corresponds to the following frame property. *)
 
 Definition Idb_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z -> z <> expl ->
-                    exists u v w, ireachable x u /\
-                                  Included _ (iupcone F (Singleton _ u)) (Union _ (mdowncone F (iupcone F (Singleton _ z))) (mdowncone F (Singleton _ expl))) /\
-                                  ireachable u v /\
-                                  mreachable v w /\
-                                  ireachable w z.
+                    exists u w, ireachable x u /\ mreachable u w /\ ireachable w z /\
+                                  Included _ (iupcone F (Singleton _ u)) (Union _ (mdowncone F (iupcone F (Singleton _ z))) (mdowncone F (Singleton _ expl))).
 
 Lemma correspond_Idb: forall F,
                   Idb_frame F <-> forall φ ψ, fvalid F (Idb φ ψ).
@@ -159,7 +162,7 @@ intros F ; split ; intro Hyp.
     exfalso. apply NP. intros u ivu r mur s irs Hs ; subst. epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | ].
     exfalso. apply NP0. exists u,r,s. repeat split ; auto. }
   destruct H as (u & v & w & iyu & muv & ivw & Hw & NHw).
-  destruct (Hyp _ _ _ muv ivw) as (u0 & v0 & w0 & iuu0 & cones & iu0v0 & mv0w0 & iw0w).
+  destruct (Hyp _ _ _ muv ivw) as (u0 & w0 & iuu0 & mu0w0 & iw0w & cones).
   intro. apply NHw. subst ; apply Expl ; auto.
   assert (forces M u0 (⬦ φ)).
   { intros v1 iu0v1.
@@ -170,7 +173,7 @@ intros F ; split ; intro Hyp.
       apply Persistence with w ; auto. destruct H. destruct H. inversion H ; subst ; auto.
     - inversion H. destruct H0. inversion H0 ; subst. exists expl. split ; auto. apply Expl. }
   assert (~ forces M u0 (☐ ψ)).
-  { intro ctr. pose (ctr _ iu0v0 _ mv0w0). apply NHw. apply Persistence with w0 ; auto. }
+  { intro ctr. pose (ctr _ (ireach_refl u0) _ mu0w0). apply NHw. apply Persistence with w0 ; auto. }
   apply H0. intros v1 iu0v1 u1 mv1u1. cbn in Hyv. apply Hyv with u0 v1 ; auto.
   apply ireach_tran with u ; auto.
 - intros x y z mxy iyz zexpl.
@@ -202,26 +205,26 @@ intros F ; split ; intro Hyp.
     exfalso. apply H0. intros v ixv Hv. epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | ].
     exfalso. apply NP. exists v ; repeat split ; auto. }
   destruct H1 as (s & Hs0 & Hs1 & Hs2).
-  exists s.
   assert (exists v w, ireachable s v /\ mreachable v w /\ ~ forces m w (# 1)).
   { epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso].
      apply Hs2. intros v isv w mvw. epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | exfalso].
      apply NP. exists v. exists w. repeat split ; auto. }
   destruct H1 as (v & w & isv & mvw & Hw).
   exists v. exists w. repeat split ; auto.
-  + intros u Hu. destruct Hu as (t & K0 & K1). inversion K0 ; subst. unfold In.
-     destruct (Hs1 _ K1) as (e & K2 & K3). destruct K3. destruct H1 ; left ; exists e ; split ; auto.
-     destruct H1. exfalso ; lia. subst. right. exists expl ; split ; auto. apply In_singleton.
+  + apply ireach_tran with s ; auto.
   + cbn in Hw. subst. epose (LEM _). destruct o as [P | NP] ; [exact P | exfalso].
     apply Hw. right. left. split ; auto. intro. apply NP. destruct H1 as (x0 & K0 & K1).
     inversion K0 ; subst ; auto.
+  + intros u Hu. destruct Hu as (t & K0 & K1). inversion K0 ; subst. unfold In.
+     destruct (Hs1 _ (ireach_tran _ _ _ isv K1)) as (e & K2 & K3). destruct K3. destruct H1 ; left ; exists e ; split ; auto.
+     destruct H1. exfalso ; lia. subst. right. exists expl ; split ; auto. apply In_singleton.
 Qed.
 
 Lemma suff_impl_Idb  : forall F, suff_Idb_frame F -> Idb_frame F.
 Proof.
 intros F H x y z ixy myz Hz. destruct (H _ _ _ ixy myz) as (u & Hu0 & Hu1 & Hu2).
-exists u. exists u. exists z. repeat split ; auto.
-2,3: apply ireach_refl.
+exists u. exists z. repeat split ; auto.
+apply ireach_refl.
 intros w Hw. left ; auto.
 Qed.
 
@@ -298,8 +301,8 @@ Lemma strong_Cd_weak_Idb_Cd_Idb : forall F, strong_Cd_weak_Idb_frame F -> (Cd_fr
 Proof.
 intros F H. destruct H ; split.
 - apply correspond_Cd. intros. apply strong_is_suff_Cd in H. apply sufficient_Cd with (φ:=φ) (ψ:=ψ) in H ; auto.
-- intros x y z mxy iyz Hz. destruct (H0 _ _ _ mxy iyz). destruct H1. exists x0. exists x0. exists z.
-  repeat split ; auto. 2-3: apply ireach_refl.
+- intros x y z mxy iyz Hz. destruct (H0 _ _ _ mxy iyz). destruct H1. exists x0. exists z.
+  repeat split ; auto. apply ireach_refl.
   intros v Hv. destruct Hv as (w & Hw1 & Hw2). unfold In. inversion Hw1 ; subst.
   unfold suff_Cd_frame in H. destruct (H _ _ _ Hw2 H2). destruct H3. left. exists x0.
   split ; auto. exists z ; split ; auto. apply In_singleton.
