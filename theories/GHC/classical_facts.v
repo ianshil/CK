@@ -15,12 +15,13 @@ Require Import Lindenbaum_lem.
 Require Import Lindenbaum_lem_pair.
 
 
-Section LEMal_facts.
+Section Classical_facts.
+
+(* Using LEM we can prove results about our calculi. *)
 
 Axiom LEM : forall P, P \/ ~ P.
 
-  (* To prove strong completeness, we require the strength of classical
-      logic. For this, we declare LEM as an axiom. *)
+(* Quasi-primeness becomes primeness. *)
 
 Lemma LEM_prime Δ :
   quasi_prime Δ  -> prime Δ .
@@ -73,4 +74,4 @@ exists l1. split ; auto.
   right. apply H3 ; auto.
 Qed.
 
-End LEMal_facts.
+End Classical_facts.

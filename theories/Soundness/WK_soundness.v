@@ -14,7 +14,7 @@ Section WK_soundness.
 Theorem WK_Soundness : forall Γ phi, (WKH_prv Γ phi) ->  (loc_conseq Nd_frame Γ phi).
 Proof.
 apply Soundness. pose correspond_Nd.
-intro F ; split ; [intros H A HA ; inversion HA ; subst ; apply i ; auto | intros H ; apply i ; apply H ; unfold Nd ; auto].
+intro F ; intros H A HA ; inversion HA ; subst ; apply i ; auto.
 Qed.
 
 End WK_soundness.

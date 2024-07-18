@@ -388,6 +388,10 @@ destruct H3. exists x1. split ; auto. exists z. split ; auto.
 apply In_singleton.
 Qed.
 
+(* We leverage the truth lemma to prove a general completeness result parametrised
+    in a set of additional axioms validated by a certain class of frames. Completeness
+    on this class of frame follows. *)
+
 Variable ClassF : frame -> Prop.
 Hypothesis ClassF_AdAx : forall f, ClassF f -> (forall A, AdAxCdIdb A -> fvalid f A).
 Hypothesis CF_ClassF : ClassF CF.

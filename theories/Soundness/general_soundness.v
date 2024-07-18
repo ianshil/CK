@@ -10,6 +10,9 @@ Require Import kripke_export.
 
 Section general_soundness.
 
+(* We can show that all axioms of CK are valid on all
+    models of our semantics. *)
+
 Lemma Ax_valid : forall A, Axioms A ->
   (forall M w, forces M w A).
 Proof.
@@ -33,9 +36,13 @@ intros A Ax. destruct Ax as [Ax | Ax].
     apply ireach_tran with v0 ; auto. apply ireach_refl.
 Qed.
 
+(* We can then show that if a certain class of frames validates a set of
+    additional axioms, then we obtain a soundness result on this class
+    of frames. *)
+
 Variable AdAx : form -> Prop.
 Variable FraP : frame -> Prop.
-Hypothesis corresp_AdAx_FraP : forall F, FraP F <-> (forall A, AdAx A -> fvalid F A).
+Hypothesis corresp_AdAx_FraP : forall F, FraP F -> (forall A, AdAx A -> fvalid F A).
 
 Theorem Soundness : forall Γ phi, (extCKH_prv AdAx Γ phi) ->  (loc_conseq FraP Γ phi).
 Proof.
@@ -45,7 +52,7 @@ intros Γ phi D. induction D ; intros C FrProp w Hw.
 (* Ax *)
 - destruct H.
   + apply Ax_valid ; destruct H ; firstorder.
-  + rewrite (corresp_AdAx_FraP fra) in FrProp. apply FrProp ; auto.
+  + apply (corresp_AdAx_FraP fra FrProp A H) ; auto.
 (* MP *)
 - unfold loc_conseq in *. cbn in *. apply IHD1 with w ; auto. apply ireach_refl.
 (* Nec *)

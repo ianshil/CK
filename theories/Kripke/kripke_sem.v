@@ -7,6 +7,8 @@ Require Import im_syntax.
 
 Section kripke_sem.
 
+(* We define frames. *)
+
     Class frame :=
       {
         (* Nodes *)
@@ -24,9 +26,11 @@ Section kripke_sem.
         mreach_expl u : mreachable expl u <-> u = expl ;
       }.
 
+(* Then models. *)
+
     Class model :=
       {
-        (* Nodes *)
+        (* Frame *)
         fra : frame ;
 
         (* Valuation *)
@@ -34,6 +38,9 @@ Section kripke_sem.
         persist :  forall u v, ireachable u v -> forall p, val u p -> val v p ;
         val_expl :  forall p, val expl p
       }.
+
+(* We can now define the notion of forcing, which interprets
+    formulas in points of models. *)
 
 Fixpoint forces (M: model) w (φ : form) : Prop :=
 match φ with
@@ -45,6 +52,8 @@ match φ with
   | Box ψ => forall v, ireachable w v -> forall u, mreachable v u -> forces M u ψ
   | Diam ψ => forall v, ireachable w v -> exists u, mreachable v u /\ forces M u ψ
 end.
+
+(* Persistence holds in our semantics. *)
 
   Lemma Persistence : forall A M w, forces M w A ->
               (forall v, ireachable w v -> forces M v A).
@@ -62,6 +71,8 @@ end.
     exists u ; split ; auto.
   Qed.
 
+(* As expected, the exploding world forces all formulas. *)
+
   Lemma Expl : forall A M, forces M expl A.
   Proof.
   induction A ; cbn ; intros ; subst ; auto.
@@ -70,6 +81,9 @@ end.
   - apply ireach_expl in H ; subst. apply mreach_expl in H0 ; auto ; subst ; auto.
   - apply ireach_expl in H ; subst. exists expl ; split ; auto. apply mreach_expl ; auto.
   Qed.
+
+(* We define notions of validity on models and frames, as well as the local
+    semantic consequence relation. *)
 
   Definition mvalid (M : model) φ := forall w, forces M w φ.
 

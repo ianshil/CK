@@ -477,6 +477,10 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   exists s0. split ; auto. apply IHψ ; auto.
 Qed.
 
+(* We leverage the truth lemma to prove a general completeness result parametrised
+    in a set of additional axioms validated by a certain class of frames. Completeness
+    on this class of frame follows. *)
+
 Variable ClassF : frame -> Prop.
 Hypothesis ClassF_AdAx : forall f, ClassF f -> (forall A, AdAx A -> fvalid f A).
 Hypothesis CF_ClassF : forall Γ, ClassF (CF Γ).

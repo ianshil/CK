@@ -18,7 +18,7 @@ Variable AdAx : form -> Prop.
 Definition AdAxIdb := fun x => AdAx x \/ (exists A B, (Idb A B) = x).
 
 
-(* We construct the Psegments for our canonical model *)
+(* We construct the P-segments for our canonical model *)
 
 Class Psegment : Type :=
   { head : @Ensemble form ;
@@ -37,6 +37,8 @@ Class Psegment : Type :=
     segP_noBot_noDiamBot : ~ head ⊥ -> ~ head (⬦ ⊥) ->
                 exists A, ~ head (⬦ A) /\ (forall th, Theory AdAxIdb th -> (tail th <-> (fun x => (forall C, head (Box C) -> x C) /\ ~ x A) th))
   }.
+
+(* P-segments are also segments as the satisfy the two following properties. *)
 
 Lemma boxreflect : forall seg A, (@head seg) (☐ A) -> forall th, (@tail seg) th -> th A.
 Proof.
@@ -76,7 +78,7 @@ intros. destruct (LEM (head ⊥)).
      intros C HC ; left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
 Qed.
 
-(* We admit that the proofs of the properties of Psegments are
+(* We admit that the proofs of the properties of P-segments are
     irrelevant to the identity between Psegments. *)
 
 Axiom Psegment_prf_irrel : forall (s0 s1 : Psegment),
@@ -555,6 +557,10 @@ Lemma CF_Idb : Idb_frame CF.
 Proof.
 apply suff_impl_Idb. apply CF_suff_Idb.
 Qed.
+
+(* We leverage the truth lemma to prove a general completeness result parametrised
+    in a set of additional axioms validated by a certain class of frames. Completeness
+    on this class of frame follows. *)
 
 Variable ClassF : frame -> Prop.
 Hypothesis ClassF_AdAx : forall f, ClassF f -> (forall A, AdAxIdb A -> fvalid f A).

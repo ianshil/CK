@@ -230,10 +230,6 @@ apply Id ; apply Union_introl ; apply Union_intror ; apply In_singleton.
 apply prv_Top.
 Qed.
 
-(* ---------------------------------------------------------------------------------------------------------- *)
-
-(* Some results about remove. *)
-
 Lemma In_remove : forall (A : form) B (l : list (form)), List.In A (remove eq_dec_form B l) -> List.In A l.
 Proof.
 intros A B. induction l.
@@ -265,8 +261,6 @@ intro A. induction l.
   * inversion H. subst. apply NoDup_cons. intro. apply H2. apply In_remove with (B:= A).
     assumption. apply IHl. assumption.
 Qed.
-
-(* To help for the Lindenbaum lemma. *)
 
 Lemma Explosion : forall Γ A B,
   extCKH_prv AdAx Γ ((B --> Bot) --> (B --> A)).

@@ -45,7 +45,18 @@
 <span class="id" title="keyword">Section</span> <a id="forming_CdIdb_model" class="idref" href="#forming_CdIdb_model"><span class="id" title="section">forming_CdIdb_model</span></a>.<br/>
 
 <br/>
+<span class="comment">(*&nbsp;To&nbsp;show&nbsp;that&nbsp;the&nbsp;logic&nbsp;CK&nbsp;+&nbsp;Idb&nbsp;is&nbsp;diamond-free&nbsp;conservative&nbsp;over&nbsp;CK<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;we&nbsp;show&nbsp;that&nbsp;one&nbsp;can&nbsp;transform&nbsp;a&nbsp;CK&nbsp;model&nbsp;into&nbsp;a&nbsp;CK&nbsp;+&nbsp;Idb&nbsp;model<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;which&nbsp;satisfies&nbsp;the&nbsp;same&nbsp;diamond-free&nbsp;formulas.&nbsp;<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;We&nbsp;proceed&nbsp;to&nbsp;define&nbsp;the&nbsp;formation&nbsp;of&nbsp;a&nbsp;CK&nbsp;+&nbsp;Idb&nbsp;model<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;a&nbsp;CK&nbsp;model.&nbsp;*)</span><br/>
+
+<br/>
 <span class="id" title="keyword">Variable</span> <a id="forming_CdIdb_model.M" class="idref" href="#forming_CdIdb_model.M"><span class="id" title="variable">M</span></a> : <a class="idref" href="Kripke.kripke_sem.html#model"><span class="id" title="class">model</span></a>.<br/>
+
+<br/>
+<span class="comment">(*&nbsp;Intuitionistic&nbsp;relation.&nbsp;*)</span><br/>
 
 <br/>
 <span class="id" title="keyword">Definition</span> <a id="CdIdbireach" class="idref" href="#CdIdbireach"><span class="id" title="definition">CdIdbireach</span></a> := <span class="id" title="keyword">fun</span> <a id="w:2" class="idref" href="#w:2"><span class="id" title="binder">w</span></a> <a id="v:3" class="idref" href="#v:3"><span class="id" title="binder">v</span></a> =&gt; (@<a class="idref" href="Kripke.kripke_sem.html#ireachable"><span class="id" title="method">ireachable</span></a> (@<a class="idref" href="Kripke.kripke_sem.html#fra"><span class="id" title="method">fra</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#forming_CdIdb_model.M"><span class="id" title="variable">M</span></a>)) <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#w:2"><span class="id" title="variable">w</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#v:3"><span class="id" title="variable">v</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#f031fe1957c4a4a8e217aa46af2b4e25"><span class="id" title="notation">\/</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#v:3"><span class="id" title="variable">v</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="Kripke.kripke_sem.html#expl"><span class="id" title="method">expl</span></a>.<br/>
@@ -69,6 +80,9 @@
 <span class="id" title="keyword">Proof</span>.<br/>
 <span class="id" title="tactic">intros</span>. <span class="id" title="tactic">unfold</span> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#CdIdbireach"><span class="id" title="definition">CdIdbireach</span></a> <span class="id" title="tactic">in</span> *. <span class="id" title="tactic">destruct</span> <span class="id" title="var">H</span> ; <span class="id" title="tactic">auto</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="Kripke.kripke_sem.html#ireach_expl"><span class="id" title="method">ireach_expl</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">H</span> ; <span class="id" title="tactic">auto</span>.<br/>
 <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="comment">(*&nbsp;Modal&nbsp;relation.&nbsp;*)</span><br/>
 
 <br/>
 <span class="id" title="keyword">Definition</span> <a id="CdIdbmreach" class="idref" href="#CdIdbmreach"><span class="id" title="definition">CdIdbmreach</span></a> := <span class="id" title="keyword">fun</span> <a id="w:9" class="idref" href="#w:9"><span class="id" title="binder">w</span></a> <a id="v:10" class="idref" href="#v:10"><span class="id" title="binder">v</span></a> =&gt; (@<a class="idref" href="Kripke.kripke_sem.html#mreachable"><span class="id" title="method">mreachable</span></a> (@<a class="idref" href="Kripke.kripke_sem.html#fra"><span class="id" title="method">fra</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#forming_CdIdb_model.M"><span class="id" title="variable">M</span></a>)) <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#w:9"><span class="id" title="variable">w</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#v:10"><span class="id" title="variable">v</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#f031fe1957c4a4a8e217aa46af2b4e25"><span class="id" title="notation">\/</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#v:10"><span class="id" title="variable">v</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="Kripke.kripke_sem.html#expl"><span class="id" title="method">expl</span></a>.<br/>
@@ -117,6 +131,9 @@
 <span class="id" title="keyword">Qed</span>.<br/>
 
 <br/>
+<span class="comment">(*&nbsp;We&nbsp;now&nbsp;define&nbsp;the&nbsp;valuation.&nbsp;*)</span><br/>
+
+<br/>
 <span class="id" title="keyword">Definition</span> <a id="CdIdbval" class="idref" href="#CdIdbval"><span class="id" title="definition">CdIdbval</span></a> := <a class="idref" href="Kripke.kripke_sem.html#val"><span class="id" title="method">val</span></a>.<br/>
 
 <br/>
@@ -134,6 +151,9 @@
 <span class="id" title="keyword">Qed</span>.<br/>
 
 <br/>
+<span class="comment">(*&nbsp;We&nbsp;finally&nbsp;have&nbsp;our&nbsp;CK&nbsp;+&nbsp;Cd&nbsp;+&nbsp;Idb&nbsp;model.&nbsp;*)</span><br/>
+
+<br/>
 <span class="id" title="keyword">Instance</span> <a id="CdIdb_model_former" class="idref" href="#CdIdb_model_former"><span class="id" title="instance">CdIdb_model_former</span></a> : <a class="idref" href="Kripke.kripke_sem.html#model"><span class="id" title="class">model</span></a> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Kripke.kripke_sem.html#fra"><span class="id" title="method">fra</span></a> := <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#CdIdb_frame_former"><span class="id" title="instance">CdIdb_frame_former</span></a> ;<br/>
@@ -142,6 +162,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Kripke.kripke_sem.html#persist"><span class="id" title="method">persist</span></a> := <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#CdIdbpersist"><span class="id" title="lemma">CdIdbpersist</span></a> ;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Kripke.kripke_sem.html#val_expl"><span class="id" title="method">val_expl</span></a> := <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#CdIdbval_expl"><span class="id" title="lemma">CdIdbval_expl</span></a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+
+<br/>
+<span class="comment">(*&nbsp;We&nbsp;can&nbsp;show&nbsp;an&nbsp;agreement&nbsp;results&nbsp;on&nbsp;diamond-free&nbsp;formulas<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;between&nbsp;both&nbsp;models.&nbsp;*)</span><br/>
 
 <br/>
 <span class="id" title="keyword">Lemma</span> <a id="model_forces_iff_CdIdb_model_forces" class="idref" href="#model_forces_iff_CdIdb_model_forces"><span class="id" title="lemma">model_forces_iff_CdIdb_model_forces</span></a> : <span class="id" title="keyword">forall</span> <a id="1a98fcca75bb9e38590f36614f4e7492" class="idref" href="#1a98fcca75bb9e38590f36614f4e7492"><span class="id" title="binder">φ</span></a>, <a class="idref" href="Syntax.im_syntax.html#diam_free"><span class="id" title="definition">diam_free</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#1a98fcca75bb9e38590f36614f4e7492"><span class="id" title="variable">φ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
@@ -182,6 +206,10 @@
 <span class="id" title="keyword">Section</span> <a id="CKCdIdb_conserv_CK" class="idref" href="#CKCdIdb_conserv_CK"><span class="id" title="section">CKCdIdb_conserv_CK</span></a>.<br/>
 
 <br/>
+<span class="comment">(*&nbsp;We&nbsp;can&nbsp;finally&nbsp;show&nbsp;that&nbsp;the&nbsp;logic&nbsp;CK&nbsp;and&nbsp;CK&nbsp;+&nbsp;Cd&nbsp;+&nbsp;Idb&nbsp;agree&nbsp;on<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;diamond-free&nbsp;formulas.&nbsp;*)</span><br/>
+
+<br/>
 <span class="id" title="keyword">Theorem</span> <a id="diam_free_eq_CKCdIdb_CK" class="idref" href="#diam_free_eq_CKCdIdb_CK"><span class="id" title="lemma">diam_free_eq_CKCdIdb_CK</span></a> : <span class="id" title="keyword">forall</span> <a id="f0fc26962fbc1476a5f5245f565ffb72" class="idref" href="#f0fc26962fbc1476a5f5245f565ffb72"><span class="id" title="binder">Γ</span></a> <a id="811db5421995400350703bd290e285cb" class="idref" href="#811db5421995400350703bd290e285cb"><span class="id" title="binder">φ</span></a>, <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">(</span></a><span class="id" title="keyword">forall</span> <a id="f33024492691f4a5a4026067e3f41e5d" class="idref" href="#f33024492691f4a5a4026067e3f41e5d"><span class="id" title="binder">ψ</span></a>, <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">(</span></a><a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#f0fc26962fbc1476a5f5245f565ffb72"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#f33024492691f4a5a4026067e3f41e5d"><span class="id" title="variable">ψ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#f031fe1957c4a4a8e217aa46af2b4e25"><span class="id" title="notation">\/</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#811db5421995400350703bd290e285cb"><span class="id" title="variable">φ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#f33024492691f4a5a4026067e3f41e5d"><span class="id" title="variable">ψ</span></a><a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="Syntax.im_syntax.html#diam_free"><span class="id" title="definition">diam_free</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#f33024492691f4a5a4026067e3f41e5d"><span class="id" title="variable">ψ</span></a><a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="GHC.CKH.html#CKH_prv"><span class="id" title="definition">CKH_prv</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#f0fc26962fbc1476a5f5245f565ffb72"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#811db5421995400350703bd290e285cb"><span class="id" title="variable">φ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'&lt;-&gt;'_x"><span class="id" title="notation">&lt;-&gt;</span></a> <a class="idref" href="GHC.CKH.html#CKCdIdbH_prv"><span class="id" title="definition">CKCdIdbH_prv</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#f0fc26962fbc1476a5f5245f565ffb72"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#811db5421995400350703bd290e285cb"><span class="id" title="variable">φ</span></a>.<br/>
 <span class="id" title="keyword">Proof</span>.<br/>
@@ -202,6 +230,9 @@
 
 <br/>
 <span class="id" title="keyword">Section</span> <a id="CKIdb_conserv_CK" class="idref" href="#CKIdb_conserv_CK"><span class="id" title="section">CKIdb_conserv_CK</span></a>.<br/>
+
+<br/>
+<span class="comment">(*&nbsp;This&nbsp;implies&nbsp;that&nbsp;CK&nbsp;and&nbsp;CK&nbsp;+&nbsp;Idb&nbsp;also&nbsp;agree&nbsp;on&nbsp;diamond-free&nbsp;formulas.&nbsp;*)</span><br/>
 
 <br/>
 <span class="id" title="keyword">Theorem</span> <a id="diam_free_eq_CKIdb_CK" class="idref" href="#diam_free_eq_CKIdb_CK"><span class="id" title="lemma">diam_free_eq_CKIdb_CK</span></a> : <span class="id" title="keyword">forall</span> <a id="8ca488d962adcdfae0a5af1368ee12c6" class="idref" href="#8ca488d962adcdfae0a5af1368ee12c6"><span class="id" title="binder">Γ</span></a> <a id="41fb38ac3e798fe26905834c105e239c" class="idref" href="#41fb38ac3e798fe26905834c105e239c"><span class="id" title="binder">φ</span></a>, <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">(</span></a><span class="id" title="keyword">forall</span> <a id="32cf365ed28b9f7f8dd18aad87ac158f" class="idref" href="#32cf365ed28b9f7f8dd18aad87ac158f"><span class="id" title="binder">ψ</span></a>, <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">(</span></a><a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#8ca488d962adcdfae0a5af1368ee12c6"><span class="id" title="variable">Γ</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#32cf365ed28b9f7f8dd18aad87ac158f"><span class="id" title="variable">ψ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#f031fe1957c4a4a8e217aa46af2b4e25"><span class="id" title="notation">\/</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#41fb38ac3e798fe26905834c105e239c"><span class="id" title="variable">φ</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#32cf365ed28b9f7f8dd18aad87ac158f"><span class="id" title="variable">ψ</span></a><a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="Syntax.im_syntax.html#diam_free"><span class="id" title="definition">diam_free</span></a> <a class="idref" href="Conservativity.CK_Cd_Idb_conserv_CK.html#32cf365ed28b9f7f8dd18aad87ac158f"><span class="id" title="variable">ψ</span></a><a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/doc/V8.19.1/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>

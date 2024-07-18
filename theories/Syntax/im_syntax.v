@@ -8,7 +8,7 @@ Delimit Scope My_scope with M.
 Open Scope My_scope.
 Set Implicit Arguments.
 
-(* First, let us define the propositional formulas we use here. *)
+(* First, let us define propositional formulas. *)
 
 Inductive form : Type :=
  | Var : nat -> form
@@ -35,7 +35,7 @@ Notation "¬ A" := (A --> ⊥) (at level 42) : My_scope.
 Notation "☐ A" := (Box A) (at level 42) : My_scope.
 Notation "⬦ A" := (Diam A) (at level 42) : My_scope.
 
-(* We define the diamond-free fragment of our language. *)
+(* We define the property of formulas of being diamond-free. *)
 
 Fixpoint diam_free φ : Prop :=
 match φ with
@@ -103,10 +103,14 @@ intros φ ψ χ. revert ψ χ φ. induction ψ.
   apply IHψ with (φ:=φ) ; auto.
 Qed.
 
+(* Equality is decidable over formulas. *)
+
 Lemma eq_dec_form : forall x y : form, {x = y}+{x <> y}.
 Proof.
 repeat decide equality.
 Qed.
+
+(* We define the notion of uniform substitution. *)
 
 Fixpoint subst (σ : nat -> form) (φ : form) : form :=
 match φ with

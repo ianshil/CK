@@ -19,7 +19,7 @@ Variable AdAx : form -> Prop.
 Definition AdAxCd := fun x => AdAx x \/ (exists A B, (Cd A B) = x).
 
 
-(* We construct the ABsegments for our canonical model *)
+(* We construct the AB-segments for our canonical model *)
 
 Class ABsegment : Type :=
   { head : @Ensemble form ;
@@ -34,6 +34,8 @@ Class ABsegment : Type :=
     segAorB : (forall th, Theory AdAxCd th -> (tail th <-> (forall C, (head (☐ C) -> th C) /\ (th C -> head (⬦ C))))) (*A*) \/
                     (forall th, Theory AdAxCd th -> (tail th <-> (forall C, (head (☐ C) -> th C)))) (*B*) ;
   }.
+
+(* These AB-segments are segments as they satisfy the two following properties. *)
 
 Lemma boxreflect : forall seg A, (@head seg) (☐ A) -> forall th, (@tail seg) th -> th A.
 Proof.
@@ -85,7 +87,7 @@ intros. destruct segAorB.
   intros. all: unfold AllForm ; auto.
 Qed.
 
-(* We admit that the proofs of the properties of ABsegments are
+(* We admit that the proofs of the properties of AB-segments are
     irrelevant to the identity between ABsegments. *)
 
 Axiom ABsegment_prf_irrel : forall (s0 s1 : ABsegment),
@@ -454,6 +456,10 @@ Lemma CF_Cd : Cd_frame CF.
 Proof.
 apply suff_impl_Cd. apply CF_suff_Cd.
 Qed.
+
+(* We leverage the truth lemma to prove a general completeness result parametrised
+    in a set of additional axioms validated by a certain class of frames. Completeness
+    on this class of frame follows. *)
 
 Variable ClassF : frame -> Prop.
 Hypothesis ClassF_AdAx : forall f, ClassF f -> (forall A, AdAxCd A -> fvalid f A).

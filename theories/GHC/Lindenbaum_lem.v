@@ -68,6 +68,8 @@ End prelims.
 
 Section Prime.
 
+(* We define the step-by-step construction of the Lindenbaum extension. *)
+
 Definition choice_form Γ Δ ψ φ: Ensemble form :=
 fun x => Δ x \/ (Γ x /\ ~ (extCKH_prv AdAx (Union _ Δ (Singleton _ x)) ψ) /\ φ = x).
 
@@ -78,6 +80,8 @@ match n with
 | 0 => Δ
 | S m => choice_code Γ (nLind_theory Γ Δ ψ m) ψ m
 end.
+
+(* The Lindenbaum extension is then defined as follows. *)
 
 Definition Lind_theory Γ Δ ψ : @Ensemble form :=
   fun x => (exists n, In _ (nLind_theory Γ Δ ψ n) x).
@@ -210,7 +214,7 @@ eapply MP. 2: exact H0. apply extCKH_Deduction_Theorem in H2.
 apply (extCKH_monot _ _ _ H2). intros C HC. exists (form_index A) ; auto.
 Qed.
 
-(* Not in Lind_theory does not derive *)
+(* Not being in Lind_theory implies not being derivable from the theory. *)
 
 Lemma not_In_Lind_theory_deriv : forall Γ Δ ψ,
   Included _ Δ Γ ->

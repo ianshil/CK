@@ -13,6 +13,8 @@ Axiom LEM : forall P, P \/ ~ P.
 
 Section Cd.
 
+(* We present strong, sufficient and correspondence conditions on
+    frames for the axiom Cd. *)
 
 Definition mupcone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /\ mreachable v w.
 Definition mdowncone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /\ mreachable w v.
@@ -23,6 +25,8 @@ Definition idowncone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /
 
 Definition suff_Cd_frame (F : frame) := forall x, exists x', ireachable x x' /\
         forall y z, ireachable x y -> mreachable x' z -> exists w, mreachable y w /\ ireachable z w.
+
+(* A stronger condition for Cd is the following. *)
 
 Definition strong_Cd_frame (F : frame) := forall w v u, ireachable w v -> mreachable w u -> exists x, mreachable v x /\ ireachable u x.
 
@@ -106,6 +110,9 @@ intros F ; split ; intro H.
     apply H3.
 Qed.
 
+(* We show that the strong condition implies the sufficient, which in turn
+    implies the correspondence one. *)
+
 Lemma strong_impl_suff_Cd  : forall F, strong_Cd_frame F -> suff_Cd_frame F.
 Proof.
 intros F H x. exists x ; split. apply ireach_refl. intros.
@@ -139,6 +146,9 @@ End Cd.
 
 
 Section Idb.
+
+(* We present sufficient and correspondence conditions on
+    frames for the axiom Idb. *)
 
 Definition suff_Idb_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z ->
                     exists u, ireachable x u /\
@@ -220,6 +230,8 @@ intros F ; split ; intro Hyp.
      destruct H1. exfalso ; lia. subst. right. exists expl ; split ; auto. apply In_singleton.
 Qed.
 
+(* We also show that the sufficient implies the correspondence condition. *)
+
 Lemma suff_impl_Idb  : forall F, suff_Idb_frame F -> Idb_frame F.
 Proof.
 intros F H x y z ixy myz Hz. destruct (H _ _ _ ixy myz) as (u & Hu0 & Hu1 & Hu2).
@@ -243,6 +255,9 @@ End Idb.
 
 
 Section Nd.
+
+(* We present sufficient and correspondence conditions on
+    frames for the axiom Nd. *)
 
 (* A sufficient condition to prove the axiom Nd (⬦⊥) --> ⊥ is that only expl can modally reach expl. *)
 
@@ -269,6 +284,8 @@ intro F ; split ; intro H.
   apply ireach_refl. intros. exists expl ; split ; auto.
 Qed.
 
+(* The sufficient implies the correspondence condition. *)
+
 Lemma suff_impl_Nd  : forall F, suff_Nd_frame F -> Nd_frame F.
 Proof.
 intros F H x Hx. apply H. apply Hx. apply ireach_refl.
@@ -290,12 +307,15 @@ End Nd.
 Section suff_CdIdb.
 
 
-(* While we did not present a sufficient condition for Idb, we can find one once
-    both Cd and Idb are present. *)
+(* While we did not present an alternative condition to sufficient and correspondence
+    for Idb, we can find one once both Cd and Idb are present. *)
 
 Definition weak_Idb_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z -> exists w, ireachable x w /\ mreachable w z.
 
 Definition strong_Cd_weak_Idb_frame (F : frame) := strong_Cd_frame F /\ weak_Idb_frame F.
+
+(* Being a strong Cd frame as well as a weak Idb frame implies being 
+    a correspondence Cd and Idb frame. *)
 
 Lemma strong_Cd_weak_Idb_Cd_Idb : forall F, strong_Cd_weak_Idb_frame F -> (Cd_frame F /\ Idb_frame F).
 Proof.
@@ -315,6 +335,9 @@ End suff_CdIdb.
 
 
 Section Ndb.
+
+(* We present sufficient and correspondence conditions on
+    frames for the axiom Ndb. *)
 
 (* A sufficient condition to prove the axiom Nd (⬦⊥) --> (☐ ⊥) is that only expl can modally reach expl. *)
 
@@ -342,6 +365,8 @@ intro F ; split ; intro H.
   pose (m0 eq_refl _ _ iwv). apply e with v ; auto. 2: apply ireach_refl.
   intros. exists expl ; split ; auto. apply Hw. apply ireach_tran with v ; auto.
 Qed.
+
+(* The sufficient condition implies the correspondence one. *)
 
 Lemma suff_impl_Ndb  : forall F, suff_Ndb_frame F -> Ndb_frame F.
 Proof.

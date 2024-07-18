@@ -26,7 +26,11 @@ Inductive MAxioms (F : form) : Prop :=
  | Kb A B : F = (☐ (A --> B)) --> ((☐ A) --> ☐ B) -> MAxioms F
  | Kd A B : F = (☐ (A --> B)) --> ((⬦A) --> ⬦B) -> MAxioms F.
 
+(* And join both set of axioms. *)
+
 Definition Axioms (A : form) : Prop := IAxioms A \/ MAxioms A.
+
+(* Here are additional specific axioms. *)
 
 Definition Cd A B := (⬦A ∨ B)-->  (⬦A) ∨ (⬦B).
 Definition Idb A B := ((⬦A) --> (☐B)) -->  ☐(A --> B).
@@ -34,11 +38,16 @@ Definition Nd := (⬦⊥) --> ⊥.
 Definition Ndb := (⬦⊥) --> (☐⊥).
 Definition wCD A B := (☐(A ∨ B)) --> ((⬦A) --> (☐B)) -->  ☐ B.
 
+(* We can then define the generalised Hilbert system for CK parametrised
+    in a set of additional axioms. *)
+
 Inductive extCKH_prv (AdAx: form -> Prop) : (form -> Prop) -> form -> Prop :=
   | Id Γ A : In _ Γ A -> extCKH_prv AdAx Γ A
   | Ax Γ A : (Axioms A \/ AdAx A) -> extCKH_prv AdAx Γ A
   | MP Γ A B : extCKH_prv AdAx Γ (A --> B) ->  extCKH_prv AdAx Γ A -> extCKH_prv AdAx Γ B
   | Nec Γ A : extCKH_prv AdAx (Empty_set _) A -> extCKH_prv AdAx Γ (☐ A).
+
+(* We give names to some instances of the general definition above. *)
 
 Definition CKH_prv := extCKH_prv (fun x => False).
 (* One axiom. *)
