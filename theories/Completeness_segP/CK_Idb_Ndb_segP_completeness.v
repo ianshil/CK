@@ -19,7 +19,7 @@ Definition is_Ndb := (fun x => Ndb = x).
 Lemma CF_suff_Ndb : suff_Ndb_frame (CF is_Ndb).
 Proof.
 intros w mwexpl v mwv.
-destruct (LEM ((@head _ w) (⬦ ⊥))).
+destruct (LEM ((@head _ w) (◊ ⊥))).
 *** assert (@head _ v = AllForm).
 { apply Extensionality_Ensembles ; split ; intros A HA ; unfold In, head in * ; cbn in *.
   - unfold AllForm ; auto.

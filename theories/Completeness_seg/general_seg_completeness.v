@@ -30,9 +30,9 @@ Class segment Γ : Type :=
     segPrime : forall th, (th = head \/ tail th) -> quasi_prime th ;
 
     (* Boxed formulas in the head are reflected in the tail *)
-    boxreflect : forall A, head (☐ A) -> forall th, tail th -> th A ;
+    boxreflect : forall A, head (□ A) -> forall th, tail th -> th A ;
     (* Diamond formulas in the head are witnessed in the tail *)
-    diamwitness : forall A, head (⬦ A) -> exists th, tail th /\ th A
+    diamwitness : forall A, head (◊ A) -> exists th, tail th /\ th A
   }.
 
 (* We admit that the proofs of the properties of segments are
@@ -65,29 +65,29 @@ intros. destruct H ; subst ; intros A B H0 H1.
   destruct A ; cbn ; auto.
 Qed.
 
-Lemma cexpl_boxreflect Γ : forall A, (Clos Γ) (☐ A) -> forall th, (Singleton _ (Clos Γ)) th -> th A.
+Lemma cexpl_boxreflect Γ : forall A, (Clos Γ) (□ A) -> forall th, (Singleton _ (Clos Γ)) th -> th A.
 Proof.
-intros. inversion H0 ; subst. apply Incl_ClosSubform_Clos. unfold In. exists (☐ A) ; split ; auto.
+intros. inversion H0 ; subst. apply Incl_ClosSubform_Clos. unfold In. exists (□ A) ; split ; auto.
   simpl ; right. destruct A ; cbn ; auto.
 Qed.
 
-Lemma cexpl_diamwitness Γ : forall A, (Clos Γ) (⬦ A) -> exists th, (Singleton _ (Clos Γ)) th /\ th A.
+Lemma cexpl_diamwitness Γ : forall A, (Clos Γ) (◊ A) -> exists th, (Singleton _ (Clos Γ)) th /\ th A.
 Proof.
 intros. exists (Clos Γ). split. apply In_singleton. 
-apply Incl_ClosSubform_Clos. unfold In. exists (⬦ A) ; split ; auto.
+apply Incl_ClosSubform_Clos. unfold In. exists (◊ A) ; split ; auto.
 simpl ; right. destruct A ; cbn ; auto.
 Qed.
 
 Instance cexpl Γ : segment Γ :=
   {| head := Clos Γ ;
-    tail := Singleton _ (Clos Γ) ;
+     tail := Singleton _ (Clos Γ) ;
 
-    segInclClos := cexpl_segInclClos Γ ;
-    segClosed := cexpl_segClosed Γ ;
-    segPrime := cexpl_segPrime Γ ;
-    boxreflect := cexpl_boxreflect Γ ;
-    diamwitness := cexpl_diamwitness Γ
-  |}.
+     segInclClos := cexpl_segInclClos Γ ;
+     segClosed := cexpl_segClosed Γ ;
+     segPrime := cexpl_segPrime Γ ;
+     boxreflect := cexpl_boxreflect Γ ;
+     diamwitness := cexpl_diamwitness Γ
+   |}.
 
 (* Intuitionistic relation on the canonical model. *)
 
@@ -122,7 +122,7 @@ assert (@tail _ u = @tail _ (cexpl Γ)).
     apply segClosed ; auto. eapply MP. apply EFQ. apply Id ; auto.
     subst. apply In_singleton.
   - unfold In in *. unfold tail in *. unfold cexpl in HC. inversion HC ; subst.
-    assert ((@head _ u) (⬦ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold Clos. auto.
+    assert ((@head _ u) (◊ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold Clos. auto.
     pose (diamwitness _ H1). destruct e. destruct H2.
     assert (x = Clos Γ). apply Extensionality_Ensembles.
     split ; intros A HA ; auto. apply segInclClos in HA ; auto.
@@ -149,7 +149,7 @@ split ; intro ; subst.
       apply segClosed ; auto. eapply MP. apply EFQ. apply Id ; auto.
       subst. apply In_singleton.
     * unfold In in *. unfold tail in *. unfold cexpl in HC. inversion HC ; subst.
-      assert ((@head _ u) (⬦ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold Clos. auto.
+      assert ((@head _ u) (◊ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold Clos. auto.
       pose (diamwitness _ H1). destruct e. destruct H2.
       assert (x = Clos Γ). apply Extensionality_Ensembles.
       split ; intros A HA ; auto. apply segInclClos in HA ; auto.
@@ -193,61 +193,61 @@ Proof.
   - destruct H7 ; subst ; auto. eapply segPrime ; auto. inversion H7 ; subst.
     right. unfold tail. unfold cexpl. apply In_singleton.
   - inversion H8 ; subst. apply H3 in H7. apply Incl_ClosSubform_Clos.
-    exists (☐ A). split ; auto. cbn. right. destruct A ; cbn ; auto.
+    exists (□ A). split ; auto. cbn. right. destruct A ; cbn ; auto.
   - exists (Clos Γ). split ; auto. apply In_singleton. apply Incl_ClosSubform_Clos.
-    exists (⬦ A). split ; auto. cbn. right. destruct A ; cbn ; auto.
+    exists (◊ A). split ; auto. cbn. right. destruct A ; cbn ; auto.
 Qed.
 
 (* We can show an existence lemma for diamond. *)
 
 Lemma Diam_existence Γ (s : segment Γ) ψ :
-  In _ (Clos Γ) (⬦ ψ) ->
-  ~ (@head _ s) (⬦ ψ) ->
+  In _ (Clos Γ) (◊ ψ) ->
+  ~ (@head _ s) (◊ ψ) ->
   exists w : segment Γ, Included _ (@head _ s) (@head _ w) /\
                                     forall th, (@tail _ w) th -> ~ th ψ.
 Proof.
 intros.
 assert (Jψ: Clos Γ ψ).
-{ apply Incl_ClosSubform_Clos. unfold In. exists (⬦ ψ). split ; simpl ; auto. right.
+{ apply Incl_ClosSubform_Clos. unfold In. exists (◊ ψ). split ; simpl ; auto. right.
   destruct ψ ; simpl ; auto. }
-assert (R0: forall B, (@head _ s) (⬦ B) -> ~ extCKH_prv AdAx (fun x => exists A, B = x \/ ((@head _ s) (☐ A) /\ x = A)) ψ).
+assert (R0: forall B, (@head _ s) (◊ B) -> ~ extCKH_prv AdAx (fun x => exists A, B = x \/ ((@head _ s) (□ A) /\ x = A)) ψ).
 { intros B HB D. apply H0. apply segClosed ; auto.
-  apply extCKH_monot with (Γ1:= Union _ (fun x : form => exists A : form, (@head _ s) (☐ A) /\ x = A) (Singleton _ B)) in D.
+  apply extCKH_monot with (Γ1:= Union _ (fun x : form => exists A : form, (@head _ s) (□ A) /\ x = A) (Singleton _ B)) in D.
   apply extCKH_Deduction_Theorem in D. eapply MP. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
   apply K_rule in D. apply (extCKH_monot _ _ _ D). intros C HC. unfold In in *.
   destruct HC as (E & (F & HF0 & HF1) & HCE) ; subst ; auto. apply Id ; auto.
   intros C HC. unfold In in *. destruct HC as (E & [HE | (HE0 & HE1)]) ; subst ; auto.
   right ; apply In_singleton. left. exists E ; auto. }
-assert (R2: forall B, (@head _ s) (⬦ B) -> Included form (fun x => exists A, B = x \/ ((@head _ s) (☐ A) /\ x = A)) (Clos Γ)).
+assert (R2: forall B, (@head _ s) (◊ B) -> Included form (fun x => exists A, B = x \/ ((@head _ s) (□ A) /\ x = A)) (Clos Γ)).
 { intros B HB C HC. destruct HC as (D & [HD | (HD0 & HD1)]) ; subst ; auto.
-  apply Incl_ClosSubform_Clos. exists (⬦ C).
+  apply Incl_ClosSubform_Clos. exists (◊ C).
   split ; cbn ; auto. apply segInclClos in HB ; auto. right ; destruct C ; cbn ; auto.
-  apply Incl_ClosSubform_Clos. exists (☐ D).
+  apply Incl_ClosSubform_Clos. exists (□ D).
   split ; cbn ; auto. apply segInclClos in HD0 ; auto. right ; destruct D ; cbn ; auto. }
-remember (fun x => exists B (P: (@head _ s) (⬦ B)), x = proj1_sig (Lindenbaum _ _ _ ψ Jψ (R2 _ P) (R0 _ P))) as LindSet.
+remember (fun x => exists B (P: (@head _ s) (◊ B)), x = proj1_sig (Lindenbaum _ _ _ ψ Jψ (R2 _ P) (R0 _ P))) as LindSet.
 assert (forall th : Ensemble form, th = head \/ LindSet th -> Included form th (Clos Γ)).
 intros. destruct H1 ; subst ; auto. pose (@segInclClos _ s). apply i ; auto.
 destruct H1 as (B & HB & J) ; subst. intros C HC. unfold In in *.
-destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (□ A) /\ x = A) ψ Jψ 
 (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L1 in HC ; auto.
 assert (forall th : Ensemble form, th = head \/ LindSet th -> restr_closed AdAx (Clos Γ) th).
 intros. destruct H2 ; subst ; auto. apply (@segClosed _ s) ; auto.
 destruct H2 as (B & HB & J) ; subst. intros C HC0 HC1.
-destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (□ A) /\ x = A) ψ Jψ 
 (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L2 in HC1 ; auto.
 assert (forall th : Ensemble form, th = head \/ LindSet th -> quasi_prime th).
 intros. destruct H3 ; subst ; auto. eapply (@segPrime _ s) ; auto. 
 destruct H3 as (B & HB & J) ; subst. intros C D Hor G.
-destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (□ A) /\ x = A) ψ Jψ 
 (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *. apply L3 in Hor ; auto.
-assert (forall A : form, head (☐ A) -> forall th : Ensemble form, LindSet th -> th A).
+assert (forall A : form, head (□ A) -> forall th : Ensemble form, LindSet th -> th A).
 intros. rewrite HeqLindSet in H5. destruct H5 as (B & HB & J) ; subst.
-destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ 
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (□ A) /\ x = A) ψ Jψ 
 (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in *.
 apply L0. unfold In. exists A ; auto.
-assert (forall A : form, head (⬦ A) -> exists th : Ensemble form, LindSet th /\ th A).
+assert (forall A : form, head (◊ A) -> exists th : Ensemble form, LindSet th /\ th A).
 intros.
-destruct (Lindenbaum _ Γ (fun x : form => exists B : form, A = x \/ head (☐ B) /\ x = B) ψ Jψ
+destruct (Lindenbaum _ Γ (fun x : form => exists B : form, A = x \/ head (□ B) /\ x = B) ψ Jψ
 (R2 _ H5) (R0 _ H5)) as (Γ0 & L0 & L1 & L2 & L3 & L4) eqn:E; cbn in *.
 exists Γ0. split ; auto. rewrite HeqLindSet. exists A. exists H5 ; auto. rewrite E.
 auto. apply L0. exists A ; auto.
@@ -255,7 +255,7 @@ pose (Build_segment Γ head LindSet H1 H2 H3 H4 H5).
 exists s0. split ; auto. intros C HC ; auto.
 intros th Hth contr. unfold tail in Hth. cbn in Hth. rewrite HeqLindSet in Hth.
 destruct Hth as (B & HB & J) ; subst.
-destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (☐ A) /\ x = A) ψ Jψ
+destruct (Lindenbaum _ Γ (fun x : form => exists A : form, B = x \/ head (□ A) /\ x = A) ψ Jψ
 (R2 B HB) (R0 B HB)) as (Γ0 & L0 & L1 & L2 & L3 & L4) ; cbn in * ; subst.
 apply L4. apply Id. auto.
 Qed.
@@ -315,7 +315,7 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
       apply segClosed ; auto. eapply MP. apply EFQ. apply Id ; auto.
       subst. apply In_singleton.
     * unfold In in *. unfold tail in *. unfold cexpl in HC. inversion HC ; subst.
-      assert ((@head _ s) (⬦ ⊥)). rewrite H1. unfold head. unfold cexpl. unfold Clos. auto.
+      assert ((@head _ s) (◊ ⊥)). rewrite H1. unfold head. unfold cexpl. unfold Clos. auto.
       pose (diamwitness _ H2). destruct e. destruct H3.
       assert (x = Clos Γ). apply Extensionality_Ensembles.
       split ; intros A HA ; auto. apply segInclClos in HA ; auto.
@@ -366,12 +366,12 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   right. apply IHψ2 ; auto.
 (* Imp ψ1 ψ2 *)
 - assert (Jψ1: Clos Γ ψ1).
-  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 --> ψ2). split ; simpl ; auto. right.
+  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 → ψ2). split ; simpl ; auto. right.
   apply in_or_app ; left ; destruct ψ1 ; simpl ; auto.
   assert (Jψ2: Clos Γ ψ2).
-  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 --> ψ2). split ; simpl ; auto. right.
+  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 → ψ2). split ; simpl ; auto. right.
   apply in_or_app ; right ; destruct ψ2 ; simpl ; auto.
-  destruct (LEM (head (ψ1 --> ψ2))) ; auto. exfalso.
+  destruct (LEM (head (ψ1 → ψ2))) ; auto. exfalso.
   assert (~ extCKH_prv AdAx (Union _ head (Singleton _ ψ1)) ψ2).
   intro. apply extCKH_Deduction_Theorem in H2. apply H1. apply segClosed ; auto.
   assert (Included form (Union _ head (Singleton form ψ1)) (Clos Γ)).
@@ -384,10 +384,10 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   apply segClosed ; auto. apply Id. apply Hw1.
   apply Union_intror ; apply In_singleton.
 - assert (Jψ1: Clos Γ ψ1).
-  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 --> ψ2). split ; simpl ; auto. right.
+  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 → ψ2). split ; simpl ; auto. right.
   apply in_or_app ; left ; destruct ψ1 ; simpl ; auto.
   assert (Jψ2: Clos Γ ψ2).
-  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 --> ψ2). split ; simpl ; auto. right.
+  apply Incl_ClosSubform_Clos. unfold In. exists (ψ1 → ψ2). split ; simpl ; auto. right.
   apply in_or_app ; right ; destruct ψ2 ; simpl ; auto.
   intros.
   apply IHψ1 in H2 ; auto. unfold cireach in H1. apply H1 in H0.
@@ -398,8 +398,8 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
 - assert (Jψ: Clos Γ ψ).
   apply Incl_ClosSubform_Clos. unfold In. exists (Box ψ). split ; simpl ; auto. right.
   destruct ψ ; simpl ; auto. simpl in H0.
-  destruct (LEM (head (☐ ψ))) ; auto. exfalso.
-  assert (~ extCKH_prv AdAx (fun x => exists A, (@head _ s) (☐ A) /\ x = A) ψ).
+  destruct (LEM (head (□ ψ))) ; auto. exfalso.
+  assert (~ extCKH_prv AdAx (fun x => exists A, (@head _ s) (□ A) /\ x = A) ψ).
   intro. apply H1. apply segClosed ; auto. apply K_rule in H2.
   apply (extCKH_monot _ _ _ H2). intros B HB. unfold In in *.
   destruct HB as (C & (D & HD0 & HD1) & HC) ; subst ; auto.
@@ -413,13 +413,13 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   intros. destruct H4 ; subst ; auto. eapply (@segPrime _ s) ; auto. inversion H4 ; subst.
   1-2: intros A B K0 K1. apply J3 in K0 ; auto. apply K1. left. apply Incl_ClosSubform_Clos. exists (A ∨ B).
   split ; auto. cbn. right. apply in_or_app ; left ; destruct A ; cbn ; auto.
-  assert (forall A : form, head (☐ A) -> forall th : Ensemble form, (fun x => x = Γ0 \/ x = (Clos Γ)) th -> th A).
+  assert (forall A : form, head (□ A) -> forall th : Ensemble form, (fun x => x = Γ0 \/ x = (Clos Γ)) th -> th A).
   intros. inversion H6 ; subst. apply J0. unfold In. exists A ; split ; auto.
-  apply Incl_ClosSubform_Clos. exists (☐ A). split ; cbn ; auto.
+  apply Incl_ClosSubform_Clos. exists (□ A). split ; cbn ; auto.
   apply segInclClos in H5 ; auto. right ; destruct A ; cbn ; auto.
-  assert (forall A : form, head (⬦ A) -> exists th : Ensemble form, (fun x => x = Γ0 \/ x = (Clos Γ)) th /\ th A).
+  assert (forall A : form, head (◊ A) -> exists th : Ensemble form, (fun x => x = Γ0 \/ x = (Clos Γ)) th /\ th A).
   intros. exists (Clos Γ). split ; auto. apply Incl_ClosSubform_Clos.
-  exists (⬦ A). split ; cbn ; auto. apply segInclClos in H6 ; auto. right ; destruct A ; cbn ; auto.
+  exists (◊ A). split ; cbn ; auto. apply segInclClos in H6 ; auto. right ; destruct A ; cbn ; auto.
   pose (Build_segment Γ head (fun x => x = Γ0 \/ x = (Clos Γ)) H2 H3 H4 H5 H6).
   assert (cireach Γ s s0). intros C HC ; auto.
   assert (K0: forall th : Ensemble form, th = Γ0 \/ Singleton (Ensemble form) (Clos Γ) th -> Included form th (Clos Γ)).
@@ -430,16 +430,16 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   intros. destruct H8 ; subst ; auto. inversion H8 ; subst.
   intros A B L0 L1. apply L1. left. apply Incl_ClosSubform_Clos. exists (A ∨ B).
   split ; auto. cbn. right. apply in_or_app ; left ; destruct A ; cbn ; auto.
-  assert (K3: forall A : form, Γ0 (☐ A) -> forall th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th -> th A).
-  intros. inversion H9 ; subst. apply Incl_ClosSubform_Clos. exists (☐ A).
+  assert (K3: forall A : form, Γ0 (□ A) -> forall th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th -> th A).
+  intros. inversion H9 ; subst. apply Incl_ClosSubform_Clos. exists (□ A).
   split ; cbn ; auto. right ; destruct A ; cbn ; auto.
-  assert (K4: forall A : form, Γ0 (⬦ A) -> exists th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th /\ th A).
+  assert (K4: forall A : form, Γ0 (◊ A) -> exists th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th /\ th A).
   intros. exists (Clos Γ). split ; auto. apply In_singleton. apply Incl_ClosSubform_Clos.
-  exists (⬦ A). split ; cbn ; auto. right ; destruct A ; cbn ; auto.
+  exists (◊ A). split ; cbn ; auto. right ; destruct A ; cbn ; auto.
   pose (Build_segment Γ Γ0 (Singleton _ (Clos Γ)) K0 K1 K2 K3 K4).
   apply H0 with (u:=s1) in H7. apply IHψ in H7 ; auto. apply J4. apply Id. auto.
   left ; auto. intros C HC. destruct HC as (D & HD0 & HD1) ; subst.
-  apply Incl_ClosSubform_Clos. exists (☐ D).
+  apply Incl_ClosSubform_Clos. exists (□ D).
   split ; cbn ; auto. apply segInclClos in HD0 ; auto. right ; destruct D ; cbn ; auto.
 - assert (Jψ: Clos Γ ψ).
   apply Incl_ClosSubform_Clos. unfold In. exists (Box ψ). split ; simpl ; auto. right.
@@ -447,15 +447,15 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   intros. apply IHψ ; auto. apply H1 in H0. pose (boxreflect _ H0). apply p ; auto.
 (* Diam ψ *)
 - assert (Jψ: Clos Γ ψ).
-  apply Incl_ClosSubform_Clos. unfold In. exists (⬦ ψ). split ; simpl ; auto. right.
+  apply Incl_ClosSubform_Clos. unfold In. exists (◊ ψ). split ; simpl ; auto. right.
   destruct ψ ; simpl ; auto.
   simpl in H0.
-  destruct (LEM (head (⬦ ψ))) ; auto. exfalso.
+  destruct (LEM (head (◊ ψ))) ; auto. exfalso.
   destruct (Diam_existence _ _ _ H H1) as (s0 & J0 & J1).
   apply H0 in J0. destruct J0 as (u & Hu1 & Hu2).
   apply IHψ in Hu2 ; auto. apply J1 with (@head _ u) ; auto.
 - assert (Jψ: Clos Γ ψ).
-  apply Incl_ClosSubform_Clos. unfold In. exists (⬦ ψ). split ; simpl ; auto. right.
+  apply Incl_ClosSubform_Clos. unfold In. exists (◊ ψ). split ; simpl ; auto. right.
   destruct ψ ; simpl ; auto.
   intros. unfold cireach in H1. apply H1 in H0.
   apply diamwitness in H0. destruct H0. destruct H0.
@@ -467,12 +467,12 @@ induction ψ ; intros ; split ; intros ; simpl ; try simpl in H1 ; auto.
   intros. destruct H5 ; subst ; auto. eapply (@segPrime _ v) ; auto. inversion H5 ; subst.
   intros A B J0 J1. apply J1. left. apply Incl_ClosSubform_Clos. exists (A ∨ B).
   split ; auto. cbn. right. apply in_or_app ; left ; destruct A ; cbn ; auto.
-  assert (forall A : form, x (☐ A) -> forall th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th -> th A).
-  intros. inversion H7 ; subst. apply Incl_ClosSubform_Clos. exists (☐ A).
+  assert (forall A : form, x (□ A) -> forall th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th -> th A).
+  intros. inversion H7 ; subst. apply Incl_ClosSubform_Clos. exists (□ A).
   split ; cbn ; auto. apply segInclClos in H6 ; auto. right ; destruct A ; cbn ; auto.
-  assert (forall A : form, x (⬦ A) -> exists th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th /\ th A).
+  assert (forall A : form, x (◊ A) -> exists th : Ensemble form, Singleton (Ensemble form) (Clos Γ) th /\ th A).
   intros. exists (Clos Γ). split ; auto. apply In_singleton. apply Incl_ClosSubform_Clos.
-  exists (⬦ A). split ; cbn ; auto. apply segInclClos in H7 ; auto. right ; destruct A ; cbn ; auto.
+  exists (◊ A). split ; cbn ; auto. apply segInclClos in H7 ; auto. right ; destruct A ; cbn ; auto.
   pose (Build_segment Γ x (Singleton _ (Clos Γ)) H3 H4 H5 H6 H7).
   exists s0. split ; auto. apply IHψ ; auto.
 Qed.

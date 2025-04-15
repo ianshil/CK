@@ -3,11 +3,6 @@ Export ListNotations.
 Require Import Arith.
 Require Import Ensembles.
 
-Declare Scope My_scope.
-Delimit Scope My_scope with M.
-Open Scope My_scope.
-Set Implicit Arguments.
-
 (* First, let us define propositional formulas. *)
 
 Inductive form : Type :=
@@ -26,14 +21,15 @@ Definition Top := Imp Bot Bot.
 
 (* We use the following notations for modal formulas. *)
 
-Notation "# p" := (Var p) (at level 1) : My_scope.
-Notation "A --> B" := (Imp A B) (at level 16, right associativity) : My_scope.
-Notation "A ∨ B" := (Or A B) (at level 16, right associativity) : My_scope.
-Notation "A ∧ B" := (And A B) (at level 16, right associativity) : My_scope.
-Notation "⊥" := Bot (at level 0)  : My_scope.
-Notation "¬ A" := (A --> ⊥) (at level 42) : My_scope.
-Notation "☐ A" := (Box A) (at level 42) : My_scope.
-Notation "⬦ A" := (Diam A) (at level 42) : My_scope.
+Notation "# p" := (Var p) (at level 1).
+Notation "¬ φ" := (Imp φ Bot) (at level 75, φ at level 75).
+Notation " ⊥ " := Bot.
+Notation " ⊤ " := Top.
+Notation " φ ∧ ψ" := (And φ ψ) (at level 80, ψ at level 80).
+Notation " φ ∨ ψ" := (Or φ ψ) (at level 85, ψ at level 85).
+Notation " φ → ψ" := (Imp φ ψ) (at level 99, ψ at level 200).
+Notation "□ φ" := (Box φ) (at level 75, φ at level 75).
+Notation "◊ φ" := (Diam φ) (at level 42).
 
 (* We define the property of formulas of being diamond-free. *)
 
@@ -43,9 +39,9 @@ match φ with
 | ⊥ => True
 | ψ ∧ χ => diam_free ψ /\ diam_free χ
 | ψ ∨ χ => diam_free ψ /\ diam_free χ
-| ψ --> χ => diam_free ψ /\ diam_free χ
-| ☐ ψ => diam_free ψ
-| ⬦ ψ => False
+| ψ → χ => diam_free ψ /\ diam_free χ
+| □ ψ => diam_free ψ
+| ◊ ψ => False
 end.
 
 
@@ -58,9 +54,9 @@ match φ with
 | ⊥ => Singleton _ ⊥
 | ψ ∧ χ => Union _ (Singleton _ (ψ ∧ χ)) (Union _ (subform ψ) (subform χ))
 | ψ ∨ χ => Union _ (Singleton _ (ψ ∨ χ)) (Union _ (subform ψ) (subform χ))
-| ψ --> χ => Union _ (Singleton _ (ψ --> χ)) (Union _ (subform ψ) (subform χ))
-| ☐ ψ => Union _ (Singleton _ (☐ ψ)) (subform ψ)
-| ⬦ ψ => Union _ (Singleton _ (⬦ ψ)) (subform ψ)
+| ψ → χ => Union _ (Singleton _ (ψ → χ)) (Union _ (subform ψ) (subform χ))
+| □ ψ => Union _ (Singleton _ (□ ψ)) (subform ψ)
+| ◊ ψ => Union _ (Singleton _ (◊ ψ)) (subform ψ)
 end.
 
 Lemma subform_id : forall φ, (subform φ) φ.
@@ -74,9 +70,9 @@ match φ with
 | ⊥ => [⊥]
 | ψ ∧ χ => (ψ ∧ χ) :: (subformlist ψ) ++ (subformlist χ)
 | ψ ∨ χ => (ψ ∨ χ) :: (subformlist ψ) ++ (subformlist χ)
-| ψ --> χ => (Imp ψ χ) :: (subformlist ψ) ++ (subformlist χ)
-| ☐ ψ => (☐ ψ) :: (subformlist ψ)
-| ⬦ ψ => (⬦ ψ) :: (subformlist ψ)
+| ψ → χ => (Imp ψ χ) :: (subformlist ψ) ++ (subformlist χ)
+| □ ψ => (□ ψ) :: (subformlist ψ)
+| ◊ ψ => (◊ ψ) :: (subformlist ψ)
 end.
 
 Lemma subform_trans : forall φ ψ χ, List.In φ (subformlist ψ) ->
@@ -118,15 +114,15 @@ match φ with
 | ⊥ => ⊥
 | ψ ∧ χ => (subst σ ψ) ∧ (subst σ χ)
 | ψ ∨ χ => (subst σ ψ) ∨ (subst σ χ)
-| ψ --> χ => (subst σ ψ) --> (subst σ χ)
-| ☐ ψ => ☐ (subst σ ψ)
-| ⬦ ψ => ⬦ (subst σ ψ)
+| ψ → χ => (subst σ ψ) → (subst σ χ)
+| □ ψ => □ (subst σ ψ)
+| ◊ ψ => ◊ (subst σ ψ)
 end.
 
 Fixpoint list_Imp (A : form) (l : list form) : form :=
 match l with
  | nil => A
- | h :: t => h --> (list_Imp A t)
+ | h :: t => h → (list_Imp A t)
 end.
 
 Definition Box_list (l : list form) : list form := map Box l.
@@ -147,7 +143,7 @@ Definition UnBox φ : form :=
 
 Definition ClosSubform Γ : Ensemble form := fun φ => exists ψ, In _ Γ ψ /\ List.In φ (subformlist ψ).
 
-Definition Clos Γ : Ensemble form := fun x => (ClosSubform Γ) x \/ x = ☐ ⊥ \/ x =⬦ ⊥ \/ x = ⊥.
+Definition Clos Γ : Ensemble form := fun x => (ClosSubform Γ) x \/ (x = □ ⊥) \/ (x = ◊ ⊥) \/ (x = ⊥).
 
 Lemma Incl_Set_ClosSubform : forall Γ, Included _ Γ (ClosSubform Γ).
 Proof.

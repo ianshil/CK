@@ -31,13 +31,13 @@ Class ABsegment : Type :=
     segPrime : forall th, (th = head \/ tail th) -> prime th ;
 
     (* The ABsegment is A or B *)
-    segAorB : (forall th, Theory AdAxCd th -> (tail th <-> (forall C, (head (☐ C) -> th C) /\ (th C -> head (⬦ C))))) (*A*) \/
-                    (forall th, Theory AdAxCd th -> (tail th <-> (forall C, (head (☐ C) -> th C)))) (*B*) ;
+    segAorB : (forall th, Theory AdAxCd th -> (tail th <-> (forall C, (head (□ C) -> th C) /\ (th C -> head (◊ C))))) (*A*) \/
+                    (forall th, Theory AdAxCd th -> (tail th <-> (forall C, (head (□ C) -> th C)))) (*B*) ;
   }.
 
 (* These AB-segments are segments as they satisfy the two following properties. *)
 
-Lemma boxreflect : forall seg A, (@head seg) (☐ A) -> forall th, (@tail seg) th -> th A.
+Lemma boxreflect : forall seg A, (@head seg) (□ A) -> forall th, (@tail seg) th -> th A.
 Proof.
 intros. destruct segAorB.
 (* A *)
@@ -46,23 +46,23 @@ intros. destruct segAorB.
 - rewrite H1 in H0. apply H0 ; auto. split ; [apply segClosed | apply segPrime] ; auto.
 Qed.
 
-Lemma diamwitness : forall seg A, (@head seg) (⬦ A) -> exists th, (@tail seg) th /\ th A.
+Lemma diamwitness : forall seg A, (@head seg) (◊ A) -> exists th, (@tail seg) th /\ th A.
 Proof.
 intros. destruct segAorB.
 (* A *)
-- destruct (LEM (head (⬦ ⊥))).
+- destruct (LEM (head (◊ ⊥))).
   + exists AllForm. split. 2: unfold AllForm ; auto. apply H0. apply Theory_AllForm.
      intro C ; split ; intro HC.
      unfold AllForm ; auto. apply segClosed ; auto. eapply MP. eapply MP.
      apply Ax ; left ; right ; eapply Kd ; reflexivity. apply Nec. apply EFQ. apply Id ; auto.
-  + assert (~ pair_extCKH_prv AdAxCd (Union _ (fun x => exists B, head (Box B) /\ x = B) (Singleton _ A)) (fun y => exists B, y = B /\ ~ head (⬦ B))).
+  + assert (~ pair_extCKH_prv AdAxCd (Union _ (fun x => exists B, head (Box B) /\ x = B) (Singleton _ A)) (fun y => exists B, y = B /\ ~ head (◊ B))).
      { intro. destruct H2 as (l & H2 & H3). destruct l.
      * apply H1. apply segClosed ; auto.
        eapply MP. 2: apply Id ; exact H. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
        apply extCKH_Deduction_Theorem in H3. apply K_rule in H3. apply (extCKH_monot _ _ _ H3).
        intros C HC. destruct HC as (D & (E & K2 & K3) & K1) ; subst ; auto.
      * remember (f :: l) as l'. apply extCKH_Deduction_Theorem in H3. apply K_rule in H3.
-       apply MP with (B:=(⬦ A) --> (⬦ list_disj l')) in H3. apply extCKH_Detachment_Theorem in H3.
+       apply MP with (B:=(◊ A) → (◊ list_disj l')) in H3. apply extCKH_Detachment_Theorem in H3.
        apply Diam_distrib_list_disj in H3. apply extCKH_monot with (Γ1:=head) in H3.
        apply segClosed in H3 ; auto. apply prime_list_disj in H3 ; auto. destruct H3 as (C & H4 & H5) ; subst.
        destruct H4 ; subst. apply in_map_iff in H3. destruct H3 as (D & K0 & K1) ; subst. apply H2 in K1.
@@ -76,7 +76,7 @@ intros. destruct segAorB.
    apply H0. split ; [intros B HB ; apply G2 ; unfold AllForm ; auto | apply LEM_prime ; auto].
    left. apply Incl_Set_ClosSubform ; unfold In ; auto.
    intro C ; split ; intro HC. apply G0. left ; exists C ; split ; auto.
-   destruct (LEM (head (⬦ C))) ; auto. exfalso. apply G4. exists [C]. split ; auto.
+   destruct (LEM (head (◊ C))) ; auto. exfalso. apply G4. exists [C]. split ; auto.
    intros. exists C ; split ; auto. inversion H3 ; subst ; auto. inversion H4.
    cbn. eapply MP. apply Ax ; left;  left ; eapply IA3 ; reflexivity. apply Id ; auto.
    apply G0. right ; apply In_singleton.
@@ -108,8 +108,8 @@ Proof.
 intros. destruct H ; subst ; intros A B H0 ; left ; unfold AllForm ; auto ; inversion H ; unfold AllForm ; auto.
 Qed.
 
-Lemma cexpl_segAorB : (forall th, Theory AdAxCd th -> ((Singleton _ AllForm) th <-> (forall C, (AllForm (☐ C) -> th C) /\ (th C -> AllForm (⬦ C))))) \/
-                    (forall th, Theory AdAxCd th -> ((Singleton _ AllForm) th <-> (forall C, (AllForm (☐ C) -> th C)))).
+Lemma cexpl_segAorB : (forall th, Theory AdAxCd th -> ((Singleton _ AllForm) th <-> (forall C, (AllForm (□ C) -> th C) /\ (th C -> AllForm (◊ C))))) \/
+                    (forall th, Theory AdAxCd th -> ((Singleton _ AllForm) th <-> (forall C, (AllForm (□ C) -> th C)))).
 Proof.
 right. intros. split ; intros.
 - inversion H0 ; subst ; unfold AllForm ; auto.
@@ -163,7 +163,7 @@ assert (@tail  u = @tail  cexpl).
     apply segClosed ; auto. eapply MP. apply EFQ. apply Id ; auto.
     subst. apply In_singleton.
   - unfold In in *. unfold tail in *. unfold cexpl in HC. inversion HC ; subst.
-    assert ((@head u) (⬦ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold AllForm. auto.
+    assert ((@head u) (◊ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold AllForm. auto.
     pose (diamwitness _ _ H1). destruct e. destruct H2.
     assert (x = AllForm). apply Extensionality_Ensembles.
     split ; intros A HA ; auto. unfold In ; unfold AllForm ; auto.
@@ -190,7 +190,7 @@ split ; intro ; subst.
       apply segClosed ; auto. eapply MP. apply EFQ. apply Id ; auto.
       subst. apply In_singleton.
     * unfold In in *. unfold tail in *. unfold cexpl in HC. inversion HC ; subst.
-      assert ((@head u) (⬦ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold AllForm. auto.
+      assert ((@head u) (◊ ⊥)). rewrite H0. unfold head. unfold cexpl. unfold AllForm. auto.
       pose (diamwitness _ _ H1). destruct e. destruct H2.
       assert (x = AllForm). apply Extensionality_Ensembles.
       split ; intros A HA ; auto. unfold In ; unfold AllForm ; auto.
@@ -227,7 +227,7 @@ Proof.
   assert (J1: Included _ Δ (Clos AllForm)). intros C HC. left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
   pose (Lindenbaum _ _ _ _ J0 J1 H1).
   destruct s as (Δm & H2 & H3 & H4 & H5 & H6).
-  pose (Build_ABsegment Δm (fun th => Theory AdAxCd th /\ (forall C, (Δm (☐ C) -> th C) /\ (th C -> Δm (⬦ C))))); intros.
+  pose (Build_ABsegment Δm (fun th => Theory AdAxCd th /\ (forall C, (Δm (□ C) -> th C) /\ (th C -> Δm (◊ C))))); intros.
   eexists (a _ _ _) ; split ; auto. intro. apply H6. apply Id ; auto.
   Unshelve. all: intros ; auto.
   - destruct H ; subst ; auto. intros C HC ; apply H4 ; auto.
@@ -290,7 +290,7 @@ induction ψ ; intros s ; split ; intros H0 ; simpl ; try simpl in H0 ; auto.
       apply segClosed ; auto. eapply MP. apply EFQ. apply Id ; auto.
       subst. apply In_singleton.
     * unfold In in *. unfold tail in *. unfold cexpl in HC. inversion HC ; subst.
-      assert ((@head s) (⬦ ⊥)). rewrite H. unfold head. unfold cexpl. unfold AllForm. auto.
+      assert ((@head s) (◊ ⊥)). rewrite H. unfold head. unfold cexpl. unfold AllForm. auto.
       pose (diamwitness _ _ H1). destruct e. destruct H2.
       assert (x = AllForm). apply Extensionality_Ensembles.
       split ; intros A HA ; auto. unfold In ; unfold AllForm ; auto.
@@ -316,7 +316,7 @@ induction ψ ; intros s ; split ; intros H0 ; simpl ; try simpl in H0 ; auto.
   left. apply IHψ1 ; auto.
   right. apply IHψ2 ; auto.
 (* Imp ψ1 ψ2 *)
-- destruct (LEM (head (ψ1 --> ψ2))) ; auto. exfalso.
+- destruct (LEM (head (ψ1 → ψ2))) ; auto. exfalso.
   assert (~ extCKH_prv AdAxCd (Union _ head (Singleton _ ψ1)) ψ2).
   intro. apply extCKH_Deduction_Theorem in H1. apply H. apply segClosed ; auto.
   assert (Included form (Union _ head (Singleton form ψ1)) (Clos AllForm)).
@@ -333,8 +333,8 @@ induction ψ ; intros s ; split ; intros H0 ; simpl ; try simpl in H0 ; auto.
   assert (extCKH_prv AdAxCd head ψ2). eapply MP. apply Id ; exact H0.
   apply Id ; auto. apply segClosed ; auto.
 (* Box ψ *)
-- destruct (LEM (head (☐ ψ))) ; auto. exfalso.
-  assert (~ extCKH_prv AdAxCd (fun x => exists A, (@head s) (☐ A) /\ x = A) ψ).
+- destruct (LEM (head (□ ψ))) ; auto. exfalso.
+  assert (~ extCKH_prv AdAxCd (fun x => exists A, (@head s) (□ A) /\ x = A) ψ).
   intro. apply H. apply segClosed ; auto. apply K_rule in H1.
   apply (extCKH_monot _ _ _ H1). intros B HB. unfold In in *.
   destruct HB as (C & (D & HD0 & HD1) & HC) ; subst ; auto.
@@ -343,51 +343,51 @@ induction ψ ; intros s ; split ; intros H0 ; simpl ; try simpl in H0 ; auto.
   2: intros C HC ; unfold In ; left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
   destruct H1 as (Γ0 & J0 & J1 & J2 & J3 & J4).
   (* Need to create the B-tail of head. *)
-  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, head (☐ C) -> x C)) th -> closed AdAxCd th).
+  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, head (□ C) -> x C)) th -> closed AdAxCd th).
   intros. destruct H1 ; subst ; auto. apply (@segClosed s) ; auto. destruct H1 ; destruct H1 ; auto.
-  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, head (☐ C) -> x C)) th -> prime th).
+  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, head (□ C) -> x C)) th -> prime th).
   intros. destruct H2 ; subst ; auto. eapply (@segPrime s) ; auto. destruct H2 ; destruct H2 ; auto.
-  assert ((forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, head (☐ C) -> x C)) th <-> (forall C, (head (☐ C) -> th C) /\ (th C -> head (⬦ C))))) \/
-                    (forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, head (☐ C) -> x C)) th <-> (forall C, (head (☐ C) -> th C))))).
+  assert ((forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, head (□ C) -> x C)) th <-> (forall C, (head (□ C) -> th C) /\ (th C -> head (◊ C))))) \/
+                    (forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, head (□ C) -> x C)) th <-> (forall C, (head (□ C) -> th C))))).
   right. intros ; split ; intros ; auto. apply H4 ; auto.
-  pose (Build_ABsegment head (fun x => Theory AdAxCd x /\ (forall C, head (☐ C) -> x C)) H1 H2 H3).
+  pose (Build_ABsegment head (fun x => Theory AdAxCd x /\ (forall C, head (□ C) -> x C)) H1 H2 H3).
   assert (cireach s a). intros C HC ; auto.
   (* Need to create the B-tail of Γ0 *)
-  assert (forall th : Ensemble form, th = Γ0 \/ (fun x => Theory AdAxCd x /\ (forall C, Γ0 (☐ C) -> x C)) th -> closed AdAxCd th).
+  assert (forall th : Ensemble form, th = Γ0 \/ (fun x => Theory AdAxCd x /\ (forall C, Γ0 (□ C) -> x C)) th -> closed AdAxCd th).
   intros. destruct H5 ; subst ; auto. intros A HA ; apply J2 ; auto. left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
   destruct H5 ; destruct H5 ; auto.
-  assert (forall th : Ensemble form, th = Γ0 \/ (fun x => Theory AdAxCd x /\ (forall C, Γ0 (☐ C) -> x C)) th -> prime th).
+  assert (forall th : Ensemble form, th = Γ0 \/ (fun x => Theory AdAxCd x /\ (forall C, Γ0 (□ C) -> x C)) th -> prime th).
   intros. destruct H6 ; subst ; auto. apply LEM_prime ; auto. destruct H6 ; destruct H6 ; auto.
-  assert ((forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, Γ0 (☐ C) -> x C)) th <-> (forall C, (Γ0 (☐ C) -> th C) /\ (th C -> Γ0 (⬦ C))))) \/
-                    (forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, Γ0 (☐ C) -> x C)) th <-> (forall C, (Γ0 (☐ C) -> th C))))).
+  assert ((forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, Γ0 (□ C) -> x C)) th <-> (forall C, (Γ0 (□ C) -> th C) /\ (th C -> Γ0 (◊ C))))) \/
+                    (forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, Γ0 (□ C) -> x C)) th <-> (forall C, (Γ0 (□ C) -> th C))))).
   right. intros ; split ; intros ; auto. apply H8 ; auto.
-  pose (Build_ABsegment Γ0 (fun x => Theory AdAxCd x /\ (forall C, Γ0 (☐ C) -> x C)) H5 H6 H7).
+  pose (Build_ABsegment Γ0 (fun x => Theory AdAxCd x /\ (forall C, Γ0 (□ C) -> x C)) H5 H6 H7).
   apply H0 with (u:=a0) in H4. apply IHψ in H4 ; auto. apply J4. apply Id. auto.
   unfold cmreach. unfold tail. unfold head. cbn. repeat split ; auto. intros. apply J0. exists C ; split ; auto.
 - intros. apply IHψ ; auto. apply H in H0. pose (boxreflect _ _ H0). apply p ; auto.
 (* Diam ψ *)
-- destruct (LEM (head (⬦ ψ))) ; auto. exfalso.
-  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, (head (☐ C) -> x C) /\ (x C -> head (⬦ C)))) th -> closed AdAxCd th).
+- destruct (LEM (head (◊ ψ))) ; auto. exfalso.
+  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, (head (□ C) -> x C) /\ (x C -> head (◊ C)))) th -> closed AdAxCd th).
   intros. destruct H1 ; subst ; auto. apply (@segClosed s) ; auto. destruct H1 ; destruct H1 ; auto.
-  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, (head (☐ C) -> x C) /\ (x C -> head (⬦ C)))) th -> prime th).
+  assert (forall th : Ensemble form, th = head \/ (fun x => Theory AdAxCd x /\ (forall C, (head (□ C) -> x C) /\ (x C -> head (◊ C)))) th -> prime th).
   intros. destruct H2 ; subst ; auto. eapply (@segPrime s) ; auto. destruct H2 ; destruct H2 ; auto.
-  assert ((forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, (head (☐ C) -> x C) /\ (x C -> head (⬦ C)))) th <-> (forall C, (head (☐ C) -> th C) /\ (th C -> head (⬦ C))))) \/
-                    (forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, (head (☐ C) -> x C) /\ (x C -> head (⬦ C)))) th <-> (forall C, (head (☐ C) -> th C))))).
+  assert ((forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, (head (□ C) -> x C) /\ (x C -> head (◊ C)))) th <-> (forall C, (head (□ C) -> th C) /\ (th C -> head (◊ C))))) \/
+                    (forall th, Theory AdAxCd th -> ((fun x => Theory AdAxCd x /\ (forall C, (head (□ C) -> x C) /\ (x C -> head (◊ C)))) th <-> (forall C, (head (□ C) -> th C))))).
   left. intros ; split ; intros ; auto. apply H4 ; auto.
-  pose (Build_ABsegment head (fun x => Theory AdAxCd x /\ (forall C, (head (☐ C) -> x C) /\ (x C -> head (⬦ C)))) H1 H2 H3).
+  pose (Build_ABsegment head (fun x => Theory AdAxCd x /\ (forall C, (head (□ C) -> x C) /\ (x C -> head (◊ C)))) H1 H2 H3).
   assert (cireach s a). intros C HC ; auto.
   apply H0 in H4. destruct H4. destruct H4. apply IHψ in H5.
   unfold head in H5. apply H4 in H5. auto.
 - intros. unfold cireach in H. apply H in H0.
   apply diamwitness in H0. destruct H0. destruct H0.
-  assert (forall th : Ensemble form, th = x \/ (fun y => Theory AdAxCd y /\ (forall C, x (☐ C) -> y C)) th -> closed AdAxCd th).
+  assert (forall th : Ensemble form, th = x \/ (fun y => Theory AdAxCd y /\ (forall C, x (□ C) -> y C)) th -> closed AdAxCd th).
   intros. destruct H2 ; subst ; auto. apply (@segClosed  _ x) ; auto. inversion H2. intros C HC ; auto. apply H3 ; auto.
-  assert (forall th : Ensemble form, th = x \/ (fun y => Theory AdAxCd y /\ (forall C, x (☐ C) -> y C)) th -> prime th).
+  assert (forall th : Ensemble form, th = x \/ (fun y => Theory AdAxCd y /\ (forall C, x (□ C) -> y C)) th -> prime th).
   intros. destruct H3 ; subst ; auto. eapply (@segPrime _ x) ; auto. destruct H3 ; destruct H3 ; auto.
-  assert ((forall th, Theory AdAxCd th -> ((fun y => Theory AdAxCd y /\ (forall C, x (☐ C) -> y C)) th <-> (forall C, (x (☐ C) -> th C) /\ (th C -> x (⬦ C))))) \/
-                    (forall th, Theory AdAxCd th -> ((fun y => Theory AdAxCd y /\ (forall C, x (☐ C) -> y C)) th <-> (forall C, (x (☐ C) -> th C))))).
+  assert ((forall th, Theory AdAxCd th -> ((fun y => Theory AdAxCd y /\ (forall C, x (□ C) -> y C)) th <-> (forall C, (x (□ C) -> th C) /\ (th C -> x (◊ C))))) \/
+                    (forall th, Theory AdAxCd th -> ((fun y => Theory AdAxCd y /\ (forall C, x (□ C) -> y C)) th <-> (forall C, (x (□ C) -> th C))))).
   right. intros ; split ; intros ; auto. apply H5 ; auto.
-  pose (Build_ABsegment x (fun y => Theory AdAxCd y /\ (forall C, x (☐ C) -> y C)) H2 H3 H4).
+  pose (Build_ABsegment x (fun y => Theory AdAxCd y /\ (forall C, x (□ C) -> y C)) H2 H3 H4).
   exists a. split ; auto. apply IHψ ; auto.
 Qed.
 
@@ -397,12 +397,12 @@ Lemma CF_suff_Cd : suff_Cd_frame CF.
 Proof.
 intro x.
 (* We create the A-segment in the cluster of x (it could be x, but we want to make sure). *)
-assert (forall th : Ensemble form, th = (@head x) \/ (fun w => Theory AdAxCd w /\ (forall C, ((@head x)  (☐ C) -> w C) /\ (w C -> (@head  x) (⬦ C)))) th -> closed AdAxCd th).
+assert (forall th : Ensemble form, th = (@head x) \/ (fun w => Theory AdAxCd w /\ (forall C, ((@head x)  (□ C) -> w C) /\ (w C -> (@head  x) (◊ C)))) th -> closed AdAxCd th).
 intros. destruct H ; subst ; auto. apply (@segClosed  x) ; auto. destruct H ; destruct H ; auto.
-assert (forall th : Ensemble form, th = (@head  x) \/ (fun w => Theory AdAxCd w /\ (forall C, ((@head  x)  (☐ C) -> w C) /\ (w C -> (@head  x) (⬦ C)))) th -> prime th).
+assert (forall th : Ensemble form, th = (@head  x) \/ (fun w => Theory AdAxCd w /\ (forall C, ((@head  x)  (□ C) -> w C) /\ (w C -> (@head  x) (◊ C)))) th -> prime th).
 intros. destruct H0 ; subst ; auto. eapply (@segPrime x) ; auto. destruct H0 ; destruct H0 ; auto.
-assert ((forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, ((@head  x)  (☐ C) -> w C) /\ (w C -> (@head  x) (⬦ C)))) th <-> (forall C, ((@head  x) (☐ C) -> th C) /\ (th C -> (@head  x) (⬦ C))))) \/
-                  (forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, ((@head  x)  (☐ C) -> w C) /\ (w C -> (@head  x) (⬦ C)))) th <-> (forall C, ((@head  x) (☐ C) -> th C))))).
+assert ((forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, ((@head  x)  (□ C) -> w C) /\ (w C -> (@head  x) (◊ C)))) th <-> (forall C, ((@head  x) (□ C) -> th C) /\ (th C -> (@head  x) (◊ C))))) \/
+                  (forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, ((@head  x)  (□ C) -> w C) /\ (w C -> (@head  x) (◊ C)))) th <-> (forall C, ((@head  x) (□ C) -> th C))))).
 left. intros ; split ; intros ; auto. apply H2 ; auto.
 pose (Build_ABsegment _ _ H H0 H1).
 exists a. repeat split ; auto.
@@ -410,10 +410,10 @@ exists a. repeat split ; auto.
 - intros y z ixy maz.
   destruct (LEM (mreachable y cexpl)) as [P | NP].
   { exists cexpl. split ; auto. intros A HA. unfold In ; unfold head ; unfold cexpl ; unfold AllForm ; auto. }
-  { assert (~ pair_extCKH_prv AdAxCd (Union _ (fun B => (@head  y) (☐ B)) (@head  z)) (fun B => ~ (@head  y) (⬦ B))).
+  { assert (~ pair_extCKH_prv AdAxCd (Union _ (fun B => (@head  y) (□ B)) (@head  z)) (fun B => ~ (@head  y) (◊ B))).
   { intro. destruct H2 as (l & G0 & G1). destruct (partial_finite _ _ _ _ G1) as (l0 & G2 & G3).
     apply prv_list_left_conj in G3. apply extCKH_Deduction_Theorem in G3. apply K_rule in G3.
-    apply MP with (B:=(⬦ list_conj l0) --> (⬦list_disj l)) in G3.
+    apply MP with (B:=(◊ list_conj l0) → (◊list_disj l)) in G3.
     apply extCKH_monot with (Γ1:= (@head  y)) in G3. apply extCKH_Detachment_Theorem in G3.
     apply extCKH_monot with (Γ1:= (@head  y)) in G3.
     destruct l.
@@ -433,19 +433,19 @@ exists a. repeat split ; auto.
   apply Lindenbaum_pair with (Γ:=AllForm) in H2.
   2-3: intros C HC ; left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
   destruct H2 as (Γ0 & J0 & J1 & J2 & J3 & J4).
-  assert (forall th : Ensemble form, th = Γ0 \/ (fun w => Theory AdAxCd w /\ (forall C, (Γ0  (☐ C) -> w C) /\ (w C -> Γ0 (⬦ C)))) th -> closed AdAxCd th).
+  assert (forall th : Ensemble form, th = Γ0 \/ (fun w => Theory AdAxCd w /\ (forall C, (Γ0  (□ C) -> w C) /\ (w C -> Γ0 (◊ C)))) th -> closed AdAxCd th).
   intros. destruct H2 ; subst ; auto. intros B HB. apply J2 ; auto. left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
   destruct H2 ; destruct H2 ; auto.
-  assert (forall th : Ensemble form, th = Γ0 \/ (fun w => Theory AdAxCd w /\ (forall C, (Γ0  (☐ C) -> w C) /\ (w C -> Γ0 (⬦ C)))) th -> prime th).
+  assert (forall th : Ensemble form, th = Γ0 \/ (fun w => Theory AdAxCd w /\ (forall C, (Γ0  (□ C) -> w C) /\ (w C -> Γ0 (◊ C)))) th -> prime th).
   intros. destruct H3 ; subst ; auto. apply LEM_prime ; auto. destruct H3 ; destruct H3 ; auto.
-  assert ((forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, (Γ0  (☐ C) -> w C) /\ (w C -> Γ0 (⬦ C)))) th <-> (forall C, (Γ0 (☐ C) -> th C) /\ (th C -> Γ0 (⬦ C))))) \/
-                    (forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, (Γ0 (☐ C) -> w C) /\ (w C -> Γ0 (⬦ C)))) th <-> (forall C, (Γ0 (☐ C) -> th C))))).
+  assert ((forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, (Γ0  (□ C) -> w C) /\ (w C -> Γ0 (◊ C)))) th <-> (forall C, (Γ0 (□ C) -> th C) /\ (th C -> Γ0 (◊ C))))) \/
+                    (forall th, Theory AdAxCd th -> ((fun w => Theory AdAxCd w /\ (forall C, (Γ0 (□ C) -> w C) /\ (w C -> Γ0 (◊ C)))) th <-> (forall C, (Γ0 (□ C) -> th C))))).
   left. intros ; split ; intros ; auto. destruct H5 ; auto.
   pose (Build_ABsegment _ _ H2 H3 H4).
   exists a0. repeat split.
   + unfold mreachable ; cbn. unfold cmreach ; cbn. auto. pose (@segAorB y). destruct o.
      apply H5 ; auto. split ; auto. intro C ; split ; intro HC ; auto. apply J0 ; left ; auto.
-     destruct (LEM ((@head y) (⬦ C))) ; auto.
+     destruct (LEM ((@head y) (◊ C))) ; auto.
      exfalso. apply J4. exists [C]. split ; intros. inversion H7 ; subst ; auto.
      cbn. eapply MP. apply Ax ; left ; left ; eapply IA3 ; reflexivity. apply Id. auto.
      apply H5 ; auto. split ; auto. intros C HC ; auto. apply J0 ; left ; auto.

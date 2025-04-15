@@ -1,4 +1,3 @@
--R theories/general General
 -R theories/GHC GHC
 -R theories/Syntax Syntax
 -R theories/Kripke Kripke
@@ -8,4 +7,5 @@
 -R theories/Completeness_segAB ComplsegAB
 -R theories/Completeness_segP ComplsegP
 -R theories/Conservativity Conservativity
+-R theories/Sequent Sequent
 theories

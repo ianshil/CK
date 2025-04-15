@@ -48,9 +48,9 @@ match φ with
   | Bot => w = expl
   | ψ ∧ χ => (forces M w ψ) /\ (forces M w χ)
   | ψ ∨ χ => (forces M w ψ) \/ (forces M w χ)
-  | ψ --> χ => forall v, ireachable w v -> forces M v ψ -> forces M v χ
-  | Box ψ => forall v, ireachable w v -> forall u, mreachable v u -> forces M u ψ
-  | Diam ψ => forall v, ireachable w v -> exists u, mreachable v u /\ forces M u ψ
+  | ψ → χ => forall v, ireachable w v -> forces M v ψ -> forces M v χ
+  | □ ψ => forall v, ireachable w v -> forall u, mreachable v u -> forces M u ψ
+  | ◊ ψ => forall v, ireachable w v -> exists u, mreachable v u /\ forces M u ψ
 end.
 
 (* Persistence holds in our semantics. *)

@@ -15,7 +15,7 @@ Section wCDb_prv.
 
 (* The logic CK + wCD + Nd proves the following formula. *)
 
-Lemma CKwCDNd_prv_wCDb : forall Γ φ ψ, CKwCDNdH_prv Γ ((☐(φ ∨ ψ)) --> ((¬ ☐¬ φ) --> (☐ψ)) -->  ☐ψ).
+Lemma CKwCDNd_prv_wCDb : forall Γ φ ψ, CKwCDNdH_prv Γ ((□(φ ∨ ψ)) → ((¬ □ ¬ φ) → (□ψ)) →  □ψ).
 Proof.
 intros.
 repeat apply extCKH_Deduction_Theorem.
@@ -89,19 +89,19 @@ Instance obM' : model :=
 (* We use this model to show that the extension is strict. *)
 
 Theorem diam_free_strict_ext_CKwCDNd_CK :
-                  CKwCDNdH_prv (Empty_set _) ((☐((#0) ∨ (#1))) --> ((¬ ☐¬ (#0)) --> (☐(#1))) -->  ☐(#1)) /\
-                  ~ CKH_prv (Empty_set _) ((☐((#0) ∨ (#1))) --> ((¬ ☐¬ (#0)) --> (☐(#1))) -->  ☐(#1)).
+                  CKwCDNdH_prv (Empty_set _) ((□((#0) ∨ (#1))) → ((¬ □¬ (#0)) → (□(#1))) →  □(#1)) /\
+                  ~ CKH_prv (Empty_set _) ((□((#0) ∨ (#1))) → ((¬ □¬ (#0)) → (□(#1))) →  □(#1)).
 Proof.
 split.
 - apply CKwCDNd_prv_wCDb.
 - intro. repeat apply extCKH_Detachment_Theorem in H. apply CK_Soundness in H.
-  assert (forces obM' (Some (false,false)) (☐ # 0 ∨ # 1)).
+  assert (forces obM' (Some (false,false)) (□ (# 0 ∨ # 1))).
   { intros ob0 ifob0 ob1 mfob1.
     destruct ob0 eqn:E0; unfold obireach in ifob0 ; cbn in ifob0 ; auto ; try contradiction.
     destruct ob1 eqn:E1; unfold obmreach in mfob1 ; cbn in mfob1 ; auto ; try contradiction.
     destruct p,p0 ; cbn in *. destruct b1 ; cbn in * ; auto. destruct b2 ; cbn in * ; auto.
     left. destruct b ; cbn in * ; auto ; try contradiction. destruct b0 ; cbn in * ; auto ; try contradiction. }
-  assert (forces obM' (Some (false,false)) ((¬ (☐ (¬ # 0))) --> (☐ # 1))).
+  assert (forces obM' (Some (false,false)) ((¬ (□ (¬ # 0))) → (□ # 1))).
   { intros ob0 ifob0 Hob0 ob1 iob0ob1 ob2 mob1ob2.
     destruct ob0 eqn:E0; unfold obireach in ifob0 ; cbn in ifob0 ; auto ; try contradiction.
     destruct ob1 eqn:E1; unfold obireach in iob0ob1 ; cbn in iob0ob1 ; auto ; try contradiction.
@@ -135,7 +135,7 @@ split.
       destruct b2 ; cbn in * ; auto ; try contradiction. destruct b3 ; cbn in * ; auto ; try contradiction.
       destruct v0 eqn:E4 ; unfold obmreach in H2 ; cbn in H2 ; auto ; try contradiction. }
     pose (Hob0 (Some (true,false)) I J) ; cbn in e. inversion e. }
-  assert (~ forces obM' (Some (false,false)) (☐ # 1)).
+  assert (~ forces obM' (Some (false,false)) (□ # 1)).
   { intro. pose (H2 (Some (false,false)) I (Some (false,true)) I) ; contradiction. }
   apply H2. apply H ; auto. intros. inversion H3 ; subst. inversion H4 ; subst.
   inversion H5. inversion H5 ; subst ; auto. inversion H4 ; subst ; auto.

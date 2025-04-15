@@ -3,28 +3,26 @@ Export ListNotations.
 Require Import Arith.
 Require Import Ensembles.
 
-Require Import general_export.
-
 Require Import im_syntax.
 
 (* We define here the intuitionistic axioms. *)
 
 Inductive IAxioms (F : form) : Prop :=
- | IA1 A B : F = (A --> (B --> A)) -> IAxioms F
- | IA2 A B C : F = (A --> (B --> C)) --> ((A --> B) --> (A --> C)) -> IAxioms F
- | IA3 A B : F = A --> (A ∨ B) -> IAxioms F
- | IA4 A B : F = B --> (A ∨ B) -> IAxioms F
- | IA5 A B C : F = (A --> C) --> ((B --> C) --> ((A ∨ B) --> C)) -> IAxioms F
- | IA6 A B : F = (A ∧ B) --> A -> IAxioms F
- | IA7 A B : F = (A ∧ B) --> B -> IAxioms F
- | IA8 A B C : F = (A --> B) --> ((A --> C) --> (A --> (B ∧ C))) -> IAxioms F
- | IA9 A : F = ⊥ --> A -> IAxioms F.
+ | IA1 A B : F = (A → (B → A)) -> IAxioms F
+ | IA2 A B C : F = ((A → (B → C)) → ((A → B) → (A → C))) -> IAxioms F
+ | IA3 A B : F = (A → (A ∨ B)) -> IAxioms F
+ | IA4 A B : F = (B → (A ∨ B)) -> IAxioms F
+ | IA5 A B C : F = ((A → C) → ((B → C) → ((A ∨ B) → C))) -> IAxioms F
+ | IA6 A B : F = ((A ∧ B) → A) -> IAxioms F
+ | IA7 A B : F = ((A ∧ B) → B) -> IAxioms F
+ | IA8 A B C : F = ((A → B) → ((A → C) → (A → (B ∧ C)))) -> IAxioms F
+ | IA9 A : F = (⊥ → A) -> IAxioms F.
 
 (* We then define the modal axioms. *)
 
 Inductive MAxioms (F : form) : Prop :=
- | Kb A B : F = (☐ (A --> B)) --> ((☐ A) --> ☐ B) -> MAxioms F
- | Kd A B : F = (☐ (A --> B)) --> ((⬦A) --> ⬦B) -> MAxioms F.
+ | Kb A B : F = ((□ (A → B)) → ((□ A) → □ B)) -> MAxioms F
+ | Kd A B : F = ((□ (A → B)) → ((◊A) → ◊B)) -> MAxioms F.
 
 (* And join both set of axioms. *)
 
@@ -32,11 +30,11 @@ Definition Axioms (A : form) : Prop := IAxioms A \/ MAxioms A.
 
 (* Here are additional specific axioms. *)
 
-Definition Cd A B := (⬦A ∨ B)-->  (⬦A) ∨ (⬦B).
-Definition Idb A B := ((⬦A) --> (☐B)) -->  ☐(A --> B).
-Definition Nd := (⬦⊥) --> ⊥.
-Definition Ndb := (⬦⊥) --> (☐⊥).
-Definition wCD A B := (☐(A ∨ B)) --> ((⬦A) --> (☐B)) -->  ☐ B.
+Definition Cd A B := (◊(A ∨ B))→  (◊A) ∨ (◊B).
+Definition Idb A B := ((◊A) → (□B)) →  □(A → B).
+Definition Nd := (◊⊥) → ⊥.
+Definition Ndb := (◊⊥) → (□⊥).
+Definition wCD A B := (□(A ∨ B)) → ((◊A) → (□B)) →  □ B.
 
 (* We can then define the generalised Hilbert system for CK parametrised
     in a set of additional axioms. *)
@@ -44,8 +42,8 @@ Definition wCD A B := (☐(A ∨ B)) --> ((⬦A) --> (☐B)) -->  ☐ B.
 Inductive extCKH_prv (AdAx: form -> Prop) : (form -> Prop) -> form -> Prop :=
   | Id Γ A : In _ Γ A -> extCKH_prv AdAx Γ A
   | Ax Γ A : (Axioms A \/ AdAx A) -> extCKH_prv AdAx Γ A
-  | MP Γ A B : extCKH_prv AdAx Γ (A --> B) ->  extCKH_prv AdAx Γ A -> extCKH_prv AdAx Γ B
-  | Nec Γ A : extCKH_prv AdAx (Empty_set _) A -> extCKH_prv AdAx Γ (☐ A).
+  | MP Γ A B : extCKH_prv AdAx Γ (A → B) ->  extCKH_prv AdAx Γ A -> extCKH_prv AdAx Γ B
+  | Nec Γ A : extCKH_prv AdAx (Empty_set _) A -> extCKH_prv AdAx Γ (□ A).
 
 (* We give names to some instances of the general definition above. *)
 

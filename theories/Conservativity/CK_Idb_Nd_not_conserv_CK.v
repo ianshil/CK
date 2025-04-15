@@ -23,7 +23,7 @@ intros. apply more_AdAx_more_prv with (fun x => False) ; auto. intros A F ; cont
 Qed.
 
 (* We proceed to show that this extension is strict, by proving that the formula
-    (¬ ¬ ☐ ⊥) --> ☐ ⊥ is not validated in the class of all frames. We thus
+    (¬ ¬ □ ⊥) → □ ⊥ is not validated in the class of all frames. We thus
     need to provide a countermodel for it, which we define next. *)
 
 (* Intuitionistic relation *)
@@ -111,8 +111,8 @@ Instance bM : model :=
 
 (* We use this model to show that the extension is strict. *)
 
-Theorem diam_free_strict_ext_CKIdbNd_CK : CKIdbNdH_prv (Empty_set _) ((¬ ¬ ☐ ⊥) --> ☐ ⊥) /\
-                                                                     ~ CKH_prv (Empty_set _) ((¬ ¬ ☐ ⊥) --> ☐ ⊥).
+Theorem diam_free_strict_ext_CKIdbNd_CK : CKIdbNdH_prv (Empty_set _) ((¬ ¬ □ ⊥) → □ ⊥) /\
+                                                                     ~ CKH_prv (Empty_set _) ((¬ ¬ □ ⊥) → □ ⊥).
 Proof.
 split.
 - eapply MP. eapply MP. apply Imp_trans.
@@ -121,7 +121,7 @@ split.
   apply Nec. apply extCKH_Deduction_Theorem. eapply MP.
   apply Id ; right ; split. apply imp_Id_gen.
 - intro. apply extCKH_Detachment_Theorem in H. apply CK_Soundness in H.
-  assert (forces bM (false,false) ((¬ (¬ (☐ ⊥))))).
+  assert (forces bM (false,false) ((¬ (¬ (□ ⊥))))).
   { intros b ifb Hb. destruct b ; cbn in * ; unfold bireach in ifb ; cbn in ifb.
     destruct b ; cbn in *.
     - destruct b0 ; cbn in * ; auto. apply Hb. unfold bireach ; cbn ; auto.
@@ -132,7 +132,7 @@ split.
       apply Hb. unfold bireach ; cbn ; auto. intros. destruct v. unfold bireach in H0 ; cbn in *. destruct b. destruct b0.
       contradiction. destruct u. unfold bmreach in H1 ; destruct b ; destruct b0 ; cbn in * ; firstorder.
       contradiction. }
-  assert (~ forces bM (false,false) (☐ ⊥)).
+  assert (~ forces bM (false,false) (□ ⊥)).
   { intro. cbn in H1. enough ((false,true) = (true,true)). inversion H2.
     apply H1 with (false,false). unfold bireach ; cbn ; auto. unfold bmreach ; cbn ; auto. }
   apply H1. apply H ; auto.
@@ -158,8 +158,8 @@ Qed.
 
 (* Using the previous model, we show that this extension is also strict. *)
 
-Theorem diam_free_strict_ext_IK_CK : IKH_prv (Empty_set _) ((¬ ¬ ☐ ⊥) --> ☐ ⊥) /\
-                                                                     ~ CKH_prv (Empty_set _) ((¬ ¬ ☐ ⊥) --> ☐ ⊥).
+Theorem diam_free_strict_ext_IK_CK : IKH_prv (Empty_set _) ((¬ ¬ □ ⊥) → □ ⊥) /\
+                                                                     ~ CKH_prv (Empty_set _) ((¬ ¬ □ ⊥) → □ ⊥).
 Proof.
 split.
 - apply more_AdAx_more_prv with (fun x => (exists A B, Idb A B = x) \/ Nd = x).

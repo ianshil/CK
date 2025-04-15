@@ -21,7 +21,7 @@ Definition mdowncone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /
 Definition iupcone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /\ ireachable v w.
 Definition idowncone (F : frame) (a : nodes -> Prop) := fun w => exists v, a v /\ ireachable w v.
 
-(* A sufficient condition to prove the axiom Cd (⬦φ ∨ ψ)-->  (⬦φ) ∨ (⬦ψ) is given below. *)
+(* A sufficient condition to prove the axiom Cd (◊φ ∨ ψ)→  (◊φ) ∨ (◊ψ) is given below. *)
 
 Definition suff_Cd_frame (F : frame) := forall x, exists x', ireachable x x' /\
         forall y z, ireachable x y -> mreachable x' z -> exists w, mreachable y w /\ ireachable z w.
@@ -89,7 +89,7 @@ intros F ; split ; intro H.
   assert (J1: forall p : nat, Val expl p).
   { intro p. subst. right ; right ; auto. }
   pose (Build_model F Val J0 J1).
-  assert (~ forces m x ((⬦ (#0)) ∨ (⬦ (#1)))).
+  assert (~ forces m x ((◊ (#0)) ∨ (◊ (#1)))).
   { intro. cbn in H2. destruct H2.
     + destruct (H2 _ H0) as (x0 & K0 & K1). rewrite HeqVal in K1. destruct K1 as [(K1 & K2) | [(K1 & K2) | k1]] ; try lia.
        - apply K1. exists x0. split. exists y ; split ; auto. apply In_singleton. apply ireach_refl.
@@ -97,7 +97,7 @@ intros F ; split ; intro H.
     + destruct (H2 _ H1) as (x0 & K0 & K1). rewrite HeqVal in K1. destruct K1 as [(K1 & K2) | [(K1 & K2) | k1]] ; try lia.
        - apply K1. exists x0. split. exists z ; split ; auto. apply In_singleton. apply ireach_refl.
        - subst. apply R1. exists expl. split ; auto. apply In_singleton. }
-  assert (forces m x (⬦ ((#0) ∨ (#1)))).
+  assert (forces m x (◊ ((#0) ∨ (#1)))).
   { intros v ixv. epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | exfalso ].
     apply NP. exists v. repeat split ; auto. 1-2: intros s Hs.
     epose (LEM _). destruct o as [P1 | NP1] ; [exact P1 | exfalso ].
@@ -155,7 +155,7 @@ Definition suff_Idb_frame (F : frame) := forall x y z, mreachable x y -> ireacha
                                   Included _ (iupcone F (Singleton _ u)) (mdowncone F (iupcone F (Singleton _ z))) /\
                                   mreachable u z.
 
-(* The axiom Idb ((⬦φ) --> (☐ψ)) -->  ☐(φ --> ψ) corresponds to the following frame property. *)
+(* The axiom Idb ((◊φ) → (□ψ)) →  □(φ → ψ) corresponds to the following frame property. *)
 
 Definition Idb_frame (F : frame) := forall x y z, mreachable x y -> ireachable y z -> z <> expl ->
                     exists u w, ireachable x u /\ mreachable u w /\ ireachable w z /\
@@ -174,7 +174,7 @@ intros F ; split ; intro Hyp.
   destruct H as (u & v & w & iyu & muv & ivw & Hw & NHw).
   destruct (Hyp _ _ _ muv ivw) as (u0 & w0 & iuu0 & mu0w0 & iw0w & cones).
   intro. apply NHw. subst ; apply Expl ; auto.
-  assert (forces M u0 (⬦ φ)).
+  assert (forces M u0 (◊ φ)).
   { intros v1 iu0v1.
     assert ((iupcone fra (Singleton nodes u0)) v1). exists u0. split ; auto.
     apply In_singleton.
@@ -182,7 +182,7 @@ intros F ; split ; intro Hyp.
     - unfold In in H. destruct H. destruct H. exists x1. split ; auto.
       apply Persistence with w ; auto. destruct H. destruct H. inversion H ; subst ; auto.
     - inversion H. destruct H0. inversion H0 ; subst. exists expl. split ; auto. apply Expl. }
-  assert (~ forces M u0 (☐ ψ)).
+  assert (~ forces M u0 (□ ψ)).
   { intro ctr. pose (ctr _ (ireach_refl u0) _ mu0w0). apply NHw. apply Persistence with w0 ; auto. }
   apply H0. intros v1 iu0v1 u1 mv1u1. cbn in Hyv. apply Hyv with u0 v1 ; auto.
   apply ireach_tran with u ; auto.
@@ -200,17 +200,17 @@ intros F ; split ; intro Hyp.
   assert (J1: forall p : nat, Val expl p).
   { intro p. rewrite HeqVal. right ; right ; auto. }
   pose (Build_model F Val J0 J1).
-  assert (~ forces m x (☐ (# 0) --> (# 1))).
+  assert (~ forces m x (□ ((# 0) → (# 1)))).
   { intro. pose (H _ (@ireach_refl _ x) _ mxy _ iyz). cbn in f.
     rewrite HeqVal in f. destruct f. 
     + left. split ; auto. exists z ; split. apply In_singleton. apply ireach_refl.
     + destruct H0 ; lia.
     + destruct H0. destruct H0. apply H0 ; exists z ; split. apply In_singleton.
        apply ireach_refl. auto. }
-  assert (~ forces m x ((⬦ (# 0)) --> (☐ (# 1)))).
+  assert (~ forces m x ((◊ (# 0)) → (□ (# 1)))).
   { intro. apply H. pose (Hyp (#0) (#1) m eq_refl x).
     cbn in *. apply f ; auto. apply ireach_refl. }
-  assert (exists s, ireachable x s /\ forces m s (⬦ # 0) /\ ~ forces m s (☐ # 1)).
+  assert (exists s, ireachable x s /\ forces m s (◊ # 0) /\ ~ forces m s (□ # 1)).
   { epose (LEM _). destruct o as [P | NP] ; [exact P | ].
     exfalso. apply H0. intros v ixv Hv. epose (LEM _). destruct o as [P0 | NP0] ; [exact P0 | ].
     exfalso. apply NP. exists v ; repeat split ; auto. }
@@ -259,7 +259,7 @@ Section Nd.
 (* We present sufficient and correspondence conditions on
     frames for the axiom Nd. *)
 
-(* A sufficient condition to prove the axiom Nd (⬦⊥) --> ⊥ is that only expl can modally reach expl. *)
+(* A sufficient condition to prove the axiom Nd (◊⊥) → ⊥ is that only expl can modally reach expl. *)
 
 Definition suff_Nd_frame (F : frame) := forall w, mreachable w expl -> w = expl.
 
@@ -339,7 +339,7 @@ Section Ndb.
 (* We present sufficient and correspondence conditions on
     frames for the axiom Ndb. *)
 
-(* A sufficient condition to prove the axiom Nd (⬦⊥) --> (☐ ⊥) is that only expl can modally reach expl. *)
+(* A sufficient condition to prove the axiom Nd (◊⊥) → (□ ⊥) is that only expl can modally reach expl. *)
 
 Definition suff_Ndb_frame (F : frame) := forall w, mreachable w expl -> (forall v, mreachable w v -> v = expl).
 

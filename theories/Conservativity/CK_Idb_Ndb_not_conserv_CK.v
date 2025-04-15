@@ -14,20 +14,20 @@ Section negboxbot_negneg_box.
 
 (* The logic CK + Idb + Ndb proves the following formula. *)
 
-Lemma negboxbot_negneg_box_prv : forall Γ φ, CKIdbNdbH_prv Γ ((¬ ☐ ⊥) --> (¬ ¬ ☐ φ) --> ☐ ¬ ¬ φ).
+Lemma negboxbot_negneg_box_prv : forall Γ φ, CKIdbNdbH_prv Γ ((¬ □ ⊥) → (¬ ¬ □ φ) → □ ¬ ¬ φ).
 Proof.
 intros.
-assert (CKIdbNdbH_prv Γ ((☐ φ) --> ((⬦ ¬ φ) --> (☐ ⊥)))).
+assert (CKIdbNdbH_prv Γ ((□ φ) → ((◊ ¬ φ) → (□ ⊥)))).
 { eapply MP. eapply MP. apply Imp_trans.
-  - Unshelve. 2: exact (☐ ¬ ¬ φ). eapply MP. apply Ax ; left ; right ; eapply Kb ; reflexivity.
+  - Unshelve. 2: exact (□ ¬ ¬ φ). eapply MP. apply Ax ; left ; right ; eapply Kb ; reflexivity.
     apply Nec. apply extCKH_Deduction_Theorem. apply extCKH_Deduction_Theorem.
     eapply MP. apply Id. right ; apply In_singleton. apply Id ; left ; right ; apply In_singleton.
-  - eapply MP. eapply MP. apply Imp_trans. Unshelve. 3: exact ((⬦ (¬ φ)) --> (⬦ ⊥)).
+  - eapply MP. eapply MP. apply Imp_trans. Unshelve. 3: exact ((◊ (¬ φ)) → (◊ ⊥)).
     + apply Ax ; left ; right ; eapply Kd ; reflexivity.
     + apply extCKH_Deduction_Theorem. eapply MP. eapply MP. apply Imp_trans.
        apply Id ; right ; apply In_singleton.
        apply Ax ; right ; right ; auto. }
-assert (CKIdbNdbH_prv Γ ((¬ (¬ (☐ φ))) --> ((¬ ☐ ⊥) --> (¬ ⬦ ¬ φ)))).
+assert (CKIdbNdbH_prv Γ ((¬ (¬ (□ φ))) → ((¬ □ ⊥) → (¬ ◊ ¬ φ)))).
 repeat apply extCKH_Deduction_Theorem. eapply MP. apply Id ; left ; left ; right ; apply In_singleton.
 apply extCKH_Deduction_Theorem. eapply MP. apply Id ; left ; left ; right ; apply In_singleton.
 repeat apply extCKH_Detachment_Theorem in H.
@@ -179,13 +179,13 @@ Instance obM : model :=
 (* We use this model to show that the extension is strict. *)
 
 Theorem diam_free_strict_ext_CKIdbNdb_CK : 
-               CKIdbNdbH_prv (Empty_set _) ((¬ ☐ ⊥) --> (¬ ¬ ☐ (#0)) --> ☐ ¬ ¬ (#0)) /\
-                ~ CKH_prv (Empty_set _) ((¬ ☐ ⊥) --> (¬ ¬ ☐ (#0)) --> ☐ ¬ ¬ (#0)).
+               CKIdbNdbH_prv (Empty_set _) ((¬ □ ⊥) → (¬ ¬ □ (#0)) → □ ¬ ¬ (#0)) /\
+                ~ CKH_prv (Empty_set _) ((¬ □ ⊥) → (¬ ¬ □ (#0)) → □ ¬ ¬ (#0)).
 Proof.
 split.
 - apply negboxbot_negneg_box_prv.
 - intro. repeat apply extCKH_Detachment_Theorem in H. apply CK_Soundness in H.
-  assert (forces obM (Some (false,false)) ((¬ (☐ ⊥)))).
+  assert (forces obM (Some (false,false)) ((¬ (□ ⊥)))).
   { intros b ifb Hb. destruct b ; cbn in * ; unfold obireach in ifb ; cbn in ifb ; auto.
     destruct p ; cbn in *. destruct b ; cbn in *.
     - destruct b0 ; cbn in * ; auto ; try contradiction.
@@ -194,7 +194,7 @@ split.
     - destruct b0 ; cbn in * ; auto ; try contradiction.
       assert (obmreach (Some (false, false)) (Some (false, true))) ; cbn ; auto.
       pose (Hb (Some (false,false)) I (Some (false,true)) H0). inversion e. }
-  assert (forces obM (Some (false,false)) (¬ (¬ (☐ (#0))))).
+  assert (forces obM (Some (false,false)) (¬ (¬ (□ (#0))))).
   { intros b ifb Hb. exfalso. destruct b ; cbn in * ; unfold obireach in ifb ; cbn in ifb ; auto.
     destruct p ; cbn in *. destruct b ; cbn in *.
     - destruct b0 ; cbn in * ; auto ; try contradiction.
@@ -215,7 +215,7 @@ split.
         destruct b ; destruct b0 ; cbn in * ; auto ; try contradiction.
         destruct u ; cbn in * ; auto ; try contradiction. }
       pose (Hb (Some (true,false)) I H2). inversion e. }
-  assert (~ forces obM (Some (false,false)) (☐ ¬ ¬ (#0))).
+  assert (~ forces obM (Some (false,false)) (□ ¬ ¬ (#0))).
   { intro.
     assert ((forall v : option (bool * bool),
     match v with

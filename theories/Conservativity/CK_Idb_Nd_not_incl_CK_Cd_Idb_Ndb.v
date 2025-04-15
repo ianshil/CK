@@ -105,13 +105,13 @@ Qed.
     not included in CK + Cd + Idb + Ndb. *)
 
 Theorem CKIdbNd_not_included_CKCdIdbNdb : 
-               CKIdbNdH_prv (Empty_set _) ((¬ ¬ ☐ (#0)) --> ☐ ¬ ¬ (#0)) /\
-                ~ CKCdIdbNdbH_prv (Empty_set _) ((¬ ¬ ☐ (#0)) --> ☐ ¬ ¬ (#0)).
+               CKIdbNdH_prv (Empty_set _) ((¬ ¬ □ (#0)) → □ ¬ ¬ (#0)) /\
+                ~ CKCdIdbNdbH_prv (Empty_set _) ((¬ ¬ □ (#0)) → □ ¬ ¬ (#0)).
 Proof.
 split.
 - apply negneg_box_prv.
 - intro. repeat apply extCKH_Detachment_Theorem in H. apply CKCdIdbNdb_Soundness in H.
-  assert (forces bM (false,false) (¬ (¬ (☐ (#0))))).
+  assert (forces bM (false,false) (¬ (¬ (□ (#0))))).
   { intros b ifb Hb. exfalso. destruct b ; cbn in * ; unfold bireach in ifb ; cbn in ifb ; auto.
     destruct b ; cbn in *.
     - destruct b0 ; cbn in * ; auto ; try contradiction.
@@ -128,7 +128,7 @@ split.
       { intros. destruct v ; cbn in * ; try contradiction.
         destruct b ; destruct b0 ; cbn in * ; auto ; try contradiction. }
       pose (Hb (true,false) I H1). inversion e. }
-  assert (~ forces bM (false,false) (☐ ¬ ¬ (#0))).
+  assert (~ forces bM (false,false) (□ ¬ ¬ (#0))).
   { intro.
     assert (forall v : bool * bool, bireach (false, true) v -> bval v 0 -> v = (true, true)).
     { intros. destruct v ; cbn in * ; auto.
@@ -153,8 +153,8 @@ Section CKIdbNd_not_incl_CKIdbNdb.
     not included in CK + Idb + Ndb. *)
 
 Theorem CKIdbNd_not_included_CKIdbNdb :
-               CKIdbNdH_prv (Empty_set _) ((¬ ¬ ☐ (#0)) --> ☐ ¬ ¬ (#0)) /\
-                ~ CKIdbNdbH_prv (Empty_set _) ((¬ ¬ ☐ (#0)) --> ☐ ¬ ¬ (#0)).
+               CKIdbNdH_prv (Empty_set _) ((¬ ¬ □ (#0)) → □ ¬ ¬ (#0)) /\
+                ~ CKIdbNdbH_prv (Empty_set _) ((¬ ¬ □ (#0)) → □ ¬ ¬ (#0)).
 Proof.
 split.
 - apply negneg_box_prv.

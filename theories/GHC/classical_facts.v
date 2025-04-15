@@ -5,8 +5,6 @@ Require Import Arith.
 Require Import Lia.
 Require Import Ensembles.
 
-Require Import general_export.
-
 Require Import im_syntax.
 Require Import CKH.
 Require Import logic.

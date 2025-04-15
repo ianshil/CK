@@ -79,8 +79,8 @@ Qed.
 (* Modal relation *)
 
 Definition cmreach (P0 P1 : cworld) : Prop :=
-  (forall A, (@th P0) (☐ A) -> (@th P1) A) /\
-  (forall A, (@th P1) A -> (@th P0) (⬦A)).
+  (forall A, (@th P0) (□ A) -> (@th P1) A) /\
+  (forall A, (@th P1) A -> (@th P0) (◊ A)).
 
 Lemma cmreach_expl  u : cmreach  cexpl u <-> u = cexpl.
 Proof.
@@ -192,7 +192,7 @@ induction ψ ; intros c ; split ; intros H0 ; simpl ; try simpl in H1 ; auto.
   left. apply IHψ1 ; auto.
   right. apply IHψ2 ; auto.
 (* Imp ψ1 ψ2 *)
-- destruct (LEM (th (ψ1 --> ψ2))) ; auto. exfalso.
+- destruct (LEM (th (ψ1 → ψ2))) ; auto. exfalso.
   assert (~ pair_extCKH_prv AdAxCdIdb (Union _ th (Singleton _ ψ1)) (Singleton _ ψ2)).
   intro. destruct H1 as (l & J0 & J1). apply extCKH_Deduction_Theorem in J1. apply H.
   apply Closed ; auto. eapply MP. eapply MP. apply Imp_trans. exact J1.
@@ -212,19 +212,19 @@ induction ψ ; intros c ; split ; intros H0 ; simpl ; try simpl in H1 ; auto.
   assert (extCKH_prv AdAxCdIdb th ψ2). eapply MP. apply Id ; exact H0.
   apply Id ; auto. apply Closed ; auto.
 (* Box ψ *)
-- destruct (LEM (th (☐ ψ))) ; auto. exfalso.
-  assert (~ pair_extCKH_prv AdAxCdIdb (fun x => exists A, (@th c) (☐ A) /\ x = A) (Singleton _ ψ)).
+- destruct (LEM (th (□ ψ))) ; auto. exfalso.
+  assert (~ pair_extCKH_prv AdAxCdIdb (fun x => exists A, (@th c) (□ A) /\ x = A) (Singleton _ ψ)).
   { intro. destruct H1 as (l & K0 & K1).
     apply H. apply Closed ; auto. apply forall_list_disj with (A:=ψ) in K1.
     apply K_rule in K1. apply (extCKH_monot _ _ _ K1). intros B HB. unfold In in *.
     destruct HB as (C & (D & HD0 & HD1) & HC) ; subst ; auto.
     intros B HB. apply K0 in HB. inversion HB ; subst. apply imp_Id_gen. }
   pose (Lindenbaum_cworld _ _ H1). destruct e as [w [Hw1 Hw2]].
-  assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (@th c) (fun x => exists A, (@th w) A /\ x = ⬦ A)) (fun x => exists A, ~ ((@th w) A) /\ x = ☐ A)).
+  assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (@th c) (fun x => exists A, (@th w) A /\ x = ◊ A)) (fun x => exists A, ~ ((@th w) A) /\ x = □ A)).
   { intro. destruct H2 as (l & K0 & K1).
     destruct (list_disj_map_Box l) as (l' & Hl') ; subst. intros. apply K0 in H2. destruct H2. destruct H2 ; subst ; eexists ; auto.
     apply list_disj_Box in K1.
-    assert (exists dl, (forall A : form, List.In A dl -> (fun x => exists A, (@th w) A /\ x = ⬦ A) A) /\
+    assert (exists dl, (forall A : form, List.In A dl -> (fun x => exists A, (@th w) A /\ x = ◊ A) A) /\
     extCKH_prv AdAxCdIdb (Union _ (@th c) (Singleton _ (list_conj dl)))  (Box (list_disj l'))).
     destruct (partial_finite _ _ _ _ K1) as (l & G0 & G1). exists l. split ; auto.
     apply prv_list_left_conj ; auto.
@@ -232,9 +232,9 @@ induction ψ ; intros c ; split ; intros H0 ; simpl ; try simpl in H1 ; auto.
     apply extCKH_Deduction_Theorem in K3.
     destruct (list_conj_map_Diam dl) as (dl' & Hdl') ; subst.
     intros. apply K2 in H2. destruct H2. destruct H2 ; subst ; eexists ; auto.
-    assert (extCKH_prv AdAxCdIdb (@th c) ((⬦ list_conj dl') --> (☐ list_disj l'))).
+    assert (extCKH_prv AdAxCdIdb (@th c) ((◊ list_conj dl') → (□ list_disj l'))).
     eapply MP. eapply MP. apply Imp_trans. apply list_conj_Diam_obj. auto.
-    assert (extCKH_prv AdAxCdIdb (@th c) (☐ list_conj dl' --> list_disj l')).
+    assert (extCKH_prv AdAxCdIdb (@th c) (□ (list_conj dl' → list_disj l'))).
     eapply MP. apply Ax ; right ; right ; eexists ; eexists ; right ; reflexivity. auto.
     assert ((@th w) (list_disj l')). apply Closed. apply MP with (list_conj dl'). apply Id.
     unfold In. apply Hw1. unfold In ; eexists ; split ; auto. apply Closed ; auto.
@@ -249,7 +249,7 @@ induction ψ ; intros c ; split ; intros H0 ; simpl ; try simpl in H1 ; auto.
   assert (cireach  c v). intros C HC ; auto. unfold In in *. unfold th in *. apply Hv1 ; left ; auto.
   assert (cmreach  v w). split.
   { intros. unfold th in *. epose (LEM _). destruct o as [P | NP] ; [exact P | ].
-    exfalso. assert ((fun x : form => exists A : form, ~ (let (th, _, _) := w in th) A /\ x = ☐ A) (☐ A)).
+    exfalso. assert ((fun x : form => exists A : form, ~ (let (th, _, _) := w in th) A /\ x = □ A) (□ A)).
     exists A ; split ; auto. apply Hv2 in H4. auto. }
   { intros. unfold th in *. apply Hv1. right ; exists A ; split ; auto. }
     pose (H0 _ H2 _ H3). apply IHψ in f ; auto. assert (~ ((@th w) ψ)).
@@ -257,19 +257,19 @@ induction ψ ; intros c ; split ; intros H0 ; simpl ; try simpl in H1 ; auto.
   auto.
 - intros. apply IHψ ; auto. apply H in H0. destruct H1. apply H1 ; auto.
 (* Diam ψ *)
-- simpl in H0. destruct (LEM (th (⬦ ψ))) ; auto. exfalso.
+- simpl in H0. destruct (LEM (th (◊ ψ))) ; auto. exfalso.
   destruct (H0 _ (cireach_refl c)) as (dc & H2 & H3).
   apply IHψ in H3 ; auto. apply H2 in H3. auto.
 - intros. unfold cireach in H. apply H in H0.
-  destruct (LEM ((@th v) (⬦ ⊥))).
+  destruct (LEM ((@th v) (◊ ⊥))).
   { exists cexpl. split ; auto. split ; intros ; unfold th in *. unfold cexpl ; cbn ; unfold AllForm ; auto.
     apply Closed. eapply MP. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity. apply Nec. apply EFQ.
     apply Id ; auto. apply IHψ. unfold th ; unfold cexpl ; cbn ; unfold AllForm ; auto. }
-  { assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (fun x => exists A, (@th v) (☐ A) /\ x = A) (Singleton _ ψ))
-        (fun x => exists B, ~ ((@th v) (⬦ B)) /\ x = B)).
+  { assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (fun x => exists A, (@th v) (□ A) /\ x = A) (Singleton _ ψ))
+        (fun x => exists B, ~ ((@th v) (◊ B)) /\ x = B)).
     { intro. destruct H2 as (l & K0 & K1).
       apply extCKH_Deduction_Theorem in K1. apply K_rule in K1.
-      assert (extCKH_prv AdAxCdIdb (Union _ (@th v) (Singleton _ (⬦ ψ))) (⬦list_disj l)).
+      assert (extCKH_prv AdAxCdIdb (Union _ (@th v) (Singleton _ (◊ ψ))) (◊list_disj l)).
       apply extCKH_Detachment_Theorem. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
       apply (extCKH_monot _ _ _ K1). intros A HA. destruct HA as (B & K2 & K3) ; subst.
       destruct K2 as (C & K4 & K5) ; subst ; auto. apply extCKH_monot with (Γ1:=@th v) in H2.
@@ -288,7 +288,7 @@ induction ψ ; intros c ; split ; intros H0 ; simpl ; try simpl in H1 ; auto.
       intros A HA. inversion HA ; subst ; auto. inversion H3 ; subst ; auto. }
     apply Lindenbaum_cworld in H2. destruct H2 as (w & K0 & K1). exists w. split ; auto.
     split ; intros. apply K0. left ; exists A ; split ; auto.
-    destruct (LEM ((@th v) (⬦ A))) ; auto. exfalso. assert ((fun x : form => exists B : form, ~ (@th v) (⬦ B) /\ x = B) A).
+    destruct (LEM ((@th v) (◊ A))) ; auto. exfalso. assert ((fun x : form => exists B : form, ~ (@th v) (◊ B) /\ x = B) A).
     exists A ; split ; auto. apply K1 in H4. auto.
     apply IHψ. apply K0. right ; apply In_singleton. }
 Qed.
@@ -299,18 +299,18 @@ Lemma CF_strong_Cd_weak_Idb : strong_Cd_weak_Idb_frame CF.
 Proof.
 split.
 - intros x y z ixy mxz.
-  destruct (LEM ((@th y) (⬦ ⊥))).
+  destruct (LEM ((@th y) (◊ ⊥))).
   + exists expl. split.
       * split ; intros A HA. unfold th ; unfold cexpl ; cbn ; unfold AllForm ; auto.
         apply Closed. eapply MP. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity. apply Nec.
         apply EFQ. apply Id ; auto.
       * intros A HA ; unfold th ; unfold cexpl ; cbn ; unfold AllForm ; auto.
-  + assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (fun B => exists A, (@th y) (☐ A) /\ B = A) (@th z))
-        (fun B => exists A, ~ ((@th y) (⬦ A)) /\ B = A)).
+  + assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (fun B => exists A, (@th y) (□ A) /\ B = A) (@th z))
+        (fun B => exists A, ~ ((@th y) (◊ A)) /\ B = A)).
     { intro. destruct H0 as (l & H1 & H2).
       apply partial_finite in H2. destruct H2 as (lz & H3 & H4). apply prv_list_left_conj in H4.
       apply extCKH_Deduction_Theorem in H4. apply K_rule in H4.
-      assert (extCKH_prv AdAxCdIdb (@th y) (⬦ list_disj l)).
+      assert (extCKH_prv AdAxCdIdb (@th y) (◊ list_disj l)).
       eapply MP. eapply MP. apply Ax ; left ; right ; eapply Kd ; reflexivity.
       apply (extCKH_monot _ _ _ H4). intros A HA. destruct HA. destruct H0 ; subst.
       destruct H0 ; subst. destruct H0 ; subst ; auto. apply Id. apply ixy.
@@ -330,8 +330,8 @@ split.
     apply Lindenbaum_cworld in H0. destruct H0 as (w & H1 & H2). exists w.
     split.
     * split ; intros A HA. apply H1. left. exists A ; auto.
-      destruct (LEM ((@th y) (⬦ A))) ; auto.
-      assert ((fun B : form => exists A : form, ~ (@th y) (⬦ A) /\ B = A) A). exists A ; split ; auto.
+      destruct (LEM ((@th y) (◊ A))) ; auto.
+      assert ((fun B : form => exists A : form, ~ (@th y) (◊ A) /\ B = A) A). exists A ; split ; auto.
       apply H2 in H3 ; exfalso ; auto.
     * intros A HA. apply H1. right. auto.
 - intros x y z mxy iyz.
@@ -340,30 +340,30 @@ split.
       * intros A HA ; unfold th ; unfold cexpl ; cbn ; unfold AllForm ; auto.
       * split ; intros A HA. 2: unfold th ; unfold cexpl ; cbn ; unfold AllForm ; auto.
         apply Closed. eapply MP. apply EFQ. apply Id ; auto.
-  + assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (@th x) (fun B => exists A, (@th z) A /\ B = ⬦ A))
-        (fun B => exists A, ~ ((@th z) A) /\ B = ☐ A)).
+  + assert (~ pair_extCKH_prv AdAxCdIdb (Union _ (@th x) (fun B => exists A, (@th z) A /\ B = ◊ A))
+        (fun B => exists A, ~ ((@th z) A) /\ B = □ A)).
     { intro. destruct H0 as (l & H1 & H2).
       apply partial_finite in H2. destruct H2 as (lz & H3 & H4). apply prv_list_left_conj in H4.
       destruct (list_Diam_map_repr lz) as (dlz & J0) ; subst. intros. apply H3 in H0. destruct H0. destruct H0 ; subst ; eexists ; auto.
       destruct (list_Box_map_repr l) as (bl & J1) ; subst. intros. apply H1 in H0. destruct H0. destruct H0 ; subst ; eexists ; auto.
       apply list_disj_Box in H4. apply extCKH_Deduction_Theorem in H4.
-      assert (extCKH_prv AdAxCdIdb (@th x) (☐ list_conj dlz --> list_disj bl)).
+      assert (extCKH_prv AdAxCdIdb (@th x) (□ (list_conj dlz → list_disj bl))).
       eapply MP. apply Ax ; right ; right ; eexists ; eexists ; right ; reflexivity.
       eapply MP. eapply MP. apply Imp_trans. apply list_conj_Diam_obj. auto.
       apply Closed in H0. apply mxy in H0. apply iyz in H0.
       assert ((@th z) (list_disj bl)).
       apply Closed. eapply MP. apply Id ; exact H0. apply forall_list_conj.
-      intros B HB. assert (List.In (⬦ B) (map Diam dlz)). apply in_map_iff ; auto. exists B ; split ; auto.
+      intros B HB. assert (List.In (◊ B) (map Diam dlz)). apply in_map_iff ; auto. exists B ; split ; auto.
       apply H3 in H2. destruct H2 as (C & HC0 & HC1). inversion HC1 ; subst. unfold th. apply Id ; auto.
       apply prime_list_disj in H2. destruct H2 as (C & HC0 & HC1) ; destruct HC0 ; subst ; auto.
-      destruct (H1 (☐ C)) as (D & (HD0 & HD1)) ; subst. apply in_map_iff ; exists C ; auto.
+      destruct (H1 (□ C)) as (D & (HD0 & HD1)) ; subst. apply in_map_iff ; exists C ; auto.
       inversion HD1 ; subst. auto. apply Prime. }
     apply Lindenbaum_cworld in H0. destruct H0 as (w & H1 & H2). exists w.
     split.
     * intros A HA. apply H1. left. auto.
     * split ; intros A HA.
       destruct (LEM ((@th z) A)) ; auto.
-      assert ((fun B : form => exists A : form, ~ (@th z) A /\ B = ☐ A) (☐ A)). exists A ; split ; auto.
+      assert ((fun B : form => exists A : form, ~ (@th z) A /\ B = □ A) (□ A)). exists A ; split ; auto.
       apply H2 in H3 ; exfalso ; auto.
       apply H1. right. exists A ; auto.
 Qed.

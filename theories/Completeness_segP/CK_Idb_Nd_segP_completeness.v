@@ -18,7 +18,7 @@ Definition is_Nd := (fun x => Nd = x).
 Lemma CF_suff_Nd : suff_Nd_frame (CF is_Nd).
 Proof.
 intros w mwexpl.
-destruct (LEM ((@head _ w) (⬦ ⊥))).
+destruct (LEM ((@head _ w) (◊ ⊥))).
 *** assert (@head _ w = AllForm).
 { apply Extensionality_Ensembles ; split ; intros A HA ; unfold In, head in * ; cbn in *.
   - unfold AllForm ; auto.
