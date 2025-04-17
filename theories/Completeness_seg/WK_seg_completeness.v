@@ -13,17 +13,16 @@ Section WK_completeness.
 
 Definition is_Nd := (fun x => Nd = x).
 
-Lemma CF_Nd Γ : Nd_frame (CF is_Nd Γ).
+Lemma CF_Nd : Nd_frame (CF is_Nd).
 Proof.
 intros w Hw.
-assert (@head _ _ w = Clos Γ).
+assert (@head _ w = AllForm).
 { apply Extensionality_Ensembles ; split ; intros A HA ; unfold In, head in * ; cbn in *.
-  - apply (segInclClos is_Nd) in HA ; auto.
+  - unfold AllForm ; auto.
   - apply (segClosed is_Nd) ; auto. eapply MP. apply EFQ.
     eapply MP. apply Ax. right. reflexivity.
     apply Id. apply (truth_lemma is_Nd).
-    right ; auto.
-    intros v Hv. apply Hw in Hv. exists (cexpl is_Nd Γ). split ; auto.
+    intros v Hv. apply Hw in Hv. exists (cexpl is_Nd). split ; auto.
     cbn ; auto. }
 apply cmreach_expl ; auto.
 unfold cmreach ; cbn. rewrite H. apply In_singleton.

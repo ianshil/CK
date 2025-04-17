@@ -24,7 +24,7 @@ assert (@head _ v = AllForm).
     apply (boxreflect is_Ndb) with (A:=⊥) in muv ; auto.
     apply (@segClosed is_Ndb u) ; auto.
     eapply MP. apply Ax. right ; left. reflexivity.
-    apply Id. apply (truth_lemma is_Ndb). unfold Clos ; auto.
+    apply Id. apply (truth_lemma is_Ndb).
     intros z Hz. exists (cexpl is_Ndb). split ; auto.
     2: cbn ; auto. apply Hw. apply cireach_trans with u ; auto. }
 apply cmreach_expl ; auto.

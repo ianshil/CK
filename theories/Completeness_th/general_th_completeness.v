@@ -89,7 +89,7 @@ split ; intro ; subst.
   apply Extensionality_Ensembles. split ; intros A HA ; auto.
   unfold In ; unfold th ; cbn ; unfold AllForm ; auto.
   assert (th Bot). unfold th. apply H. unfold th. unfold th ; unfold cexpl.
-  unfold Clos. auto. apply Closed ; auto. eapply MP. apply EFQ. apply Id ; auto.
+  unfold AllForm. auto. apply Closed ; auto. eapply MP. apply EFQ. apply Id ; auto.
 - unfold cmreach. unfold th. unfold cexpl. split ; intros ; auto.
 Qed.
 
@@ -117,19 +117,16 @@ Lemma Lindenbaum_cworld ψ Δ :
   exists w : cworld, Included _ Δ th /\ Included _ ψ (Complement _ th).
 Proof.
   intros.
-  assert (J0: Included _ ψ (Clos AllForm)). intros C HC. left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
-  assert (J1: Included _ Δ (Clos AllForm)). intros C HC. left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
-  pose (Lindenbaum_pair _ _ _ _ J0 J1 H).
-  destruct s as (Δm & H2 & H3 & H4 & H5 & H6).
+  pose (Lindenbaum_pair _ _ _ H).
+  destruct s as (Δm & H2 & H3 & H4 & H5).
   pose (Build_cworld Δm); intros.
   eexists (c _ _) ; split ; auto. intros A HA J.
-  apply H6. exists [A]. split ; auto.
+  apply H5. exists [A]. split ; auto.
   - intros B HB. inversion HB ; subst ; auto. inversion H0.
   - cbn. eapply MP. apply Ax ; left ; left ; eapply IA3 ; reflexivity.
     apply Id ; auto.
   Unshelve.
-  intros A HA ; apply H4 ; auto. left ; apply Incl_Set_ClosSubform ; unfold In ; unfold AllForm ; auto.
-  apply LEM_prime ; auto.
+  intros A HA ; apply H3 ; auto. apply LEM_prime ; auto.
 Qed.
 
 (* We define the canonical valuation. *)

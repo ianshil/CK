@@ -141,26 +141,6 @@ Definition UnBox φ : form :=
   | _ => φ
   end.
 
-Definition ClosSubform Γ : Ensemble form := fun φ => exists ψ, In _ Γ ψ /\ List.In φ (subformlist ψ).
-
-Definition Clos Γ : Ensemble form := fun x => (ClosSubform Γ) x \/ (x = □ ⊥) \/ (x = ◊ ⊥) \/ (x = ⊥).
-
-Lemma Incl_Set_ClosSubform : forall Γ, Included _ Γ (ClosSubform Γ).
-Proof.
-intros Γ φ Hφ. unfold In. exists φ ; split ; auto. destruct φ ; simpl ; auto.
-Qed.
-
-Lemma Incl_ClosSubform_Clos : forall Γ, Included _ (ClosSubform (Clos Γ)) (Clos Γ).
-Proof.
-intros Γ φ Hφ. unfold In in *. unfold Clos in *.
-unfold ClosSubform in *. destruct Hφ. destruct H. unfold In in H. destruct H.
-- destruct H. destruct H. left. exists x0. split ; auto. apply subform_trans with (φ:=x) ; auto.
-- destruct H ; subst ; auto ; cbn in *.
-  + destruct H0 ; subst ; auto. destruct H ; subst ; auto ; contradiction.
-  + destruct H ; subst ; auto ; cbn in *. destruct H0 ; subst ; auto. destruct H ; subst ; auto ; contradiction.
-     destruct H0 ; subst ; auto ; contradiction.
-Qed.
-
 
 
 
