@@ -1,9 +1,9 @@
-Require Import List.
-Require Import ListDec.
+From Stdlib Require Import List.
+From Stdlib Require Import ListDec.
 Export ListNotations.
-Require Import Arith.
-Require Import Lia.
-Require Import Ensembles.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Ensembles.
 
 Require Import im_syntax.
 Require Import CKH.
@@ -58,19 +58,19 @@ Qed.
 
 Lemma Imp_trans_help7 : forall x y z Γ, extCKH_prv AdAx Γ ((x → (y → (z → y)))).
 Proof.
-intros. eapply  MP. all: apply Ax ; left ; left ; eapply IA1 ; reflexivity.
+intros. eapply  MP ; apply Ax ; left ; left ; eapply IA1 ; reflexivity.
 Qed.
 
 Lemma Imp_trans_help8 : forall x y z Γ,
   extCKH_prv AdAx Γ ((((x → (y → z)) → (x → y)) → ((x → (y → z)) → (x → z)))).
 Proof.
-intros. eapply  MP. all: apply Ax ; left ; left ; eapply IA2 ; reflexivity.
+intros. eapply MP ; apply Ax ; left ; left ; eapply IA2 ; reflexivity.
 Qed.
 
 Lemma Imp_trans_help9 : forall x y z u Γ,
   extCKH_prv AdAx Γ ((x → ((y → (z → u)) → ((y → z) → (y → u))))).
 Proof.
-intros. eapply  MP. all: apply Ax ; left ; left.
+intros. eapply  MP ; apply Ax ; left ; left.
 eapply IA1 ; reflexivity. eapply IA2 ; reflexivity.
 Qed.
 
@@ -362,25 +362,19 @@ intro. split ; intros ; apply Hl ; auto. intros C HC. inversion HC. destruct H. 
 exists x ; split ; auto. apply HX1. apply Hl ; auto.
 Qed.
 
+Lemma Diam_rule : forall Γ B A, 
+    extCKH_prv AdAx (Union _ Γ (Singleton _ B)) A ->
+    extCKH_prv AdAx (Union _  (fun x => (exists B, In _ Γ B /\ x = Box B)) (Singleton _ (◊ B))) (◊ A).
+Proof.
+intros. 
+apply extCKH_Detachment_Theorem.
+eapply MP ; [ apply Ax ; left ; right ; eapply Kd ; reflexivity | ].
+apply K_rule. apply extCKH_Deduction_Theorem ; auto.
+Qed.
+
 
 
 Section list_of_disjunctions.
-
-Fixpoint list_disj (l : list form) :=
-match l with
- | nil => Bot
- | h :: t => Or h (list_disj t)
-end.
-
-Lemma list_disj_map_Box : forall l, (forall A, List.In A l -> exists B, A = □ B) ->
-                exists l', l = map Box l'.
-Proof.
-induction l ; cbn ; intros ; auto.
-- exists [] ; auto.
-- destruct (H a) ; auto ; subst.
-  destruct (IHl). intros. apply H ; auto. subst.
-  exists (x :: x0). cbn ; auto.
-Qed.
 
 Lemma remove_disj : forall l B Γ , extCKH_prv AdAx Γ (list_disj l →  Or B (list_disj (remove eq_dec_form B l))).
 Proof.
@@ -472,22 +466,6 @@ End list_of_disjunctions.
 
 
 Section list_of_conjunctions.
-
-Fixpoint list_conj (l : list form) :=
-match l with
- | nil => ⊤
- | h :: t => And h (list_conj t)
-end.
-
-Lemma list_conj_map_Diam : forall l, (forall A, List.In A l -> exists B, A = ◊ B) ->
-                exists l', l = map Diam l'.
-Proof.
-induction l ; cbn ; intros ; auto.
-- exists [] ; auto.
-- destruct (H a) ; auto ; subst.
-  destruct (IHl). intros. apply H ; auto. subst.
-  exists (x :: x0). cbn ; auto.
-Qed.
 
 Lemma forall_list_conj : forall l Γ,
   (forall B, List.In B l -> extCKH_prv AdAx Γ B) ->
@@ -604,24 +582,6 @@ eapply MP. eapply MP. apply Imp_trans.
   apply Imp_trans. apply EFQ.
 Qed.
 
-Lemma list_Box_map_repr : forall l, (forall A : form, List.In A l -> exists B : form, A = □ B) ->
-      exists l', l = map Box l'.
-Proof.
-induction l ; cbn ; intros.
-- exists [] ; auto.
-- destruct (H a) ; auto ; subst. destruct IHl ; auto ; subst.
-  exists (x :: x0). cbn ; auto.
-Qed.
-
-Lemma list_Diam_map_repr : forall l, (forall A : form, List.In A l -> exists B : form, A = ◊ B) ->
-      exists l', l = map Diam l'.
-Proof.
-induction l ; cbn ; intros.
-- exists [] ; auto.
-- destruct (H a) ; auto ; subst. destruct IHl ; auto ; subst.
-  exists (x :: x0). cbn ; auto.
-Qed.
-
 Variable AdAx : form -> Prop.
 
 Definition AdAxCd := fun x => AdAx x \/ (exists A B, (Cd A B) = x).
@@ -645,3 +605,60 @@ Qed.
 
 End Additional_ax.
 
+
+
+
+
+
+Section Natural_Deduction.
+
+Variable AdAx : form -> Prop.
+
+Lemma ND_BotE Γ φ : extCKH_prv AdAx Γ ⊥ -> extCKH_prv AdAx Γ φ.
+Proof.
+intros Hp.
+eapply MP ; [ eapply Ax ; left ; left ; eapply IA9 ; reflexivity | exact Hp ].
+Qed.
+
+Lemma ND_AndI Γ φ ψ : extCKH_prv AdAx Γ φ -> extCKH_prv AdAx Γ ψ -> extCKH_prv AdAx Γ (φ ∧ ψ).
+Proof.
+intros Hp1 Hp2.
+eapply MP ; [ eapply MP ; [ eapply MP ; [ eapply Ax ; left ; left ; eapply IA8 ; reflexivity | apply imp_Id_gen ]| ] | ].
+eapply MP ; [ apply Thm_irrel | exact Hp2].
+exact Hp1.
+Qed.
+
+Lemma ND_AndE1 Γ φ ψ : extCKH_prv AdAx Γ (φ ∧ ψ) -> extCKH_prv AdAx Γ φ.
+Proof.
+intros Hp.
+eapply MP ; [ eapply Ax ; left ; left ; eapply IA6 ; reflexivity | exact Hp ].
+Qed.
+
+Lemma ND_AndE2 Γ φ ψ : extCKH_prv AdAx Γ (φ ∧ ψ) -> extCKH_prv AdAx Γ ψ.
+Proof.
+intros Hp.
+eapply MP ; [ eapply Ax ; left ; left ; eapply IA7 ; reflexivity | exact Hp ].
+Qed.
+
+Lemma ND_OrI1 Γ φ ψ : extCKH_prv AdAx Γ φ -> extCKH_prv AdAx Γ (φ ∨ ψ).
+Proof.
+intros Hp.
+eapply MP ; [ eapply Ax ; left ; left ; eapply IA3 ; reflexivity | exact Hp ].
+Qed.
+
+Lemma ND_OrI2 Γ φ ψ : extCKH_prv AdAx Γ ψ -> extCKH_prv AdAx Γ (φ ∨ ψ).
+Proof.
+intros Hp.
+eapply MP ; [ eapply Ax ; left ; left ; eapply IA4 ; reflexivity | exact Hp ].
+Qed.
+
+Lemma ND_OrE Γ φ ψ χ : extCKH_prv AdAx Γ (φ ∨ ψ) ->
+    extCKH_prv AdAx Γ (φ → χ) -> extCKH_prv AdAx Γ (ψ → χ) -> 
+    extCKH_prv AdAx Γ χ.
+Proof.
+intros Hp1 Hp2 Hp3.
+eapply MP ; [ eapply MP ; [ eapply MP ; [ eapply Ax ; left ; left ; eapply IA5 ; reflexivity | exact Hp2 ]| exact Hp3 ] | exact Hp1].
+Qed.
+
+
+End Natural_Deduction.

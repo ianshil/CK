@@ -1,10 +1,10 @@
-Require Import List.
+From Stdlib Require Import List.
 Export ListNotations.
-Require Import Arith.
-Require Import Lia.
-Require Import Ensembles.
-Require Import Coq.Logic.Description.
-Require Import Coq.Logic.FunctionalExtensionality.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Ensembles.
+From Stdlib Require Import Logic.Description.
+From Stdlib Require Import Logic.FunctionalExtensionality.
 
 Require Import im_syntax.
 Require Import CKH.

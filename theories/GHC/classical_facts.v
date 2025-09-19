@@ -1,9 +1,9 @@
-Require Import List.
-Require Import ListDec.
+From Stdlib Require Import List.
+From Stdlib Require Import ListDec.
 Export ListNotations.
-Require Import Arith.
-Require Import Lia.
-Require Import Ensembles.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Ensembles.
 
 Require Import im_syntax.
 Require Import CKH.

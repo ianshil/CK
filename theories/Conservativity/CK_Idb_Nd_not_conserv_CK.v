@@ -1,14 +1,16 @@
-Require Import List.
+From Stdlib Require Import List.
 Export ListNotations.
-Require Import Arith.
-Require Import Ensembles.
-Require Import Bool.
-Require Import Btauto.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Ensembles.
+From Stdlib Require Import Bool.
+From Stdlib Require Import Btauto.
 
 Require Import im_syntax.
 Require Import CKH_export.
 Require Import kripke_export.
 Require Import CK_soundness.
+Require Import CK_Idb_Nd_soundness.
+Require Import CK_Idb_Nd_segP_completeness.
 
 
 
@@ -172,5 +174,273 @@ End IK_not_conserv_CK.
 
 
 
+
+
+Section IK_not_conserv_CKIdbNd.
+
+  (* Intuitionistic relation *)
+
+Definition tbireach (tb0 tb1 : bool * bool * bool) : Prop :=
+  match tb0 with
+  | (true,true,true) => match tb1 with
+                            | (true,true,true) => True
+                            | _ => False
+                            end
+  | (false,false,false) => match tb1 with
+                            | (false,false,false) => True
+                            | (false,true,false) => True
+                            | (true,true,false) => True
+                            | (true,false,true) => True
+                            | _ => False
+                            end
+  | (false,false,true) => match tb1 with
+                            | (false,false,true) => True
+                            | (false,true,true) => True
+                            | (true,false,false) => True
+                            | _ => False
+                            end
+  | (false,true,false) => match tb1 with
+                            | (false,true,false) => True
+                            | (true,true,false) => True
+                            | (true,false,true) => True
+                            | _ => False
+                            end
+  | (true,false,true) => match tb1 with
+                            | (true,false,true) => True
+                            | _ => False
+                            end
+  | (true,true,false) => match tb1 with
+                            | (true,true,false) => True
+                            | _ => False
+                            end
+  | (true,false,false) => match tb1 with
+                            | (true,false,false) => True
+                            | _ => False
+                            end
+  | (false,true,true) => match tb1 with
+                            | (false,true,true) => True
+                            | _ => False
+                            end
+  end.
+
+Lemma tbireach_refl t : tbireach t t.
+Proof.
+unfold tbireach ; destruct t as [[b0 b1] b2] ; destruct b0,b1,b2 ; repeat rewrite eqb_reflx ; cbn ; auto.
+Qed.
+
+Lemma tbireach_trans u v w: tbireach u v -> tbireach v w -> tbireach u w.
+Proof.
+intros ; unfold tbireach in *.
+destruct w as [[b0 b1] b2]; destruct v as [[b3 b4] b5]; destruct u as [[b6 b7] b8]; 
+destruct b0,b1,b2,b3,b4,b5,b6,b7,b8 ; cbn in * ; auto ; try contradiction.
+Qed.
+
+Lemma tbireach_expl u : tbireach (true,true,true) u -> u = (true,true,true).
+Proof.
+intros. unfold tbireach in H ; destruct u as [[b0 b1] b2]; destruct b0,b1,b2 ; cbn in * ; auto ; try contradiction.
+Qed.
+
+(* Modal relation *)
+
+Definition tbmreach (tb0 tb1 : bool * bool * bool) : Prop :=
+  match tb0 with
+  | (true,true,true) => match tb1 with
+                            | (true,true,true) => True
+                            | _ => False
+                            end
+  | (false,false,false) => match tb1 with
+                            | (false,false,true) => True
+                            | _ => False
+                            end
+  | (false,false,true) => False
+  | (false,true,false) => match tb1 with
+                            | (false,true,true) => True
+                            | (true,false,false) => True
+                            | _ => False
+                            end
+  | (true,false,true) => match tb1 with
+                            | (false,true,true) => True
+                            | _ => False
+                            end
+  | (true,true,false) => match tb1 with
+                            | (true,false,false) => True
+                            | _ => False
+                            end
+  | (true,false,false) => False
+  | (false,true,true) => False
+  end.
+
+Lemma tbmreach_expl u : tbmreach (true,true,true) u <-> u = (true,true,true).
+Proof.
+split ; unfold tbmreach ; intro ; destruct u as [[b0 b1] b2] ; destruct b0,b1,b2; 
+cbn in * ; subst ; auto ; try contradiction ; try inversion H.
+Qed.
+
+(* We can define a frame. *)
+
+Instance tbF : frame :=
+      {|
+        nodes := bool * bool * bool ;
+        expl:= (true,true,true) ;
+
+        ireachable := tbireach ;
+        ireach_refl := tbireach_refl ;
+        ireach_tran := tbireach_trans ;
+        ireach_expl := tbireach_expl  ;
+
+        mreachable := tbmreach  ;
+        mreach_expl := tbmreach_expl  ;
+      |}.
+
+
+(* This frame is a CK_Idb_Nd frame *)
+
+Lemma tbF_Idb_Nd : suff_Idb_frame tbF /\ suff_Nd_frame tbF.
+Proof.
+split.
+(* suff_Idb *)
+- intros x y z mxy iyz ; cbn in *. unfold tbmreach in * ; unfold tbireach in *.
+  destruct x as [[b0 b1] b2] ; destruct y as [[b3 b4] b5] ; destruct z as [[b6 b7] b8] ; 
+  destruct b0,b1,b2,b3,b4,b5,b6,b7,b8 ; cbn in * ; subst ; auto ; try contradiction ; cbn.
+  + exists (true,true,true) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    exists (true,true,true) ; cbn. cbn in *. destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction.
+  + exists (true,true,false) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    exists (true,false,false) ; cbn. cbn in *. destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction. split ; auto. exists (true,false,false) ; cbn ; split ; auto ; split.
+  + exists (true,false,true) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    exists (false,true,true) ; cbn. cbn in *. destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction. split ; auto. exists (false,true,true) ; cbn ; split ; auto ; split.
+  + exists (true,true,false) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    exists (true,false,false) ; cbn. cbn in *. destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction. split ; auto. exists (true,false,false) ; cbn ; split ; auto ; split.
+  + exists (true,false,true) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    exists (false,true,true) ; cbn. cbn in *. destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction. split ; auto. exists (false,true,true) ; cbn ; split ; auto ; split.
+  + exists (true,true,false) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    exists (true,false,false) ; cbn. cbn in *. destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction. split ; auto. exists (true,false,false) ; cbn ; split ; auto ; split.
+  + exists (true,false,true) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    exists (false,true,true) ; cbn. cbn in *. destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction. split ; auto. exists (false,true,true) ; cbn ; split ; auto ; split.
+  + exists (false,false,false) ; cbn. repeat split ; auto. intros z Hz ; inversion Hz. destruct H. inversion H ; subst.
+    destruct z as [[b6 b7] b8] ; destruct b6,b7,b8 ; cbn in * ; subst ; auto ;
+    try contradiction.
+    * exists (true,false,false) ; cbn. split ; auto. exists (false,false,true) ; cbn ; split ; auto ; split.
+    * exists (false,true,true) ; cbn. split ; auto. exists (false,false,true) ; cbn ; split ; auto ; split.
+    * exists (false,true,true) ; cbn. split ; auto. exists (false,false,true) ; cbn ; split ; auto ; split.
+    * exists (false,false,true) ; cbn. split ; auto. exists (false,false,true) ; cbn ; split ; auto ; split.
+(* suff_Nd *)
+- intros x mxexpl ; cbn in *. destruct x as [[b0 b1] b2] ; destruct b0,b1,b2 ; cbn in * ; auto ; try contradiction.
+Qed.
+
+(* We define a valuation. *)
+
+Definition tbval (tb : bool * bool * bool) (p : nat) := 
+  match tb with
+  | (true,true,true) => True
+  | (true,false,false) => p = 0 \/ p = 1
+  | (false,true,true) => p = 0 \/ p = 2
+  | _ => False
+  end.
+
+Lemma tbval_persist : forall u v, tbireach u v -> forall (p : nat), tbval u p -> tbval v p.
+Proof.
+intros. unfold tbval in *.
+destruct u as [[b0 b1] b2]; destruct v as [[b3 b4] b5]; destruct b0,b1,b2,b3,b4,b5 ; cbn in * ; auto ; try contradiction.
+Qed.
+
+Lemma tbval_expl  : forall p, tbval expl p.
+Proof.
+intros. unfold tbval. destruct expl as [[b0 b1] b2] eqn:E ; auto.
+unfold expl in E. inversion E ; subst ; cbn ; auto.
+Qed.
+
+(* Finally we can define a model. *)
+
+Instance tbM : model :=
+      {|
+        fra := tbF ;
+
+        val := tbval  ;
+        persist :=  tbval_persist ;
+        val_expl :=  tbval_expl
+      |}.
+
+
+
+
+Theorem diam_free_strict_ext_IK_CKIdbNd : 
+        IKH_prv (Empty_set _) (((□ ((# 1) ∨ (# 2)) → ((¬ □ ¬ # 1) ∨ (¬ □ ¬ # 2))) → □ # 0) → □ # 0) /\
+        ~ CKIdbNdH_prv (Empty_set _) (((□ ((# 1) ∨ (# 2)) → ((¬ □ ¬ # 1) ∨ (¬ □ ¬ # 2))) → □ # 0) → □ # 0).
+Proof.
+split ; [ | intro H].
+- eapply MP.
+  + remember (□ (# 1 ∨ # 2) → ¬ □ ¬ # 1 ∨ ¬ □ ¬ # 2) as φ.
+    do 2 (apply extCKH_Deduction_Theorem).
+    eapply MP.
+    * apply extCKH_Deduction_Theorem.
+      eapply MP.
+      -- eapply MP ; [apply Ax ; left ; right ; eapply Kb ; reflexivity | ].
+         apply extCKH_monot with (Empty_set _) ; [ | intros A HA ; inversion HA ].
+         apply Nec. apply extCKH_Deduction_Theorem.
+         apply MP with ⊤.
+         ++ apply Id ; right ; apply In_singleton.
+         ++ apply prv_Top.
+      -- eapply MP ;  [apply Ax ; right ; left ; eexists ; eexists ; right ; reflexivity | ].
+         apply Id ; right ; apply In_singleton.
+    * eapply MP ; [ eapply MP ; [ apply Imp_trans | apply Id ; left ; right ; subst ; apply In_singleton ]| apply Id ; right ; apply In_singleton].
+  + do 2 (apply extCKH_Deduction_Theorem). eapply MP ; [ apply extCKH_Deduction_Theorem | ].
+    * apply extCKH_monot with  (Singleton form (◊ (# 1 ∨ # 2))).
+      -- eapply MP ; [ | eapply MP ; [ apply Ax ; right ; left ; eexists ; eexists ; left ; reflexivity | apply Id ; apply In_singleton ] ].
+         apply extCKH_Deduction_Theorem.
+         eapply ND_OrE ; [ apply Id ; right ; apply In_singleton | apply extCKH_Deduction_Theorem | apply extCKH_Deduction_Theorem ].
+         ++ apply ND_OrI1. apply extCKH_Deduction_Theorem.
+            eapply MP ; [ apply Ax ; right ; right ; reflexivity | ].
+            apply extCKH_monot with (Union _  (fun x => (exists B, In _ (Singleton _ (¬ # 1)) B /\ x = Box B)) (Singleton _ (◊ # 1))).
+            ** apply Diam_rule. eapply MP ; [ apply Id ; left ; apply In_singleton | apply Id ; right ; apply In_singleton].
+            ** intros A HA ; inversion HA ; subst.
+               --- inversion H ; subst. destruct H0 ; subst. inversion H0 ; subst. right ; split.
+               --- left ; right ; auto.
+         ++ apply ND_OrI2. apply extCKH_Deduction_Theorem.
+            eapply MP ; [ apply Ax ; right ; right ; reflexivity | ].
+            apply extCKH_monot with (Union _  (fun x => (exists B, In _ (Singleton _ (¬ # 2)) B /\ x = Box B)) (Singleton _ (◊ # 2))).
+            ** apply Diam_rule. eapply MP ; [ apply Id ; left ; apply In_singleton | apply Id ; right ; apply In_singleton].
+            ** intros A HA ; inversion HA ; subst.
+               --- inversion H ; subst. destruct H0 ; subst. inversion H0 ; subst. right ; split.
+               --- left ; right ; auto.
+      -- intros A HA ; inversion HA ; subst. right ; split.
+    * apply extCKH_monot with (Union _  (fun x => (exists B, In _ (Singleton _ (# 1 ∨ # 2)) B /\ x = Box B)) (Singleton _ (◊ ⊤))).
+      -- apply Diam_rule. apply Id ; left ; split.
+      -- intros A HA ; inversion HA ; subst.
+        ++ inversion H. destruct H0 ; subst. inversion H0 ; subst. right ; split.
+        ++ left ; right ; auto.
+- apply extCKH_Detachment_Theorem in H. apply CKIdbNd_Soundness in H.
+  assert (~ forces tbM (false,false,false) (□ # 0)).
+  { intro H0. cbn in H0. pose (H0 (false,false,false) I (false,false,true) I) as p ; cbn in p ; auto. }
+  apply H0. apply H ; auto.
+  split ; [apply suff_impl_Idb ; apply tbF_Idb_Nd | apply suff_impl_Nd ; apply tbF_Idb_Nd].
+  intros ψ H1 ; cbn in *. inversion H1 ; subst.
+  + inversion H2.
+  + inversion H2 ; subst. clear H1 H2. intros w iw Hw v iwv u mvu ; cbn.
+    destruct w as [[b0 b1] b2] eqn:E0 ; destruct v as [[b3 b4] b5] eqn:E1 ; destruct u as [[b6 b7] b8] eqn:E2;
+    destruct b0,b1,b2,b3,b4,b5,b6,b7,b8 ; cbn ; cbn in iw,iwv,mvu ; auto ; try contradiction.
+    assert (forces tbM (false, true, false) (¬ □ ¬ # 1 ∨ ¬ □ ¬ # 2)).
+    { apply Hw ; auto. intros. destruct v0 as [[b9 b10] b11] eqn:E3 ; destruct u0 as [[b12 b13] b14] eqn:E4 ;
+    destruct b9,b10,b11,b12,b13,b14 ; cbn ; cbn in * ; auto ; try contradiction. }
+    destruct H1.
+    * pose (H1 (true,false,true) I) ; cbn in f.
+      enough ((true, false, true) = (true, true, true)) ; [discriminate | apply f].
+      intros [[b0 b1] b2] H2 [[b3 b4] b5] H3 [[b6 b7] b8] H4 H5.
+      destruct b0,b1,b2,b3,b4,b5,b6,b7,b8 ; cbn in H2,H3,H4,H5 ; auto ; try contradiction.
+      destruct H5 ; discriminate.
+    * pose (H1 (true,true,false) I) ; cbn in f.
+      enough ((true, true, false) = (true, true, true)) ; [discriminate | apply f].
+      intros [[b0 b1] b2] H2 [[b3 b4] b5] H3 [[b6 b7] b8] H4 H5.
+      destruct b0,b1,b2,b3,b4,b5,b6,b7,b8 ; cbn in H2,H3,H4,H5 ; auto ; try contradiction.
+      destruct H5 ; discriminate.
+Qed.
+
+End IK_not_conserv_CKIdbNd.
 
 
