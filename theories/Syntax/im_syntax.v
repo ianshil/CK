@@ -1,7 +1,7 @@
-Require Import List.
+From Stdlib Require Import List.
 Export ListNotations.
-Require Import Arith.
-Require Import Ensembles.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Ensembles.
 
 (* First, let us define propositional formulas. *)
 
@@ -141,6 +141,57 @@ Definition UnBox φ : form :=
   | _ => φ
   end.
 
+Fixpoint list_conj (l : list form) :=
+match l with
+ | [] => ⊤
+ | φ :: l => φ ∧ (list_conj l)
+end.
+
+Lemma list_conj_map_Diam : forall l, (forall A, List.In A l -> exists B, A = ◊ B) ->
+                exists l', l = map Diam l'.
+Proof.
+induction l ; cbn ; intros ; auto.
+- exists [] ; auto.
+- destruct (H a) ; auto ; subst.
+  destruct (IHl). intros. apply H ; auto. subst.
+  exists (x :: x0). cbn ; auto.
+Qed.
+
+Fixpoint list_disj (l : list form) :=
+match l with
+ | nil => Bot
+ | h :: t => Or h (list_disj t)
+end.
+
+Lemma list_disj_map_Box : forall l, (forall A, List.In A l -> exists B, A = □ B) ->
+                exists l', l = map Box l'.
+Proof.
+induction l ; cbn ; intros ; auto.
+- exists [] ; auto.
+- destruct (H a) ; auto ; subst.
+  destruct (IHl). intros. apply H ; auto. subst.
+  exists (x :: x0). cbn ; auto.
+Qed.
+
+(* More lemmas about lists of formulas. *)
+
+Lemma list_Box_map_repr : forall l, (forall A : form, List.In A l -> exists B : form, A = □ B) ->
+      exists l', l = map Box l'.
+Proof.
+induction l ; cbn ; intros.
+- exists [] ; auto.
+- destruct (H a) ; auto ; subst. destruct IHl ; auto ; subst.
+  exists (x :: x0). cbn ; auto.
+Qed.
+
+Lemma list_Diam_map_repr : forall l, (forall A : form, List.In A l -> exists B : form, A = ◊ B) ->
+      exists l', l = map Diam l'.
+Proof.
+induction l ; cbn ; intros.
+- exists [] ; auto.
+- destruct (H a) ; auto ; subst. destruct IHl ; auto ; subst.
+  exists (x :: x0). cbn ; auto.
+Qed.
 
 
 

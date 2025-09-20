@@ -1,7 +1,7 @@
-Require Import Arith.
-Require Import Lia.
-Require Import Ensembles.
-Require Import Init.Wf.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Ensembles.
+From Stdlib Require Import Init.Wf.
 
 Require Import im_syntax.
 

@@ -1,10 +1,10 @@
-Require Import Lia.
-Require Import Coq.Arith.Cantor.
-Require Import Coq.Logic.ConstructiveEpsilon.
+From Stdlib Require Import Lia.
+From Stdlib Require Import Arith.Cantor.
+From Stdlib Require Import Logic.ConstructiveEpsilon.
 
 Require Import im_syntax.
 
-Require Import List.
+From Stdlib Require Import List.
 Import ListNotations.
 
 Fixpoint L_enum n :=

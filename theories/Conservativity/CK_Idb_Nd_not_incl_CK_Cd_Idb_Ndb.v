@@ -1,9 +1,9 @@
-Require Import List.
+From Stdlib Require Import List.
 Export ListNotations.
-Require Import Arith.
-Require Import Ensembles.
-Require Import Bool.
-Require Import Btauto.
+From Stdlib Require Import Arith.
+From Stdlib Require Import Ensembles.
+From Stdlib Require Import Bool.
+From Stdlib Require Import Btauto.
 
 Require Import im_syntax.
 Require Import CKH_export.
