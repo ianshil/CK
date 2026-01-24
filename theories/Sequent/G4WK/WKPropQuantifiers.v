@@ -63,9 +63,9 @@ Equations e_rule {Δ : list form} {ϕ : option form }
   E (Δ' • δ₁ • δ₂, None) _;
 (* E3 *)
 | δ₁ ∨ δ₂ := let Δ' := rm (δ₁ ∨ δ₂) Δ in
-  E (Δ' • δ₁, ϕ) _ ∨ E (Δ' • δ₂, ϕ) _;
+  E (Δ' • δ₁, None) _ ∨ E (Δ' • δ₂, None) _;
 | Var q → δ := let Δ' := rm (Var q → δ) Δ in
-    if decide (Var q ∈ Δ) then E (Δ'•δ, ϕ) _ (* E5 modified *)
+    if decide (Var q ∈ Δ) then E (Δ'•δ, None) _ (* E5 modified *)
     else if decide (p = q) then ⊤
     else # q  → E (Δ'•δ, None) _ ; (* E4 *)
 (* E6 *)
@@ -306,25 +306,7 @@ replace Δ with pe'.1 by now subst.
 replace ϕ with pe'.2 by now subst. clear Heqpe' Δ ϕ pe. revert pe'.
 refine  (@well_founded_induction _ _ wf_pointed_order _ _).
 intros (Δ, ϕ) Hind.
-repeat split.
-- intros θ Hin. cbn in Hin.
-  funelim (e_rule p θ) ; cbn ; cbn in Hin,Heqcall ; auto.
-  + simp e_rule ; cbn. f_equal.
-    * simp EA. assert (((rm (δ₁ ∨ δ₂) Δ0 • δ₁)%list, ϕ0) ≺· (Δ0, ϕ0)) by (destruct ϕ0 ; order_tac).
-      f_equal. f_equal. f_equal.
-      eapply in_map_ext; intros θ Hθ ; cbn in Hθ.
-      apply Hind in H as ((H & H0) & H1) ; cbn in H0. erewrite H ; auto.  
-    * simp EA. assert (((rm (δ₁ ∨ δ₂) Δ0 • δ₂)%list, ϕ0) ≺· (Δ0, ϕ0)) by (destruct ϕ0 ; order_tac).
-      f_equal. f_equal. f_equal.
-      eapply in_map_ext; intros θ Hθ ; cbn in Hθ.
-      apply Hind in H as ((H & H0) & H1) ; cbn in H0. erewrite H ; auto.  
-  + simp e_rule ; cbn. assert (((rm (# q → δ) Δ0 • δ)%list, ϕ0) ≺· (Δ0, ϕ0)) by (destruct ϕ0 ; order_tac).
-    case decide ; intro Hq.
-    * simp EA. f_equal. f_equal. f_equal.
-      eapply in_map_ext; intros θ Hθ ; cbn in Hθ.
-      apply Hind in H as ((H & H0) & H1) ; cbn in H0. erewrite H ; auto.
-    * case decide ; auto.
-- cbn. funelim (e_rule_9 Δ) ; cbn ; cbn in Heqcall ; auto.
+repeat split. cbn. funelim (e_rule_9 Δ) ; cbn ; cbn in Heqcall ; auto.
 Qed.
 
 Lemma e_rule_cong_strong  p Δ ϕ θ (Hin1 Hin2: θ ∈ Δ) E1 A1 E2 A2:
@@ -406,9 +388,7 @@ Qed.
 
 Lemma EA_cong  p Δ ϕ: EA p true (Δ, ϕ) = EA p true (Δ, None).
 Proof.
-simp EA; simpl. f_equal.
-- apply e_rules_cong.
-- f_equal. f_equal. apply in_map_ext, e_rules_cong.
+simp EA; simpl. f_equal. apply e_rules_cong.
 Qed.
 
 

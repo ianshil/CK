@@ -8,4 +8,5 @@
 -R theories/Completeness_segP ComplsegP
 -R theories/Conservativity Conservativity
 -R theories/Sequent Sequent
+-R theories/Algebras Algebras
 theories
