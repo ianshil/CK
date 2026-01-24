@@ -227,6 +227,35 @@ destruct (Lindenbaum _ (fun x : form => exists A : form, B = x \/ head (□ A) /
 apply L2. apply Id. auto.
 Qed.
 
+Lemma backward_confluence : forall s0 s1 s2, cmreach s0 s1 -> cireach s1 s2 ->
+                                            exists s3, cireach s0 s3 /\ cmreach s3 s2.
+Proof.
+intros.
+assert (H1 : forall th : Ensemble form, th = @head s0 \/ @tail s0 th \/ th = @head s2 -> closed AdAx th).
+{ intros th Hth φ D. destruct Hth as [H1 | [H1 | H1]] ; subst.
+  - apply (@segClosed s0) ; auto.
+  - apply (@segClosed s0) ; auto.
+  - apply (@segClosed s2) ; auto. }
+assert (H2: forall th : Ensemble form, th = @head s0 \/ @tail s0 th \/ th = @head s2 -> quasi_prime th).
+{ intros th Hth. destruct Hth as [H2 | [H2 | H2]] ; subst.
+  - apply (@segPrime s0) ; auto.
+  - apply (@segPrime s0) ; auto.
+  - apply (@segPrime s2) ; auto. }
+assert (H3: forall A : form, @head s0 (□ A) -> forall th : Ensemble form, @tail s0 th \/ th = @head s2 -> th A).
+{ intros φ Hφ th Hth. destruct Hth ; subst.
+  - apply (@boxreflect s0) ; auto.
+  - apply H0. unfold In ; apply (@boxreflect s0) ; auto. }
+assert (H4: forall A : form, @head s0 (◊ A) -> exists th : Ensemble form, (@tail s0 th \/ th = @head s2) /\ th A).
+{ intros φ Hφ. apply (@diamwitness s0) in Hφ.
+  destruct Hφ as [th [Hthtail thφ]]. exists th ; auto. }
+pose (Build_segment (@head s0) (fun U => (@tail s0) U \/ U = (@head s2)) H1 H2 H3 H4).
+exists s.
+split.
+- intros φ Hφ ; auto.
+- cbn. auto.
+Qed.
+
+
 (* We define the canonical valuation. *)
 
 Definition cval s (p : nat) := (@head s) (# p).
@@ -402,4 +431,4 @@ Qed.
 End general_seg_completeness.
 
 
-  
+   

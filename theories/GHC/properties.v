@@ -119,6 +119,35 @@ intros. eapply  MP. eapply  MP. apply Imp_trans_help54. apply Imp_trans_help427.
 apply Imp_trans_help170.
 Qed.
 
+Lemma meta_Imp_trans : forall A B C Γ, extCKH_prv AdAx Γ (A → B) -> extCKH_prv AdAx Γ (B → C) ->
+                extCKH_prv AdAx Γ (A → C).
+Proof.
+intros A B C Γ H H0. eapply MP. 
+- eapply MP.
+  + eapply Imp_trans.
+  + exact H.
+- auto.
+Qed.
+
+Lemma Or_imp_assoc : forall A B C D Γ,
+  extCKH_prv AdAx Γ (A → ((B ∨ C) ∨ D)) ->
+  extCKH_prv AdAx Γ (A → (B ∨ (C ∨ D))).
+Proof.
+intros. eapply MP.
+- eapply MP ; [apply Imp_trans | exact H].
+- eapply MP.
+  + eapply MP ; [apply Ax ; left ; left ; eapply IA5 ; reflexivity | ].
+    eapply MP.
+    * eapply MP ; [apply Ax ; left ; left ; eapply IA5 ; reflexivity | ].
+      apply Ax ; left ; left ; eapply IA3 ; reflexivity.
+    * eapply MP.
+      -- eapply MP ; [ apply Imp_trans | apply Ax ; left ; left ; eapply IA3 ; reflexivity].
+      -- apply Ax ; left ; left ; eapply IA4 ; reflexivity.
+  + eapply MP.
+    * eapply MP ; [apply Imp_trans | apply Ax ; left ; left ; eapply IA4 ; reflexivity].
+    * apply Ax ; left ; left ; eapply IA4 ; reflexivity.
+Qed.
+
 Lemma monotR_Or : forall A B Γ ,
     extCKH_prv AdAx Γ (A →  B) ->
     forall C, extCKH_prv AdAx Γ ((Or A C) →  (Or B C)).
@@ -662,3 +691,26 @@ Qed.
 
 
 End Natural_Deduction.
+
+
+Section even_more.
+
+Variable AdAx : form -> Prop.
+
+Lemma assoc_And_obj : forall A B C Γ, extCKH_prv AdAx Γ (A ∧ B ∧ C → (A ∧ B) ∧ C) /\ 
+                                      extCKH_prv AdAx Γ ((A ∧ B) ∧ C → A ∧ B ∧ C).
+Proof.
+intros ; split.
+- apply extCKH_Deduction_Theorem. apply ND_AndI.
+  + apply ND_AndI.
+    * eapply ND_AndE1. apply Id ; right ; split.
+    * eapply ND_AndE1 ; eapply ND_AndE2 ; apply Id ; right ; split.
+  + eapply ND_AndE2 ; eapply ND_AndE2 ; apply Id ; right ; split.
+- apply extCKH_Deduction_Theorem. apply ND_AndI.
+  + eapply ND_AndE1 ; eapply ND_AndE1 ; apply Id ; right ; split.
+  + apply ND_AndI.
+    * eapply ND_AndE2 ; eapply ND_AndE1 ; apply Id ; right ; split.
+    * eapply ND_AndE2. apply Id ; right ; split.
+Qed.
+
+End even_more.
