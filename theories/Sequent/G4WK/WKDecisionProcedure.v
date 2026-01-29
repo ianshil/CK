@@ -40,9 +40,7 @@ Ltac eqt := match goal with | H : (_ • ?φ) = list_to_set_disj ?Γ |- _ =>
   assert(Hinφ : φ ∈ Γ) by (apply elem_of_list_to_set_disj; setoid_rewrite <- H; ms);
   apply env_equiv_eq, env_add_inv', symmetry in Heq; rewrite list_to_set_disj_rm in Heq end.
 
-(** The function [Provable_dec] decides whether a sequent is provable.
-   The proof is essentially the same as the definition of [Proof_tree_dec].
-   *)
+(** The function [Provable_dec] decides whether a sequent is provable. *)
 
 Proposition Provable_dec  Γ φ :
   (list_to_set_disj Γ ⊢ φ) + (list_to_set_disj  Γ ⊢ φ -> False).

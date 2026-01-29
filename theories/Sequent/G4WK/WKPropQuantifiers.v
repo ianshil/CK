@@ -12,9 +12,8 @@ It consists of two parts:
 2) a proof of its correctness. *)
 
 Require Import WKSequents im_syntax syntax_facts.
-Require Import WKSequentProps WKOrder (* Optimizations *).
+Require Import WKSequentProps WKOrder.
 From Stdlib Require Import Program.Equality. (* for dependent induction *)
-(* Require Import ISL.Simplifications. *)
 From Equations Require Import Equations.
 
 (* We define propositional quantifiers given a simplification method
@@ -44,8 +43,6 @@ Open Scope list_scope.
 (** First, the implementation of the rules for calculating E. The names of the rules
   refer to the table in Pitts' paper. *)
 
-(* I took the decision of having None in the recursive calls
-   instead of ϕ. *)
 Equations e_rule {Δ : list form} {ϕ : option form }
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
@@ -199,7 +196,7 @@ Equations a_rule_env17 {Δ : list form} {ϕ : option form}
                         (□(E((□⁻¹ Δ'') • δ3, None) _
                            → A((□⁻¹ Δ'') • δ3, Some δ1) _))
                                   ∧ A(Δ' • δ2, ϕ) _
-  | _ , _ => ⊥ (* default case, quite annoying as it will create a lot of duplicates. *).
+  | _ , _ => ⊥.
 Next Obligation.
 apply env_order_0' ; apply env_order_env_order_refl.
 all : enough ((□⁻¹ rm (◊ δ3) (rm (◊ δ1 → δ2) Δ)) = □⁻¹ rm (◊ δ3) Δ) ;
@@ -220,9 +217,9 @@ Qed.
 Equations a_rule_form  {Δ : list form} (ϕ : option form)
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form} : form :=
-| None := ⊥ (* This may cause problems. It could be a default case though. *)
+| None := ⊥
 | Some (Var q) :=
-    if decide (p = q) (* TODO : change this to p∈Vars(ϕ) *)
+    if decide (p = q)
     then ⊥
     else Var q; (* A9 *)
 (* A11 *)
@@ -231,7 +228,6 @@ Equations a_rule_form  {Δ : list form} (ϕ : option form)
 | Some (ϕ₁ ∨ ϕ₂) := A (Δ, Some ϕ₁) _ (* ⊻ *) ∨ A (Δ, Some ϕ₂) _;
 (* A13 *)
 | Some (ϕ₁ → ϕ₂) := E (Δ•ϕ₁, None) _  → A (Δ•ϕ₁, Some ϕ₂) _;
-(* Is it safe to put ⊥ in E? Not sure given the clause for ◊ in a_rule_env *)
 | Some Bot := ⊥;
 (* A14 *)
 | Some (□δ) := □((E ((□⁻¹ Δ), None) _)  → A((□⁻¹ Δ), Some δ) _)
@@ -415,7 +411,9 @@ Section Correctness.
 Context {p : nat}.
 
 
-(** This section contains the proof of Proposition 5, the main correctness result, stating that the E- and A-formulas defined above are indeed existential and universal propositional quantified versions of the original formula, respectively. *)
+(** This section contains the proof of the main correctness result, 
+    stating that the E- and A-formulas defined above are indeed existential
+    and universal propositional quantified versions of the original formula, respectively. *)
 
 (** *** (i) Variables *)
 Section VariablesCorrect.
@@ -425,8 +423,6 @@ Section VariablesCorrect.
   *)
 
 (* A general tactic for variable occurrences *)
-
-(* I modified it from Hugo's work, but it only partially works. *)
 
 Ltac vars_tac :=
 intros; subst;
@@ -714,7 +710,6 @@ match goal with |- ?d ∖ {[?f]} • _ • _ ⊢ _ => rw (list_to_set_disj_rm Δ
       apply equiv_disj_union_compat_r. ms.
   + apply AndL. exch 0. exch 1. exch 0. apply ImpDiam.
     * remember (A0 ((rm (◊ θ1 → θ2) Δ • θ2)%list, ϕ) (a_rule_env_obligations_obligation_18 Δ ϕ E0 A0 θ1 θ2 Hin)) as ψ.
-      (* Inelegant case distinction but which is proof-theoretically relevant. *)
       destruct (is_box ψ) eqn:E.
       -- rewrite open_boxes_add_t ; auto. exch 0. apply weakening.
          apply weak_ImpL.
