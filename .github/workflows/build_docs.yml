@@ -30,7 +30,7 @@ jobs:
       - name: "Run coq-community/docker-coq-action@v1 with debian:10"
         uses: coq-community/docker-coq-action@v1
         with:
-          opam_file: 'rocq-km.opam'
+          opam_file: 'rocq-ck.opam'
           coq_version: ${{ matrix.coq_version }}
           ocaml_version: ${{ matrix.ocaml_version }}
           # Explanation for the permission issue:
