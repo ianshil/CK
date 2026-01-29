@@ -3,9 +3,8 @@ Require Import CKSequents CKSequentProps CKOrder.
 From Stdlib Require Import Program.Equality.
 
 (**
-  This file implements a decision procedure for CK. There are two versions, with the same proof.
-  `Proof_tree_dec` computes a proof tree for the sequent, while `Provable_dec` only decides the provability
-  of the sequent.
+  This file implements a decision procedure for CK:
+  `Provable_dec` decides the provability of the sequent.
 *)
 
 Global Instance proper_rm : Proper ((=) ==> (≡ₚ) ==> (≡ₚ)) rm.
@@ -47,8 +46,6 @@ Ltac eqt := match goal with | H : (_ • ?φ) = list_to_set_disj ?Γ |- _ =>
 
 Proposition Provable_dec  Γ φ :
   (list_to_set_disj Γ ⊢ φ) + (list_to_set_disj  Γ ⊢ φ -> False).
-(* Proposition Provable_dec  Γ φ :
-  (exists _ : list_to_set_disj Γ ⊢ φ, True) + (forall H : list_to_set_disj  Γ ⊢ φ, False). *)
 Proof.
 remember (Γ, φ) as pe.
 replace Γ with pe.1 by now inversion Heqpe.

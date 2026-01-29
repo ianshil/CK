@@ -3,9 +3,9 @@ Require Import CKSequents.
 (* Required for dependent induction. *)
 From Stdlib Require Import Program.Equality.
 
-(** * Admissible rules in G4ip sequent calculus
+(** * Admissible rules in G4CK sequent calculus
 
-This file contains important properties of the sequent calculus G4ip, defined in
+This file contains important properties of the sequent calculus G4CK, defined in
 Sequents.v, namely the admissibility of various inversion rules, weakening and
 contraction. We draw various consequences from this that are used extensively in
 the proof of correctness of propositional quantifiers. The first part of this
@@ -18,14 +18,6 @@ Logic (65):4.
 
 (** ** Weakening *)
 
-(* Needs to be rewritten. 
-
-Lemma open_boxes_add'
-      (Γ : env) (φ : form) : (⊗ (Γ • φ)) = (⊗ Γ • ⊙ φ).
-Proof. apply open_boxes_add. Qed. *)
-(*
-Global Hint Rewrite open_boxes_add' : proof.
-*)
 (** We prove the admissibility of the weakening rule. *)
 
 Theorem weakening  φ' Γ φ : Γ ⊢ φ -> Γ•φ' ⊢ φ.
@@ -169,8 +161,7 @@ induction Hp; intros φ0 ψ0 Hin.
 - forward. auto with proof.
 - apply AndR; auto with proof.
 (* the main case *)
-- (* TODO: forward gets stuck there. *)
-  case(decide ((φ ∧ ψ) = (φ0 ∧ ψ0))); intro Heq0.
+- case(decide ((φ ∧ ψ) = (φ0 ∧ ψ0))); intro Heq0.
   + dependent destruction Heq0; subst. peapply Hp.
   + forward. constructor 4. exch 0. backward. backward. apply IHHp. ms.
 (* only left rules remain. Now it's all a matter of putting the right principal
@@ -506,7 +497,7 @@ dependent induction Hp.
     erewrite proper_Provable ; [ exact Hp | rewrite open_boxes_remove_f ; cbn ; auto | auto].
 Qed.
 
-(* inversion for ImpLdiam is only partial too *)
+(* inversion for ImpLDiam is only partial too *)
 Lemma ImpLDiam_prev Γ χ φ1 φ2 ψ: (Γ• (◊ χ) • ((◊φ1) → φ2)) ⊢ ψ -> (Γ•(◊ χ)•φ2) ⊢ ψ.
 Proof.
 intro Hp.
@@ -669,7 +660,7 @@ Proof. intro Hd. dependent induction Hd; auto using exfalso with proof. Qed.
 
 (** We prove Lemma 4.1 of (Dyckhoff & Negri 2000). This lemma shows that a
     weaker version of the ImpL rule of Gentzen's original calculus LJ is still
-    admissible in G4ip. The proof is simple, but requires the inversion lemmas
+    admissible in G4CK. The proof is simple, but requires the inversion lemmas
     proved above.
   *)
 
@@ -706,7 +697,7 @@ Global Hint Resolve weak_ImpL : proof.
 (** ** Contraction
 
  The aim of this section is to prove that the contraction rule is admissible in
- G4ip. *)
+ G4CK. *)
 
 (** An auxiliary definition of **height** of a proof, measured along the leftmost branch. *)
 Fixpoint height  {Γ φ} (Hp : Γ ⊢ φ) := match Hp with
@@ -803,7 +794,7 @@ destruct Hp; simpl in Hleh.
     erewrite proper_Provable ; [ exact Hp | rewrite open_boxes_remove_f ; cbn ; auto | auto].
 Qed.
 
-(* Is not used in the proof of contraction. *)
+(* The following is not used in the proof of contraction. *)
 Lemma ImpBox_dup Γ φ1 φ2 θ:
   Γ•(□φ1 → φ2)  ⊢ θ ->
     Γ • □ φ1 • □ φ1 • φ2 ⊢ θ.
@@ -883,7 +874,7 @@ Lemma weight_open_box  φ : weight (⊙ φ) ≤ weight φ.
 Proof. dependent destruction φ; simpl; lia. Qed.
 
 
-(** Admissibility of contraction in G4ip. *)
+(** Admissibility of contraction in G4CK. *)
 Lemma contraction  Γ ψ θ : Γ • ψ • ψ ⊢ θ -> Γ • ψ ⊢ θ.
 Proof.
 remember (Γ•ψ•ψ) as Γ0 eqn:Heq0.
@@ -1026,7 +1017,7 @@ destruct Hp; simpl in Hleh, Hle.
       erewrite (proper_Provable _ (Γ • (◊ φ1 → φ2))) ; [ | ms | auto].
       exhibit Hin''' 1. apply ImpDiam.
         -- erewrite proper_Provable ; [ exact Hp1 | rewrite open_boxes_remove_f ; cbn ; auto | auto].
-        -- case (decide (φ2 = ◊ χ)); intro Heq1. (* Feels unnecessary... *)
+        -- case (decide (φ2 = ◊ χ)); intro Heq1.
           ++ subst. 
             erewrite (proper_Provable _ (Γ • ◊ χ)) ; [ | | auto].
             ** apply p_contr. apply IHh with Hp2 ; auto ; try lia. ms. ms.
@@ -1092,8 +1083,7 @@ Qed.
 
 (** ** Admissibility of LJ's implication left rule *)
 
-(** We show that the general implication left rule of LJ is admissible in G4ip.
-  This is Proposition 5.2 in (Dyckhoff Negri 2000). *)
+(** We show that the general implication left rule of LJ is admissible in G4CK. *)
 
 Lemma ImpL  Γ φ ψ θ: Γ•(φ → ψ) ⊢ φ -> Γ•ψ  ⊢ θ -> Γ•(φ → ψ) ⊢ θ.
 Proof. intros H1 H2. apply contraction, weak_ImpL; auto with proof. Qed.
@@ -1199,6 +1189,8 @@ Proof. intro Hp. dependent induction Hp; auto with proof. Qed.
   - [bot_not_tautology]: ⊥ is not a tautology.
   - [box_var_not_tautology]: A boxed variable cannot be a tautology.
   - [box_bot_not_tautology]: A boxed ⊥ cannot be a tautology.
+  - [diam_var_not_tautology]: A diamonded variable cannot be a tautology.
+  - [diam_bot_not_tautology]: A diamoned ⊥ cannot be a tautology.
 *)
 
 Lemma bot_not_tautology  : (∅ ⊢ ⊥) -> False.

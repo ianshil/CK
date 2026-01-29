@@ -37,7 +37,6 @@ Ltac solve_decision :=
 (** Formulas have decidable equality. *)
 Global Instance form_eq_dec : EqDecision form.
 Proof.
-(* solve decision does not support the modality parameter). *)
 Local Ltac ctac Hn := right; let Heq := fresh "Heq" in intro Heq;
                 contradict Hn; dependent destruction Heq; now subst.
 Local Ltac dec := now subst; left.

@@ -2,7 +2,7 @@
 Require Export Environments.
 From Stdlib Require Import Program.Equality.
 
-(* Note 3 or 4 would suffice for IPC ; iSL requires 5 *)
+(* Note 3 or 4 would suffice for IPC ; WK requires 5 *)
 Definition env_weight Γ :=
   list_sum (map (fun x => 5^ weight x) Γ).
 
@@ -311,8 +311,6 @@ pose (pow5_gt_0 (Init.Nat.pred (weight φ))).
 lia.
 Qed.
 
-(* Do I need this lemma for CK? *)
-
 Lemma env_order_4 Δ Δ' φ1 φ2 φ3 φ4 φ:
   weight φ1 < weight φ -> weight φ2 < weight φ -> weight φ3 < weight φ -> weight φ4 < weight φ ->
    (Δ' ≼ Δ) -> Δ' • φ1 • φ2  • φ3 • φ4 ≺ Δ • φ.
@@ -418,7 +416,7 @@ Qed.
 
 Ltac prepare_order :=
 repeat (apply env_order_add_compat);
-unfold pointed_env_order; subst; simpl; (* repeat rewrite open_boxes_add_t; *) try match goal with
+unfold pointed_env_order; subst; simpl; try match goal with
 | Δ := _ |- _ => subst Δ; try prepare_order
 | Hin : ?a ∈ ?Γ |- context[elements ?Γ] => rewrite (elements_elem_of Hin); try prepare_order
 | H : _ ∈ list_to_set_disj _ |- _ => apply elem_of_list_to_set_disj in H; try prepare_order

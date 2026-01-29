@@ -2,21 +2,24 @@ Require Export Environments.
 
 Open Scope stdpp_scope.
 
-(** * Sequent calculus G4CK *)
+(** * Sequent calculus G4WK *)
 
-(** We implement the sequent calculus G4ip, a contraction-free
- refinement of the usual Gentzen sequent calculus LJ for intuitionistic
- propositional logic, which was developed by the Soviet school of proof theory
- (Vorob'ev 1970) and introduced in the West by (Hudelmaier 1989) and (Dyckhoff
- 1990). This calculus is also referred to as "LJT" in the literature, but we this name 
- has also been used in the literature for other, unrelated calculi, so we prefer to 
- use "G4ip" to avoid ambiguity.
+(** We implement the sequent calculus G4WK, a single-succedent 
+  sequent calculus capturing the intuitionistic modal logic WK.
+  It extends the calculus G4ip for intuitionistic logic. 
+  
+  The formalisation of this sequent is based on the work of 
+  Férée and van Gool "Formalizing and Computing Propositional Quantifiers" (2023).
+  The formalisation is hosted here: https://github.com/hferee/rocq-pil *)
 
- The calculus G4ip is important because it allows for a terminating proof
- search, and in our proof of Pitts' theorem, it therefore lets us perform
- well-founded induction on proofs. Technically, this is thanks to the absence of
- a contraction rule. The left implication rule is refined into four separate
- proof rules.  *)
+(** ** Definition of provability in G4WK *)
+
+(* To simulate succedents of "at most one formula", we use "option" type:
+   "None" will simulate the empty succedent, and "Some ϕ" the singleton succedent. *)
+
+(* We define the operation of undiamonding such a succedent:
+   it results in a non-empty succedent only when the succedent
+   it is applied to is non-empty and is a diamond formula. *)
 
 Definition oud (oφ : option form) : option form :=
 match oφ with
@@ -24,7 +27,7 @@ match oφ with
   | _ => None
 end.
 
-(** ** Definition of provability in G4CK *)
+(** ** Definition of provability in G4WK *)
 Reserved Notation "Γ ⊢ φ" (at level 90).
 Inductive Provable : env -> option form -> Type :=
 | Atom :    ∀ Γ p, Γ • (Var p) ⊢ Some (Var p)
@@ -196,18 +199,3 @@ Ltac rw Heq n := match n with
 | 4 => erewrite (proper_Provable _ _ (equiv_disj_union_compat_r(equiv_disj_union_compat_r(equiv_disj_union_compat_r (equiv_disj_union_compat_r Heq)))) _ _ eq_refl)
 | 5 => erewrite (proper_Provable _ _ (equiv_disj_union_compat_r(equiv_disj_union_compat_r(equiv_disj_union_compat_r(equiv_disj_union_compat_r (equiv_disj_union_compat_r Heq))))) _ _ eq_refl)
 end.
-
-(* This will need to be reworked to match the modifications
-   of the results in Environments.v (with filtering).
-
-Ltac box_tac :=
-       let rec box_tac_aux Δ n := lazymatch Δ with
-  |⊗(?Δ' • ?φ) => rewrite (open_boxes_add Δ' φ)
-  |⊗(?Γ ∖ {[?ψ]}) => match goal with |H: ψ ∈ Γ |- _ => rw (open_boxes_remove Γ ψ H) n end
-  | ?Δ' • ?φ => box_tac_aux Δ' (S n)  end
-  in
-    try match goal with | |- ?Δ ⊢ _ =>  box_tac_aux Δ 0 end; simpl.
-
-    (* Probably need a diamond tac? Also, analyse the above as the box rule is different in CK. *)
-
-    *)

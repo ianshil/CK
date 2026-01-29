@@ -3,9 +3,9 @@ Require Import WKSequents.
 (* Required for dependent induction. *)
 From Stdlib Require Import Program.Equality.
 
-(** * Admissible rules in G4ip sequent calculus
+(** * Admissible rules in G4WK sequent calculus
 
-This file contains important properties of the sequent calculus G4ip, defined in
+This file contains important properties of the sequent calculus G4WK, defined in
 Sequents.v, namely the admissibility of various inversion rules, weakening and
 contraction. We draw various consequences from this that are used extensively in
 the proof of correctness of propositional quantifiers. The first part of this
@@ -18,14 +18,6 @@ Logic (65):4.
 
 (** ** Weakening *)
 
-(* Needs to be rewritten. 
-
-Lemma open_boxes_add'
-      (Γ : env) (φ : form) : (⊗ (Γ • φ)) = (⊗ Γ • ⊙ φ).
-Proof. apply open_boxes_add. Qed. *)
-(*
-Global Hint Rewrite open_boxes_add' : proof.
-*)
 (** We prove the admissibility of the weakening rule. *)
 
 Theorem weakening  φ' Γ φ : Γ ⊢ φ -> Γ•φ' ⊢ φ.
@@ -178,8 +170,7 @@ induction Hp; intros φ0 ψ0 Hin.
 - forward. auto with proof.
 - apply AndR; auto with proof.
 (* the main case *)
-- (* TODO: forward gets stuck there. *)
-  case(decide ((φ ∧ ψ) = (φ0 ∧ ψ0))); intro Heq0.
+- case(decide ((φ ∧ ψ) = (φ0 ∧ ψ0))); intro Heq0.
   + dependent destruction Heq0; subst. peapply Hp.
   + forward. constructor 4. exch 0. backward. backward. apply IHHp. ms.
 (* only left rules remain. Now it's all a matter of putting the right principal
@@ -680,7 +671,7 @@ Proof. intro Hd. dependent induction Hd; auto using exfalso with proof. Qed.
 
 (** We prove Lemma 4.1 of (Dyckhoff & Negri 2000). This lemma shows that a
     weaker version of the ImpL rule of Gentzen's original calculus LJ is still
-    admissible in G4ip. The proof is simple, but requires the inversion lemmas
+    admissible in G4WK. The proof is simple, but requires the inversion lemmas
     proved above.
   *)
 
@@ -718,7 +709,7 @@ Global Hint Resolve weak_ImpL : proof.
 (** ** Contraction
 
  The aim of this section is to prove that the contraction rule is admissible in
- G4ip. *)
+ G4WK. *)
 
 (** An auxiliary definition of **height** of a proof, measured along the leftmost branch. *)
 Fixpoint height  {Γ φ} (Hp : Γ ⊢ φ) := match Hp with
@@ -895,7 +886,7 @@ Lemma weight_open_box  φ : weight (⊙ φ) ≤ weight φ.
 Proof. dependent destruction φ; simpl; lia. Qed.
 
 
-(** Admissibility of contraction in G4ip. *)
+(** Admissibility of contraction in G4WK. *)
 Lemma contraction  Γ ψ θ : Γ • ψ • ψ ⊢ θ -> Γ • ψ ⊢ θ.
 Proof.
 remember (Γ•ψ•ψ) as Γ0 eqn:Heq0.
@@ -1104,7 +1095,7 @@ Qed.
 
 (** ** Admissibility of LJ's implication left rule *)
 
-(** We show that the general implication left rule of LJ is admissible in G4ip.
+(** We show that the general implication left rule of LJ is admissible in G4WK.
   This is Proposition 5.2 in (Dyckhoff Negri 2000). *)
 
 Lemma ImpL  Γ φ ψ θ: Γ•(φ → ψ) ⊢ Some φ -> Γ•ψ  ⊢ θ -> Γ•(φ → ψ) ⊢ θ.
@@ -1214,6 +1205,8 @@ Proof. intro Hp. dependent induction Hp; auto with proof. Qed.
   - [bot_not_tautology]: ⊥ is not a tautology.
   - [box_var_not_tautology]: A boxed variable cannot be a tautology.
   - [box_bot_not_tautology]: A boxed ⊥ cannot be a tautology.
+  - [diam_var_not_tautology]: A diamonded variable cannot be a tautology.
+  - [diam_bot_not_tautology]: A diamoned ⊥ cannot be a tautology.
 *)
 
 Lemma bot_not_tautology  : (∅ ⊢ Some ⊥) -> False.

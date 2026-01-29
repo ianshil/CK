@@ -3,7 +3,7 @@
 The main theorem proved in this file was first proved as Theorem 1 in:
 
 (Pitts 1992). A. M. Pitts. On an interpretation of second order quantification in first order intuitionistic propositional logic. J. Symb. Log., 57(1):33–52.
-It has been further extended to handle CK
+It has been further extended to handle WK
 
 It consists of two parts:
 
@@ -19,8 +19,6 @@ From Equations Require Import Equations.
 
 (* We define propositional quantifiers given a simplification method
   for formulas and contexts *)
-
-(* Module PropQuant (Import S : SimpT). *)
 
 (** ** Definition of propositional quantifiers. *)
 
@@ -45,7 +43,6 @@ Open Scope list_scope.
 
 (** First, the implementation of the rules for calculating E. The names of the rules
   refer to the table in Pitts' paper. *)
-(** note the use of  "lazy" conjunctions, disjunctions and implications *)
 
 (* I took the decision of having None in the recursive calls
    instead of ϕ. *)
@@ -118,7 +115,7 @@ Equations e_rule_12 {Δ : list form} {ϕ : option form}
                         (□(E((□⁻¹ Δ'') • δ3, None) _
                            → A((□⁻¹ Δ'') • δ3, Some δ1) _))
                            → E(Δ' • δ2, None) _
-  | _ , _ => ⊤ (* default case, quite annoying as it will create a lot of duplicates. *).
+  | _ , _ => ⊤.
 Next Obligation.
 enough ((□⁻¹ rm (◊ δ3) (rm (◊ δ1 → δ2) Δ)) = □⁻¹ rm (◊ δ3) Δ) ;
 [ rewrite H ; apply env_order_0' ; apply env_order_env_order_refl ; apply env_order_compat ; cbn ; [ lia | apply l_open_boxes_env_order] |
@@ -159,10 +156,11 @@ Equations a_rule_env  {Δ : list form} {ϕ : option form}
 | δ₁ ∨ δ₂ := let Δ' := rm (δ₁ ∨ δ₂) Δ in
       (E (Δ'•δ₁, None) _  → A (Δ'•δ₁, ϕ) _)
   (* ⊼ *) ∧ (E (Δ'•δ₂, None) _  → A (Δ'•δ₂, ϕ) _);
+(* A4 *)
 | Var q → δ := let Δ' := rm (Var q → δ) Δ in
     if decide (Var q ∈ Δ) then A (Δ'•δ, ϕ) _ (* A5 modified *)
     else if decide (p = q) then ⊥
-    else Var q (* ⊼ *) ∧ A (Δ'•δ, ϕ) _; (* A4 *)
+    else Var q ∧ A (Δ'•δ, ϕ) _; (* A4 *)
 (* A6 *)
 | (δ₁ ∧ δ₂)→ δ₃ := let Δ' := rm ((δ₁ ∧ δ₂)→ δ₃) Δ in
   A (Δ'•(δ₁ → (δ₂ → δ₃)), ϕ) _;
@@ -172,7 +170,7 @@ Equations a_rule_env  {Δ : list form} {ϕ : option form}
 (* A8 modified*)
 | (δ₁→ δ₂)→ δ₃ := let Δ' := rm ((δ₁→ δ₂)→ δ₃) Δ in
   (E (Δ'•(δ₂ → δ₃) • δ₁, None) _  → A (Δ'•(δ₂ → δ₃) • δ₁, Some δ₂) _)
-  (* ⊼ *) ∧ A (Δ'• δ₃, ϕ) _;
+   ∧ A (Δ'• δ₃, ϕ) _;
 | Bot := ⊥;
 | Bot → _ := ⊥;
 | □δ := ⊥;
@@ -898,7 +896,6 @@ apply OrL.
     apply a_rule_env_spec; intros.
     rewrite EA_cong. split ; apply HE || apply HA; destruct ϕ ; order_tac ;
     eapply pointed_env_order_None_L in Hpe ; exact Hpe.
-
   + apply elem_of_list_In in Hin. apply in_in_map2 in Hin as (ψ1 & ψ2 & Hin1 & Hin2 & Heq). subst φ.
       destruct ψ1 ; simp a_rule_env17 ; try now apply ExFalso.
       destruct ψ1_1 ; simp a_rule_env17 ; try now apply ExFalso.
@@ -1058,7 +1055,6 @@ eapply AndL. eapply list_conjL with (ψ:= e_rule_12 φ1 φ2).
   + trivial.
 Qed.
 
-(* Ian: May need to generalise this lemma to include A16 and A17 (and others?). *)
 Local Lemma A_right  {Γ Δ φ φ'} : ∀ (Hin : φ ∈ Δ),
 Γ ⊢ Some (@a_rule_env p _ _ (λ pe (_ : pe ≺· (Δ, φ')), E p pe.1) (λ pe (_ : pe ≺· (Δ, φ')), A p pe) φ Hin) ->
 Γ ⊢ Some (A p (Δ, φ')).

@@ -12,15 +12,12 @@ It consists of two parts:
 2) a proof of its correctness. *)
 
 Require Import CKSequents im_syntax syntax_facts.
-Require Import CKSequentProps CKOrder (* Optimizations *).
+Require Import CKSequentProps CKOrder.
 From Stdlib Require Import Program.Equality. (* for dependent induction *)
-(* Require Import ISL.Simplifications. *)
 From Equations Require Import Equations.
 
 (* We define propositional quantifiers given a simplification method
   for formulas and contexts *)
-
-(* Module PropQuant (Import S : SimpT). *)
 
 (** ** Definition of propositional quantifiers. *)
 
@@ -40,10 +37,6 @@ Notation "□⁻¹ Γ" := (l_open_boxes Γ) (at level 75).
 
 Open Scope list_scope.
 
-(** First, the implementation of the rules for calculating E. The names of the rules
-  refer to the table in Pitts' paper. *)
-(** note the use of  "lazy" conjunctions, disjunctions and implications *)
-
 Equations e_rule {Δ : list form} {ϕ : form }
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
@@ -60,7 +53,7 @@ Equations e_rule {Δ : list form} {ϕ : form }
 | δ₁ ∨ δ₂ := let Δ' := rm (δ₁ ∨ δ₂) Δ in
   E (Δ' • δ₁, ϕ) _ ∨ E (Δ' • δ₂, ϕ) _;
 | Var q → δ := let Δ' := rm (Var q → δ) Δ in
-    if decide (Var q ∈ Δ) then E (Δ'•δ, ϕ) _ (* E5 modified *)
+    if decide (Var q ∈ Δ) then E (Δ'•δ, ϕ) _ (* E5 *)
     else if decide (p = q) then ⊤
     else # q  → E (Δ'•δ, ϕ) _ ; (* E4 *)
 (* E6 *)
@@ -110,7 +103,7 @@ Equations e_rule_12 {Δ : list form} {ϕ : form}
                         (□(E((□⁻¹ Δ'') • δ3, ϕ) _
                            → A((□⁻¹ Δ'') • δ3, δ1) _))
                            → E(Δ' • δ2, ϕ) _
-  | _ , _ => ⊤ (* default case, quite annoying as it will create a lot of duplicates. *).
+  | _ , _ => ⊤.
 Next Obligation.
 enough ((□⁻¹ rm (◊ δ3) (rm (◊ δ1 → δ2) Δ)) = □⁻¹ rm (◊ δ3) Δ).
 - rewrite H. apply env_order_compat ; cbn ; [ lia | apply l_open_boxes_env_order].
@@ -130,9 +123,6 @@ Qed.
 
 Hint Extern 2 (_ <= _) => lia : order.
 
-(** The implementation of the rules for defining A is separated into two pieces.
-    Referring to Table 5 in Pitts, the definition a_rule_env handles A1-8 and A10,
-    and the definition a_rule_form handles A9 and A11-13. *)
 Equations a_rule_env  {Δ : list form} {ϕ : form}
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
@@ -147,11 +137,12 @@ Equations a_rule_env  {Δ : list form} {ϕ : form}
 (* A3 *)
 | δ₁ ∨ δ₂ := let Δ' := rm (δ₁ ∨ δ₂) Δ in
       (E (Δ'•δ₁, ϕ) _  → A (Δ'•δ₁, ϕ) _)
-  (* ⊼ *) ∧ (E (Δ'•δ₂, ϕ) _  → A (Δ'•δ₂, ϕ) _);
+    ∧ (E (Δ'•δ₂, ϕ) _  → A (Δ'•δ₂, ϕ) _);
+(* A4 *)
 | Var q → δ := let Δ' := rm (Var q → δ) Δ in
     if decide (Var q ∈ Δ) then A (Δ'•δ, ϕ) _ (* A5 modified *)
     else if decide (p = q) then ⊥
-    else Var q (* ⊼ *) ∧ A (Δ'•δ, ϕ) _; (* A4 *)
+    else Var q ∧ A (Δ'•δ, ϕ) _; (* A4 *)
 (* A6 *)
 | (δ₁ ∧ δ₂)→ δ₃ := let Δ' := rm ((δ₁ ∧ δ₂)→ δ₃) Δ in
   A (Δ'•(δ₁ → (δ₂ → δ₃)), ϕ) _;
@@ -161,7 +152,7 @@ Equations a_rule_env  {Δ : list form} {ϕ : form}
 (* A8 modified*)
 | (δ₁→ δ₂)→ δ₃ := let Δ' := rm ((δ₁→ δ₂)→ δ₃) Δ in
   (E (Δ'•(δ₂ → δ₃) • δ₁, ϕ) _  → A (Δ'•(δ₂ → δ₃) • δ₁, δ₂) _)
-  (* ⊼ *) ∧ A (Δ'• δ₃, ϕ) _;
+  ∧ A (Δ'• δ₃, ϕ) _;
 | Bot := ⊥;
 | Bot → _ := ⊥;
 | □δ := ⊥;
@@ -170,7 +161,6 @@ Equations a_rule_env  {Δ : list form} {ϕ : form}
   let Δ' := rm ((□δ1) → δ2) Δ in
   let Δ'' := □⁻¹ Δ' in
    (□(E(Δ'', ϕ) _  → A(Δ'', δ1) _)) ∧ A(Δ' • δ2, ϕ) _ ;
-(* using (* ⊼ *) ∧ here breaks congruence *)
 (* Default case when we only see diamond on the left. *)
 | ◊δ := ⊥ ;
 (* A19 *)
@@ -195,7 +185,7 @@ Equations a_rule_env17 {Δ : list form} {ϕ : form}
                         (□(E((□⁻¹ Δ'') • δ3, ϕ) _
                            → A((□⁻¹ Δ'') • δ3, δ1) _))
                                   ∧ A(Δ' • δ2, ϕ) _
-  | _ , _ => ⊥ (* default case, quite annoying as it will create a lot of duplicates. *).
+  | _ , _ => ⊥.
 Next Obligation.
 enough ((□⁻¹ rm (◊ δ3) (rm (◊ δ1 → δ2) Δ)) = □⁻¹ rm (◊ δ3) Δ).
 - rewrite H. apply env_order_compat ; cbn ; [ lia | apply l_open_boxes_env_order].
@@ -217,16 +207,15 @@ Equations a_rule_form  {Δ : list form} (ϕ : form)
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form} : form :=
 | Var q :=
-    if decide (p = q) (* TODO : change this to p∈Vars(ϕ) *)
+    if decide (p = q)
     then ⊥
     else Var q; (* A9 *)
 (* A11 *)
-| ϕ₁ ∧ ϕ₂ := A (Δ, ϕ₁) _ (* ⊼ *) ∧ A (Δ, ϕ₂) _;
+| ϕ₁ ∧ ϕ₂ := A (Δ, ϕ₁) _ ∧ A (Δ, ϕ₂) _;
 (* A12 *)
-| ϕ₁ ∨ ϕ₂ := A (Δ, ϕ₁) _ (* ⊻ *) ∨ A (Δ, ϕ₂) _;
+| ϕ₁ ∨ ϕ₂ := A (Δ, ϕ₁) _ ∨ A (Δ, ϕ₂) _;
 (* A13 *)
 | ϕ₁ → ϕ₂ := E (Δ•ϕ₁, ⊥) _  → A (Δ•ϕ₁, ϕ₂) _;
-(* Is it safe to put ⊥ in E? Not sure given the clause for ◊ in a_rule_env *)
 | Bot := ⊥;
 (* A14 *)
 | □δ := □((E ((□⁻¹ Δ), ⊥) _)  → A((□⁻¹ Δ), δ) _)
@@ -554,18 +543,18 @@ Section Correctness.
 Context {p : nat}.
 
 
-(** This section contains the proof of Proposition 5, the main correctness result, stating that the E- and A-formulas defined above are indeed existential and universal propositional quantified versions of the original formula, respectively. *)
+(** This section contains the proof of the main correctness result, 
+  stating that the E- and A-formulas defined above are indeed existential and universal 
+  propositional quantified versions of the original formula, respectively. *)
 
 (** *** (i) Variables *)
 Section VariablesCorrect.
 
 (** In this subsection we prove (i), which states that the variable p no longer
-  occurs in the E- and A-formulas, and that the E- and A-formulas contain no more variables than the original formula.
-  *)
+  occurs in the E- and A-formulas, and that the E- and A-formulas contain no 
+  more variables than the original formula. *)
 
 (* A general tactic for variable occurrences *)
-
-(* I modified it from Hugo's work, but it only partially works. *)
 
 Ltac vars_tac :=
 intros; subst;
@@ -579,8 +568,8 @@ intuition;
 simpl in *; in_tac; try (split; [tauto || auto with *|]); simpl in *;
 try match goal with
 | H : occurs_in _ (?a  → (?b  → ?c)) |- _ => apply occurs_in in H
-| H : occurs_in _ (?a (* ⊻ *) ∨ ?b) |- _ => apply occurs_in in H
-| H : occurs_in _ (?a (* ⊼ *) ∧ ?b) |- _ => apply occurs_in in H
+| H : occurs_in _ (?a ∨ ?b) |- _ => apply occurs_in in H
+| H : occurs_in _ (?a ∧ ?b) |- _ => apply occurs_in in H
 |H1 : ?x0 ∈ (⊗ ?Δ), H2 : occurs_in ?x ?x0 |- _ =>
       apply (occurs_in_map_l_open_boxes _ _ _ H2) in H1
 |H1 : ?x0 ∈ (l_open_boxes ?Δ), H2 : occurs_in ?x ?x0 |- _ =>
@@ -873,7 +862,6 @@ match goal with |- ?d ∖ {[?f]} • _ • _ ⊢ _ => rw (list_to_set_disj_rm Δ
       apply equiv_disj_union_compat_r. ms.
   + apply AndL. exch 0. exch 1. exch 0. apply ImpDiam.
     * remember (A0 ((rm (◊ θ1 → θ2) Δ • θ2)%list, ϕ) (a_rule_env_obligations_obligation_18 Δ ϕ θ1 θ2 Hin)) as ψ.
-      (* Inelegant case distinction but which is proof-theoretically relevant. *)
       destruct (is_box ψ) eqn:E.
       -- rewrite open_boxes_add_t ; auto. exch 0. apply weakening.
          apply weak_ImpL.
@@ -1155,7 +1143,8 @@ End EntailmentCorrect.
 Section PropQuantCorrect.
 
 (** The proof in this section, which is the most complex part of the argument,
-  shows that the E- and A-formulas constructed above are indeed their propositionally quantified versions, that is, *any* formula entailed by the original formula and
+  shows that the E- and A-formulas constructed above are indeed their propositionally
+  quantified versions, that is, *any* formula entailed by the original formula and
   using only variables from that formula except p is already a consequence of
   the E-quantified version, and similarly on the other side for the A-quantifier.
 *)
@@ -1206,7 +1195,6 @@ eapply AndL. eapply list_conjL with (ψ:= e_rule_12 φ1 φ2).
   + trivial.
 Qed.
 
-(* Ian: May need to generalise this lemma to include A16 and A17 (and others?). *)
 Local Lemma A_right  {Γ Δ φ φ'} : ∀ (Hin : φ ∈ Δ),
 Γ ⊢ @a_rule_env p _ _ (λ pe (_ : pe ≺· (Δ, φ')), E p pe.1) (λ pe (_ : pe ≺· (Δ, φ')), A p pe) φ Hin ->
 Γ ⊢ A p (Δ, φ').

@@ -182,28 +182,6 @@ Definition in_map {A : Type} Γ
   in_map_aux Γ f Γ (reflexivity _).
 
 
-(* This function seems to only look at the first two arguments... 
-Program Fixpoint in_map2_aux'' {A : Type} (Γ : list form) (f : forall φ ψ, (φ ∈ Γ) -> (ψ ∈ Γ) -> A)
- Γ' (HΓ' : Γ' ⊆ Γ) : list A:=
-match Γ' with
-| [] => []
-| a:: Γ'' => match Γ'' with
-           | [] => [f a a _ _]
-           | b :: Γ''' => (f a a _ _) :: (f b b _ _) :: (f a b _ _) :: in_map2_aux'' Γ f Γ''' _
-           end
-end.
-Next Obligation.
-intros. auto with *.
-Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed. *)
-
 Program Fixpoint in_map2_aux {A : Type} (Γ : list form) (f : forall φ ψ, (φ ∈ Γ) -> (ψ ∈ Γ) -> A)
  Γ' (HΓ' : Γ' ⊆ Γ) : list A :=
 match Γ' with
@@ -213,35 +191,10 @@ end.
 Next Obligation. intros. auto with *. Qed.
 Next Obligation. intros. auto with *. Qed.
 
-(* Program Fixpoint in_map2_aux' {A : Type} (Γ : list form) (f : forall φ ψ, (φ ∈ Γ) -> (ψ ∈ Γ) -> A)
- Γ' (HΓ' : Γ' ⊆ Γ) : list A:=
-match Γ' with
-| [] => []
-| a:: Γ'' => (f a a _ _) :: in_map_aux Γ (fun ϕ (Hin : ϕ ∈ Γ) => f a ϕ _ Hin) (a :: Γ'') _ ++ in_map2_aux Γ f Γ'' _
-end.
-Next Obligation. intros. auto with *. Qed.
-Next Obligation. auto with *. Qed.
-Next Obligation. auto with *. Qed. *)
-
 Definition in_map2 {A : Type} Γ
   (f : forall φ ψ, (φ ∈ Γ) -> (ψ ∈ Γ) -> A) : list A :=
   in_map2_aux Γ f Γ (reflexivity _).
 
-(* Definition in_map2' {A : Type} Γ
-  (f : forall φ ψ, (φ ∈ Γ) -> (ψ ∈ Γ) -> A) : list A :=
-  in_map2_aux' Γ f Γ (reflexivity _). *)
-
-(* Fixpoint flatten {A : Type} (l : list (list A)) : list A :=
-match l with
-| [] => [] 
-| la :: l' => la ++ flatten l'
-end.
-
-Definition in_map2'' {A : Type} Γ
-  (f : forall φ ψ, (φ ∈ Γ) -> (ψ ∈ Γ) -> A) : list A := 
-  (flatten (in_map Γ (fun δ (Hinδ : δ ∈ Γ) => in_map Γ (fun χ (Hinχ : χ ∈ Γ) => f δ χ Hinδ Hinχ)))) ++ 
-  (flatten (in_map Γ (fun δ (Hinδ : δ ∈ Γ) => in_map Γ (fun χ (Hinχ : χ ∈ Γ) => f χ δ Hinχ Hinδ)))).
-  (* PRobably need to do the reverse as well... *) *)
 
 (* This generalises to any type. decidability of equality over this type is necessary for a result in "Type" *)
 Lemma in_in_map {A : Type} {HD : forall a b : A, Decision (a = b)}
@@ -279,7 +232,6 @@ Local Definition in_subset {Γ : env} {Γ'} (Hi : Γ' ⊆ elements Γ) {ψ0} (Hi
 Proof. apply gmultiset_elem_of_elements,Hi, Hin. Defined.
 
 (* converse *)
-(* we require proof irrelevance for the mapped function *)
 Lemma in_map_in {A : Type} {HD : forall a b : A, Decision (a = b)}
   {Γ} {f : forall φ, (φ ∈ Γ) -> A} {ψ0} (Hin : ψ0 ∈ Γ):
   {Hin' | f ψ0 Hin' ∈ (in_map Γ f)}.
@@ -758,17 +710,6 @@ Qed.
 Lemma is_not_box_open_box φ : is_box φ = false -> (⊙φ) = φ.
 Proof. unfold is_box. dependent destruction φ; simpl; intuition. discriminate. Qed.
 
-(* Lemma open_boxes_spec' Γ φ :
-    {_ : φ ∈ Γ & is_box φ = false}
-  + {HK : φ = ψ & ((□ ψ) ∈ Γ)} -> φ ∈ open_boxes Γ.
-Proof.
-intros [[Hin Heq] | [HK Hin]];
-unfold open_boxes; apply elem_of_list_to_set_disj, elem_of_list_In, in_map_iff.
-- exists φ. apply is_not_box_open_box in Heq. rewrite Heq. split; trivial.
-  now apply elem_of_list_In,  gmultiset_elem_of_elements.
-- subst. exists (□ φ). simpl. split; trivial. now apply elem_of_list_In,  gmultiset_elem_of_elements.
-Qed. *)
-
 Lemma In_open_boxes_t (Γ : env) φ : is_box φ = true -> (φ ∈ Γ) -> open_box φ ∈ open_boxes Γ.
 Proof.
 intros Hφ Hin. apply difference_singleton in Hin.
@@ -789,8 +730,6 @@ induction l as [| a l].
 - cbn. destruct (is_box a) ; auto. setoid_rewrite gmultiset_elements_disj_union.
   rewrite IHl. setoid_rewrite gmultiset_elements_singleton. trivial.
 Qed.
-
-(* Probably need to do somethin similar for diamonds. *)
 
 Lemma list_to_set_disj_env_add Δ v:
   ((list_to_set_disj Δ : env) • v : env) ≡ list_to_set_disj (v :: Δ).
@@ -900,7 +839,6 @@ Global Hint Rewrite (@open_boxes_remove_t) : proof.
 Global Hint Rewrite (@open_boxes_remove_f) : proof.
 Global Hint Rewrite (@open_boxes_singleton_t): proof.
 Global Hint Rewrite (@open_boxes_singleton_f): proof.
-(* Global Hint Resolve open_boxes_spec' : proof. *)
 
 
 Lemma elements_list_to_set_disj (Γ : env) : (≡@{env}) Γ (list_to_set_disj (elements Γ)).

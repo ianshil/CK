@@ -8,7 +8,6 @@ From Stdlib Require Import Program.Equality.
 Local Hint Rewrite @elements_env_add : order.
 
 
-(* From "A New Calculus for Intuitionistic Strong Löb Logic" *)
 Theorem additive_cut Γ φ ψ :
   Γ ⊢ φ  -> Γ • φ ⊢ ψ ->
   Γ ⊢ ψ.
@@ -36,8 +35,7 @@ destruct HPφ; simpl in Hw.
   + exch 0. eapply (OrL_rev _ φ ψ0). exch 0. exact HPψ.
   + otac Heq.
   + exch 0. eapply (OrL_rev _ φ ψ0). exch 0. exact HPψ.
-- (* (V) *) (* hard:  *)
-(* START *)
+- (* (V) *)
   remember (Γ • (φ → ψ0)) as Γ' eqn:HH.
   assert (Heq: Γ ≡ Γ' ∖ {[ φ → ψ0]}) by ms.
   assert(Hin : (φ → ψ0) ∈ Γ')by ms.
