@@ -1,0 +1,36 @@
+opam-version: "2.0"
+synopsis: "Rocq library for intuitionistic modal logics between CK and IK"
+
+homepage: "https://github.com/ianshil/CK"
+dev-repo: "git+https://github.com/ianshil/CK.git"
+bug-reports: "https://github.com/ianshil/CK/issues"
+doc: "https://ianshil.github.io/CK"
+maintainer: "i.b.p.shillito@bham.ac.uk"
+authors: [
+  "Ian Shillito"
+]
+license: "CECILL-2.1"
+
+depends: [
+  "rocq-prover" {>= "9.0.0"}
+  "coq-stdpp" {>= "1.11.0"}
+  "rocq-equations" {>="1.3.1"}
+]
+
+build: [
+  [make "-j%{jobs}%"]
+]
+install: [
+  [make "install"]
+]
+
+
+tags: [
+  "date:2026-01-14"
+  "keyword:intuitionistic logic"
+  "keyword:proof theory"
+  "category:Computer Science/Decision Procedures and Certified Algorithms/Decision procedures"
+  "category:Mathematics/Logic/Foundations"
+  "category:Mathematics/Logic/Modal logic"
+  "logpath:CK"
+]
