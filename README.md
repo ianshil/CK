@@ -3,7 +3,7 @@
 This library gathers results on intuitionistic modal logics, with both diamond and box, between CK and IK.
 This far, it contains two distinct project:
 
-- **Semantical Analysis of Intuitionistic Modal Logics between CK and IK:** This project formalises (non-)conservativity results between the intuitionistic modal logics CK and IK, via semantic means (see branch LICS2025). The results of this project were published in [a paper]((https://ieeexplore.ieee.org/document/11186337/) at LICS 2025.
+- **Semantical Analysis of Intuitionistic Modal Logics between CK and IK:** This project formalises (non-)conservativity results between the intuitionistic modal logics CK and IK, via semantic means (see branch LICS2025). The results of this project were published in [a paper](https://ieeexplore.ieee.org/document/11186337/) at LICS 2025.
 - **Uniform interpolation for CK and WK**: This project formalises terminating calculi for CK and WK, and their exploitation in a proof of uniform interpolation for the two logics (see branch uniform_interpolation).
 
 ## Building
