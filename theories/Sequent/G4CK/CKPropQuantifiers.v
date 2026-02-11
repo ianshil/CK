@@ -1,9 +1,9 @@
 (** * Propositional Quantifiers
 
-The main theorem proved in this file was first proved as Theorem 1 in:
+The main theorem proved in this file is an adaptation of what was first proved as Theorem 1 in:
 
 (Pitts 1992). A. M. Pitts. On an interpretation of second order quantification in first order intuitionistic propositional logic. J. Symb. Log., 57(1):33–52.
-It has been further extended to handle CK
+It has been further extended to handle WK
 
 It consists of two parts:
 
@@ -26,9 +26,7 @@ Section PropQuantDefinition.
 (** Throughout the construction and proof, we fix a variable p, with respect to
   which the propositional quantifier will be computed. *)
 Variable p : nat.
-(** We define the formulas Eφ and Aφ associated to any formula φ. This
-  is an implementation of Pitts' Table 5, together with a (mostly automatic)
-  proof that the definition terminates*)
+(** We define the formulas Eφ and Aφ associated to any formula φ. *)
 
 (* solves the obligations of the following programs *)
 Obligation Tactic := intros; repeat rewrite <- Eqdep.EqdepTheory.eq_rect_eq in * ; order_tac.
@@ -44,8 +42,8 @@ Equations e_rule {Δ : list form} {ϕ : form }
 (* E0 *)
 | ⊥ := ⊥;
 | Var q :=
-  if decide (p = q) then ⊤ (* default *)
-  else # q (* E1 modified *);
+  if decide (p = q) then ⊤ (* E1'' *)
+  else # q (* E1' *);
 (* E2 *)
 | δ₁ ∧ δ₂ := let Δ' := rm (δ₁ ∧ δ₂) Δ in
   E (Δ' • δ₁ • δ₂, ⊥) _;
@@ -53,16 +51,16 @@ Equations e_rule {Δ : list form} {ϕ : form }
 | δ₁ ∨ δ₂ := let Δ' := rm (δ₁ ∨ δ₂) Δ in
   E (Δ' • δ₁, ϕ) _ ∨ E (Δ' • δ₂, ϕ) _;
 | Var q → δ := let Δ' := rm (Var q → δ) Δ in
-    if decide (Var q ∈ Δ) then E (Δ'•δ, ϕ) _ (* E5 *)
-    else if decide (p = q) then ⊤
-    else # q  → E (Δ'•δ, ϕ) _ ; (* E4 *)
+    if decide (Var q ∈ Δ) then E (Δ'•δ, ϕ) _ (* E5' *)
+    else if decide (p = q) then ⊤  (* E4'' *)
+    else # q  → E (Δ'•δ, ϕ) _ ; (* E4' *)
 (* E6 *)
 | (δ₁ ∧ δ₂)→ δ₃ := let Δ' := rm ((δ₁ ∧ δ₂)→ δ₃) Δ in
   E (Δ'•(δ₁ → (δ₂ → δ₃)), ϕ) _;
 (* E7 *)
 | (δ₁ ∨ δ₂)→ δ₃ := let Δ' := rm ((δ₁ ∨ δ₂)→ δ₃) Δ in
   E (Δ' • (δ₁ → δ₃)•(δ₂ → δ₃), ϕ) _;
-(* E8 modified *)
+(* E8' *)
 | (δ₁ → δ₂ )→ δ₃ := let Δ' := rm ((δ₁ → δ₂)→ δ₃) Δ in
   (E (Δ'•(δ₂ → δ₃) • δ₁, ϕ) _  → A (Δ'•(δ₂ → δ₃) • δ₁, δ₂) _)  → E (Δ'• δ₃, ϕ) _;
 | ⊥ → _ := ⊤;
@@ -84,9 +82,11 @@ Equations e_rule {Δ : list form} {ϕ : form }
 Equations e_rule_9 (Δ : list form) {ϕ : form}
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form} : form :=
+  (* Default case when the context is empty *) 
   | [] := ⊤
+  (* E9 *)
   | ψ :: Δ := let Δ' := □⁻¹ (ψ :: Δ) in 
-              (□ E (Δ' , ϕ) _).
+              (□ E (Δ' , ϕ) _). (* Unboxing of the context *)
 Next Obligation.
 destruct (is_box ψ) eqn:E0.
 - destruct ψ ; cbn ; cbn in E0 ; try discriminate ; auto.
@@ -98,11 +98,13 @@ Equations e_rule_12 {Δ : list form} {ϕ : form}
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   (θ₁ θ₂ : form) {Hin1 : θ₁ ∈ Δ} {Hin2 : θ₂ ∈ Δ} : form :=
+  (* E12 *)
   | ◊ δ1 → δ2, ◊ δ3 => let Δ' := rm (◊ δ1 → δ2) Δ in
                        let Δ'' := rm (◊δ3) Δ' in
                         (□(E((□⁻¹ Δ'') • δ3, ϕ) _
                            → A((□⁻¹ Δ'') • δ3, δ1) _))
                            → E(Δ' • δ2, ϕ) _
+  (* Default case *)
   | _ , _ => ⊤.
 Next Obligation.
 enough ((□⁻¹ rm (◊ δ3) (rm (◊ δ1 → δ2) Δ)) = □⁻¹ rm (◊ δ3) Δ).
@@ -123,6 +125,12 @@ Qed.
 
 Hint Extern 2 (_ <= _) => lia : order.
 
+(** The implementation of the rules for defining A is separated into three pieces.
+    Referring to Figure 3 in our paper,
+    the definition a_rule_env handles A1-8 and A10 and A15 and A16 and A19,
+    the definition a_rule_env17 handles A17,
+    and the definition a_rule_form handles A9 and A11-14 and A18. *)
+
 Equations a_rule_env  {Δ : list form} {ϕ : form}
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
@@ -130,8 +138,8 @@ Equations a_rule_env  {Δ : list form} {ϕ : form}
 | Var q :=
     if decide (p = q) then
       if decide (Var p = ϕ) then ⊤ (* A10 *)
-      else ⊥
-    else ⊥; (* A1 modified : A (Δ', ϕ) can be removed *)
+      else ⊥ (* A1'' *)
+    else ⊥; (* A1' *)
 (* A2 *)
 | δ₁ ∧ δ₂ := let Δ' := rm (δ₁ ∧ δ₂) Δ in A ((Δ'•δ₁)•δ₂, ϕ) _;
 (* A3 *)
@@ -140,19 +148,20 @@ Equations a_rule_env  {Δ : list form} {ϕ : form}
     ∧ (E (Δ'•δ₂, ϕ) _  → A (Δ'•δ₂, ϕ) _);
 (* A4 *)
 | Var q → δ := let Δ' := rm (Var q → δ) Δ in
-    if decide (Var q ∈ Δ) then A (Δ'•δ, ϕ) _ (* A5 modified *)
-    else if decide (p = q) then ⊥
-    else Var q ∧ A (Δ'•δ, ϕ) _; (* A4 *)
+    if decide (Var q ∈ Δ) then A (Δ'•δ, ϕ) _ (* A5'  *)
+    else if decide (p = q) then ⊥ (* A4'' *)
+    else Var q ∧ A (Δ'•δ, ϕ) _; (* A4' *)
 (* A6 *)
 | (δ₁ ∧ δ₂)→ δ₃ := let Δ' := rm ((δ₁ ∧ δ₂)→ δ₃) Δ in
   A (Δ'•(δ₁ → (δ₂ → δ₃)), ϕ) _;
 (* A7 *)
 | (δ₁ ∨ δ₂)→ δ₃ := let Δ' := rm ((δ₁ ∨ δ₂)→ δ₃) Δ in
   A ((Δ'•(δ₁ → δ₃))•(δ₂ → δ₃), ϕ) _;
-(* A8 modified*)
+(* A8' *)
 | (δ₁→ δ₂)→ δ₃ := let Δ' := rm ((δ₁→ δ₂)→ δ₃) Δ in
   (E (Δ'•(δ₂ → δ₃) • δ₁, ϕ) _  → A (Δ'•(δ₂ → δ₃) • δ₁, δ₂) _)
   ∧ A (Δ'• δ₃, ϕ) _;
+(* The three next cases are default cases  *)
 | Bot := ⊥;
 | Bot → _ := ⊥;
 | □δ := ⊥;
@@ -172,19 +181,23 @@ Equations a_rule_env_form16  {Δ : list form} (ϕ : form)
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   (θ: form) {Hin : θ ∈ Δ} : form :=
+(* A16 *)
 | ◊ψ , ◊δ := let Δ' := rm (◊δ) Δ in
               (□(E(□⁻¹ Δ' • δ, ψ) _  → A(□⁻¹ Δ' • δ , ψ) _)) ;
+(* Default case *)
 | _ , _ := ⊥.
 
 Equations a_rule_env17 {Δ : list form} {ϕ : form}
   {E : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form}
   (θ₁ θ₂ : form) {Hin1 : θ₁ ∈ Δ} {Hin2 : θ₂ ∈ Δ} : form :=
+  (* A17 *)
   | ◊ δ1 → δ2, ◊ δ3 => let Δ' := rm (◊ δ1 → δ2) Δ in
                        let Δ'' := rm (◊δ3) Δ' in
                         (□(E((□⁻¹ Δ'') • δ3, ϕ) _
                            → A((□⁻¹ Δ'') • δ3, δ1) _))
                                   ∧ A(Δ' • δ2, ϕ) _
+  (* Default case *)
   | _ , _ => ⊥.
 Next Obligation.
 enough ((□⁻¹ rm (◊ δ3) (rm (◊ δ1 → δ2) Δ)) = □⁻¹ rm (◊ δ3) Δ).
@@ -208,7 +221,7 @@ Equations a_rule_form  {Δ : list form} (ϕ : form)
   {A : ∀ pe (Hpe : pe ≺· (Δ, ϕ)), form} : form :=
 | Var q :=
     if decide (p = q)
-    then ⊥
+    then ⊥  (* Default case *)
     else Var q; (* A9 *)
 (* A11 *)
 | ϕ₁ ∧ ϕ₂ := A (Δ, ϕ₁) _ ∧ A (Δ, ϕ₂) _;
@@ -241,8 +254,8 @@ EA false pe :=
   let ϕ := pe.2 in
   let E pe H := EA true pe in
   let A pe H := EA false pe in
-    list_disj ((@a_rule_form Δ ϕ E A) (* A11-14,18*)
-    :: (in_map Δ (@a_rule_env Δ ϕ E A)) (* A1-8,10,15,19 *)
+    list_disj ((@a_rule_form Δ ϕ E A) (* A9,11-14,18 *)
+    :: (in_map Δ (@a_rule_env Δ ϕ E A)) (* A0-8,10,15,19 *)
     ++ (in_map Δ (@a_rule_env_form16 Δ ϕ E A)) (* A16 *)
     ++ (in_map2 Δ (@a_rule_env17 Δ ϕ E A))) (* A17 *). 
     
@@ -259,8 +272,9 @@ Definition Af (ψ : form) := (A ([], ψ)).
 
 End PropQuantDefinition.
 
-(** Congruence lemmas: if we apply any of e_rule, e_rule_9, e_rule_12, a_rule_env, or a_rule_form
-  to two equal environments, then they give the same results. *)
+(** Congruence lemmas: if we apply any of e_rule, e_rule_9, e_rule_12, a_rule_env, 
+    a_rule_env17, a_rule_env_form16 or a_rule_form to two equal environments,
+    then they give the same results. *)
 
 
 Lemma e_rules_cong p Δ ϕ:
@@ -2315,5 +2329,3 @@ intros Hp φ Hvarsφ; repeat split.
       * simpl. peapply Hyp.
       * rewrite E_of_empty. ms.
 Qed.
-
-
